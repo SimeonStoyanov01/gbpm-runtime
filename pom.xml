@@ -1,46 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.6</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
-    <groupId>cs.rug</groupId>
-    <artifactId>demo</artifactId>
+
+    <groupId>cs.rug.gbpmruntime</groupId>
+    <artifactId>gbpmruntime</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo</name>
-    <description>Minimal Spring Boot Camunda Zeebe worker</description>
+    <packaging>pom</packaging>
+
+    <name>GBPMRuntime</name>
+    <description>Runtime environmental monitoring prototype for BPMN process execution.</description>
+
     <properties>
         <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>camunda-spring-boot-starter</artifactId>
-            <version>8.9.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>gbpmruntime-common</module>
+        <module>gbpmruntime-process-registry</module>
+        <module>gbpmruntime-engine-integration</module>
+        <module>gbpmruntime-observation</module>
+        <module>gbpmruntime-messaging</module>
+        <module>gbpmruntime-calculation</module>
+        <module>gbpmruntime-aggregation</module>
+        <module>gbpmruntime-evaluation</module>
+        <module>gbpmruntime-results</module>
+        <module>gbpmruntime-violations</module>
+        <module>gbpmruntime-bootstrap</module>
+    </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.38</version>
+                <optional>true</optional>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
