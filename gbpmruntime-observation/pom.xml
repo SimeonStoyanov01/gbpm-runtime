@@ -19,10 +19,5 @@
             <artifactId>gbpmruntime-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>gbpmruntime-process-registry</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>
