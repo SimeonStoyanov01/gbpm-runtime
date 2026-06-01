@@ -3,6 +3,12 @@ package cs.rug.gbpmruntime.processregistry.infrastructure.rest;
 import cs.rug.gbpmruntime.processregistry.api.operations.deployprocess.DeployProcessDefinitionOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.deployprocess.DeployProcessDefinitionRequest;
 import cs.rug.gbpmruntime.processregistry.api.operations.deployprocess.DeployProcessDefinitionResponse;
+import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsOperation;
+import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsRequest;
+import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsResponse;
+import cs.rug.gbpmruntime.processregistry.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsOperation;
+import cs.rug.gbpmruntime.processregistry.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsRequest;
+import cs.rug.gbpmruntime.processregistry.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsResponse;
 import cs.rug.gbpmruntime.processregistry.api.operations.getprocessdefinition.GetProcessDefinitionOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.getprocessdefinition.GetProcessDefinitionRequest;
 import cs.rug.gbpmruntime.processregistry.api.operations.getprocessdefinition.GetProcessDefinitionResponse;
@@ -33,6 +39,8 @@ public class ProcessRegistryController {
     private final DeployProcessDefinitionOperation deployProcessDefinitionOperation;
     private final StartProcessInstanceOperation startProcessInstanceOperation;
     private final GetProcessDefinitionOperation getProcessDefinitionOperation;
+    private final FindActivityKeiAnnotationsOperation findActivityKeiAnnotationsOperation;
+    private final FindProcessKeiAnnotationsOperation findProcessKeiAnnotationsOperation;
 
     @PostMapping(value = "/deploy", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DeployProcessDefinitionResponse> deployProcessDefinition(
@@ -70,5 +78,29 @@ public class ProcessRegistryController {
                 .processDefinitionKey(processDefinitionKey)
                 .build();
         return ResponseEntity.ok(getProcessDefinitionOperation.process(request));
+    }
+
+    @GetMapping("/{processDefinitionKey}/activities/{bpmnElementId}/keis")
+    public ResponseEntity<FindActivityKeiAnnotationsResponse> findActivityKeiAnnotations(
+            @PathVariable Long processDefinitionKey,
+            @PathVariable String bpmnElementId
+    ) {
+        FindActivityKeiAnnotationsRequest request = FindActivityKeiAnnotationsRequest
+                .builder()
+                .processDefinitionKey(processDefinitionKey)
+                .bpmnElementId(bpmnElementId)
+                .build();
+        return ResponseEntity.ok(findActivityKeiAnnotationsOperation.process(request));
+    }
+
+    @GetMapping("/{processDefinitionKey}/keis")
+    public ResponseEntity<FindProcessKeiAnnotationsResponse> findProcessKeiAnnotations(
+            @PathVariable Long processDefinitionKey
+    ) {
+        FindProcessKeiAnnotationsRequest request = FindProcessKeiAnnotationsRequest
+                .builder()
+                .processDefinitionKey(processDefinitionKey)
+                .build();
+        return ResponseEntity.ok(findProcessKeiAnnotationsOperation.process(request));
     }
 }
