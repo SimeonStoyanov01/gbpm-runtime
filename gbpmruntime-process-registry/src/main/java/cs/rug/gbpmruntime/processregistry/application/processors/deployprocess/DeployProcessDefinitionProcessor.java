@@ -1,14 +1,14 @@
 package cs.rug.gbpmruntime.processregistry.application.processors.deployprocess;
 
-import cs.rug.gbpmruntime.engineintegration.api.operations.deployprocess.DeployProcessToEngineOperation;
-import cs.rug.gbpmruntime.engineintegration.api.operations.deployprocess.DeployProcessToEngineRequest;
-import cs.rug.gbpmruntime.engineintegration.api.operations.deployprocess.DeployProcessToEngineResponse;
 import cs.rug.gbpmruntime.processregistry.api.operations.deployprocess.DeployProcessDefinitionOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.deployprocess.DeployProcessDefinitionRequest;
 import cs.rug.gbpmruntime.processregistry.api.operations.deployprocess.DeployProcessDefinitionResponse;
 import cs.rug.gbpmruntime.processregistry.application.bpmn4es.Bpmn4esKeiAnnotationParser;
 import cs.rug.gbpmruntime.processregistry.application.bpmn4es.ElementKeiAnnotations;
 import cs.rug.gbpmruntime.processregistry.application.registry.ProcessKeiAnnotationRegistry;
+import cs.rug.gbpmruntime.processregistry.infrastructure.clients.Camunda8IntegrationClient;
+import cs.rug.gbpmruntime.processregistry.infrastructure.clients.dto.deployprocess.DeployProcessToEngineRequest;
+import cs.rug.gbpmruntime.processregistry.infrastructure.clients.dto.deployprocess.DeployProcessToEngineResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DeployProcessDefinitionProcessor implements DeployProcessDefinitionOperation {
 
-    private final DeployProcessToEngineOperation deployProcessToEngineOperation;
+    private final Camunda8IntegrationClient camunda8IntegrationClient;
     private final Bpmn4esKeiAnnotationParser bpmn4esKeiAnnotationParser;
     private final ProcessKeiAnnotationRegistry processKeiAnnotationRegistry;
 
@@ -29,12 +29,10 @@ public class DeployProcessDefinitionProcessor implements DeployProcessDefinition
                 .builder()
                 .resourceName(request.getResourceName())
                 .resourceContent(request.getBpmnXml())
-                .targetEngine(request.getTargetEngine())
                 .build();
 
-
-        DeployProcessToEngineResponse deployProcessToEngineResponse = deployProcessToEngineOperation
-                .process(deployProcessToEngineRequest);
+        DeployProcessToEngineResponse deployProcessToEngineResponse = camunda8IntegrationClient
+                .deployProcessDefinition(deployProcessToEngineRequest);
 
         List<ElementKeiAnnotations> elementKeiAnnotations = bpmn4esKeiAnnotationParser
                 .parse(request.getBpmnXml());

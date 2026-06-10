@@ -1,9 +1,21 @@
-camunda:
-  client:
-    mode: self-managed
-    auth:
-      method: none
-    rest-address: http://localhost:8088
-    grpc-address: http://localhost:26500
+spring:
+  rabbitmq:
+    host: ${GBPMRUNTIME_RABBITMQ_HOST:localhost}
+    port: ${GBPMRUNTIME_RABBITMQ_PORT:5672}
+    username: ${GBPMRUNTIME_RABBITMQ_USERNAME:gbpmruntime}
+    password: ${GBPMRUNTIME_RABBITMQ_PASSWORD:gbpmruntime}
 
+gbpmruntime:
+  observation:
+    messaging:
+      engine-events:
+        queue-name: ${GBPMRUNTIME_OBSERVATION_ENGINE_EVENTS_QUEUE:gbpmruntime.observation.engine-task-completed}
+        bindings:
+          - exchange-name: ${GBPMRUNTIME_CAMUNDA8_ENGINE_EVENTS_EXCHANGE:gbpmruntime.camunda8.events}
+            routing-key: ${GBPMRUNTIME_CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY:engine.task.completed}
+      kei-observation-events:
+        exchange-name: ${GBPMRUNTIME_KEI_OBSERVATION_EXCHANGE:gbpmruntime.observation.events}
+        routing-key: ${GBPMRUNTIME_KEI_OBSERVATION_ROUTING_KEY:kei.observation.created}
 
+camunda8-integration:
+  url: ${CAMUNDA8_INTEGRATION_URL:http://localhost:8090}

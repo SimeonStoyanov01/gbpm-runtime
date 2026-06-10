@@ -1,8 +1,0 @@
-package cs.rug.gbpmruntime.engineintegration.api.exceptions;
-
-public class EngineProcessStartException extends RuntimeException {
-
-    public EngineProcessStartException(String message) {
-        super(message);
-    }
-}
