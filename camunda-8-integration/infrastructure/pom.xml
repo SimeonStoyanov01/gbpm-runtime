@@ -5,28 +5,37 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>cs.rug.gbpmruntime</groupId>
-        <artifactId>gbpmruntime</artifactId>
+        <groupId>cs.rug.camunda8integration</groupId>
+        <artifactId>camunda-8-integration</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>gbpmruntime-observation</artifactId>
-    <name>GBPMRuntime Observation</name>
+    <artifactId>infrastructure</artifactId>
+    <name>Camunda 8 Integration Infrastructure</name>
 
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>gbpmruntime-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>gbpmruntime-process-registry</artifactId>
-            <version>${project.version}</version>
+            <groupId>io.camunda</groupId>
+            <artifactId>camunda-spring-boot-starter</artifactId>
+            <version>${camunda.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
