@@ -1,8 +1,8 @@
 package cs.rug.gbpmruntime.processregistry.infrastructure.memory;
 
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.KeiMetadata;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.ElementKeiAnnotations;
-import cs.rug.gbpmruntime.processregistry.application.registry.ProcessKeiAnnotationRegistry;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.KeiMetadata;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.ElementKeiAnnotations;
+import cs.rug.gbpmruntime.processregistry.application.out.keiregistry.ProcessKeiAnnotationRegistry;
 
 import org.springframework.stereotype.Component;
 

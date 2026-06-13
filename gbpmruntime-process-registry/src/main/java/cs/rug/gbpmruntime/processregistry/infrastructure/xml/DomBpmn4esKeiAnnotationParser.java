@@ -1,9 +1,9 @@
 package cs.rug.gbpmruntime.processregistry.infrastructure.xml;
 
 import cs.rug.gbpmruntime.processregistry.api.exceptions.InvalidProcessDefinitionException;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.Bpmn4esKeiAnnotationParser;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.ElementKeiAnnotations;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.KeiMetadata;
+import cs.rug.gbpmruntime.processregistry.application.out.bpmn4es.Bpmn4esKeiAnnotationParser;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.ElementKeiAnnotations;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.KeiMetadata;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

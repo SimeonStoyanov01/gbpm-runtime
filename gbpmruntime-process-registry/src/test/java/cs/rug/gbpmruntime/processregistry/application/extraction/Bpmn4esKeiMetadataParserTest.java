@@ -2,8 +2,8 @@ package cs.rug.gbpmruntime.processregistry.application.extraction;
 
 import org.junit.jupiter.api.Test;
 
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.KeiMetadata;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.ElementKeiAnnotations;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.KeiMetadata;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.ElementKeiAnnotations;
 import cs.rug.gbpmruntime.processregistry.infrastructure.xml.DomBpmn4esKeiAnnotationParser;
 
 import java.nio.charset.StandardCharsets;

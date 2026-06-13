@@ -4,8 +4,8 @@ import cs.rug.gbpmruntime.processregistry.api.model.KeiAnnotationModel;
 import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsRequest;
 import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsResponse;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.KeiMetadata;
-import cs.rug.gbpmruntime.processregistry.application.registry.ProcessKeiAnnotationRegistry;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.KeiMetadata;
+import cs.rug.gbpmruntime.processregistry.application.out.keiregistry.ProcessKeiAnnotationRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

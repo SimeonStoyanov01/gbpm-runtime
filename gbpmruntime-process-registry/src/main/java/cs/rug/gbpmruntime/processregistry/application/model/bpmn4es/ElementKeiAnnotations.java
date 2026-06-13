@@ -1,4 +1,4 @@
-package cs.rug.gbpmruntime.processregistry.application.bpmn4es;
+package cs.rug.gbpmruntime.processregistry.application.model.bpmn4es;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

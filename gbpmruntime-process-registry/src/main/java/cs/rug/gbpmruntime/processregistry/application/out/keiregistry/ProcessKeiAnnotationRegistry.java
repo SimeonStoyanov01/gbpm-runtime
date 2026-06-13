@@ -1,7 +1,7 @@
-package cs.rug.gbpmruntime.processregistry.application.registry;
+package cs.rug.gbpmruntime.processregistry.application.out.keiregistry;
 
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.KeiMetadata;
-import cs.rug.gbpmruntime.processregistry.application.bpmn4es.ElementKeiAnnotations;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.KeiMetadata;
+import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.ElementKeiAnnotations;
 
 import java.util.List;
 
