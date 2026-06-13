@@ -1,26 +1,25 @@
-package cs.rug.camunda8integration.infrastructure.rabbitmq;
+package cs.rug.camunda8integration.infrastructure.messaging.outbound;
 
-import cs.rug.camunda8integration.api.operations.publishenginetaskcompleted.PublishEngineTaskCompletedEventOperation;
-import cs.rug.camunda8integration.api.operations.publishenginetaskcompleted.PublishEngineTaskCompletedEventRequest;
-import cs.rug.camunda8integration.api.operations.publishenginetaskcompleted.PublishEngineTaskCompletedEventResponse;
+import cs.rug.camunda8integration.api.events.enginetaskcompleted.EngineTaskCompletedEvent;
+import cs.rug.camunda8integration.application.out.EngineTaskCompletedEventPublisher;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-@Service
-public class EngineTaskCompletedEventPublisher implements PublishEngineTaskCompletedEventOperation {
+@Component
+public class RabbitEngineTaskCompletedEventPublisher implements EngineTaskCompletedEventPublisher {
 
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
     private final String exchangeName;
     private final String routingKey;
 
-    public EngineTaskCompletedEventPublisher(
+    public RabbitEngineTaskCompletedEventPublisher(
             RabbitTemplate rabbitTemplate,
             ObjectMapper objectMapper,
             @Value("${camunda8integration.messaging.engine-task-completed.exchange-name}") String exchangeName,
@@ -33,24 +32,18 @@ public class EngineTaskCompletedEventPublisher implements PublishEngineTaskCompl
     }
 
     @Override
-    public PublishEngineTaskCompletedEventResponse process(PublishEngineTaskCompletedEventRequest request) {
+    public void publish(EngineTaskCompletedEvent event) {
         rabbitTemplate.send(
                 exchangeName,
                 routingKey,
-                buildJsonMessage(request)
+                buildJsonMessage(event)
         );
-
-        return PublishEngineTaskCompletedEventResponse
-                .builder()
-                .eventId(request.getEvent().getEventId())
-                .published(true)
-                .build();
     }
 
-    private Message buildJsonMessage(PublishEngineTaskCompletedEventRequest request) {
+    private Message buildJsonMessage(EngineTaskCompletedEvent event) {
         try {
             return MessageBuilder
-                    .withBody(objectMapper.writeValueAsBytes(request.getEvent()))
+                    .withBody(objectMapper.writeValueAsBytes(event))
                     .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                     .build();
         } catch (JacksonException exception) {

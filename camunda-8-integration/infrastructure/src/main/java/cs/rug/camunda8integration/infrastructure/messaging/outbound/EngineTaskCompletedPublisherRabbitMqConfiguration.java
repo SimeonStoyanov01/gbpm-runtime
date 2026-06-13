@@ -1,4 +1,4 @@
-package cs.rug.camunda8integration.infrastructure.rabbitmq;
+package cs.rug.camunda8integration.infrastructure.messaging.outbound;
 
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;

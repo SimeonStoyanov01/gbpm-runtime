@@ -4,48 +4,22 @@ import cs.rug.camunda8integration.api.exceptions.EngineProcessStartException;
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineOperation;
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineRequest;
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineResponse;
-import io.camunda.client.CamundaClient;
-import io.camunda.client.api.response.ProcessInstanceEvent;
+import cs.rug.camunda8integration.application.out.Camunda8CommandClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class StartProcessInEngineProcessor implements StartProcessInEngineOperation {
 
-    private final CamundaClient camundaClient;
+    private final Camunda8CommandClient camunda8CommandClient;
 
     @Override
     public StartProcessInEngineResponse process(StartProcessInEngineRequest request) {
         try {
-            ProcessInstanceEvent processInstanceEvent = camundaClient
-                    .newCreateInstanceCommand()
-                    .processDefinitionKey(Long.parseLong(request.getProcessDefinitionKey()))
-                    .variables(normalizeVariables(request.getVariables()))
-                    .send()
-                    .join();
-
-            return StartProcessInEngineResponse
-                    .builder()
-                    .processDefinitionKey(String.valueOf(processInstanceEvent.getProcessDefinitionKey()))
-                    .bpmnProcessId(processInstanceEvent.getBpmnProcessId())
-                    .version(processInstanceEvent.getVersion())
-                    .processInstanceKey(String.valueOf(processInstanceEvent.getProcessInstanceKey()))
-                    .tenantId(processInstanceEvent.getTenantId())
-                    .build();
+            return camunda8CommandClient.startProcess(request);
         } catch (Exception exception) {
             throw new EngineProcessStartException("Failed to start process instance in Camunda 8.", exception);
         }
-    }
-
-    private Map<String, Object> normalizeVariables(Map<String, Object> variables) {
-        if (variables == null) {
-            return Collections.emptyMap();
-        }
-
-        return variables;
     }
 }

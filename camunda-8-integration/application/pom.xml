@@ -24,11 +24,6 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>camunda-client-java</artifactId>
-            <version>${camunda.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>

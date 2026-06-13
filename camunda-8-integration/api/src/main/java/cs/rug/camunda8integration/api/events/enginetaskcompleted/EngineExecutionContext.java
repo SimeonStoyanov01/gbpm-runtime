@@ -1,20 +1,15 @@
-package cs.rug.camunda8integration.api.events;
+package cs.rug.camunda8integration.api.events.enginetaskcompleted;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-import java.util.Map;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EngineTaskCompletedEvent {
-    private String eventId;
-    private String eventType;
+public class EngineExecutionContext {
     private String engineType;
     private Long processDefinitionKey;
     private String bpmnProcessId;
@@ -24,8 +19,4 @@ public class EngineTaskCompletedEvent {
     private Long jobKey;
     private String jobType;
     private String workerName;
-    private Instant occurredAt;
-    private Map<String, Object> variablesBefore;
-    private Map<String, Object> businessOutput;
-    private Map<String, Object> workerObservation;
 }
