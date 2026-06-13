@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: mock-operational-service
+
+server:
+  port: ${SERVER_PORT:8091}

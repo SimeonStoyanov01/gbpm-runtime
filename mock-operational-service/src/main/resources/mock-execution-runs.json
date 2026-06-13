@@ -1,0 +1,10 @@
+[
+  {
+    "bpmnElementId": "Activity_04tru70",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 480.0,
+    "unit": "minutes"
+  }
+]
