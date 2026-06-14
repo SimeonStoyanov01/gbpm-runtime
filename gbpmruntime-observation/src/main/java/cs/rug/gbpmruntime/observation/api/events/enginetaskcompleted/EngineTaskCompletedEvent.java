@@ -1,6 +1,7 @@
-package cs.rug.camunda8integration.api.events.enginetaskcompleted;
+package cs.rug.gbpmruntime.observation.api.events.enginetaskcompleted;
 
-import cs.rug.camunda8integration.api.model.EngineExecutionContext;
+import cs.rug.gbpmruntime.observation.api.model.EngineExecutionContext;
+import cs.rug.gbpmruntime.observation.api.model.ResourceUsageFact;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

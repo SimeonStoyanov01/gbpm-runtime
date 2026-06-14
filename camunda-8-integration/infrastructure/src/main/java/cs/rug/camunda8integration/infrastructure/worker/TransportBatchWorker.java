@@ -1,12 +1,12 @@
 package cs.rug.camunda8integration.infrastructure.worker;
 
 import cs.rug.camunda8integration.api.model.AssignedResourceModel;
+import cs.rug.camunda8integration.api.model.EngineExecutionContext;
 import cs.rug.camunda8integration.api.model.WorkObjectModel;
 import cs.rug.camunda8integration.api.operations.executetransportbatch.ExecuteTransportBatchOperation;
 import cs.rug.camunda8integration.api.operations.executetransportbatch.ExecuteTransportBatchRequest;
 import cs.rug.camunda8integration.api.operations.executetransportbatch.ExecuteTransportBatchResponse;
-import cs.rug.camunda8integration.api.operations.publishenginetaskcompleted.PublishEngineTaskCompletedEventOperation;
-import cs.rug.camunda8integration.api.operations.publishenginetaskcompleted.PublishEngineTaskCompletedEventRequest;
+import cs.rug.camunda8integration.application.out.EngineTaskCompletedEventPublisher;
 import io.camunda.client.annotation.JobWorker;
 import io.camunda.client.api.response.ActivatedJob;
 import io.camunda.client.api.worker.JobClient;
@@ -28,7 +28,7 @@ public class TransportBatchWorker {
     private static final String WORKER_NAME = "transport-worker-1";
 
     private final ExecuteTransportBatchOperation executeTransportBatchOperation;
-    private final PublishEngineTaskCompletedEventOperation publishEngineTaskCompletedEventOperation;
+    private final EngineTaskCompletedEventPublisher engineTaskCompletedEventPublisher;
     private final ObjectMapper objectMapper;
 
     @JobWorker(type = JOB_TYPE, name = WORKER_NAME)
@@ -56,10 +56,7 @@ public class TransportBatchWorker {
 
     private void publishEvent(ExecuteTransportBatchResponse response) {
         try {
-            publishEngineTaskCompletedEventOperation.process(PublishEngineTaskCompletedEventRequest
-                    .builder()
-                    .event(response.getEngineTaskCompletedEvent())
-                    .build());
+            engineTaskCompletedEventPublisher.publish(response.getEngineTaskCompletedEvent());
         } catch (Exception exception) {
             log.warn(
                     "Failed to publish engine task completed event after Camunda job completion: eventId={}",
@@ -74,14 +71,14 @@ public class TransportBatchWorker {
 
         return ExecuteTransportBatchRequest
                 .builder()
-                .processDefinitionKey(job.getProcessDefinitionKey())
-                .bpmnProcessId(job.getBpmnProcessId())
-                .processInstanceKey(job.getProcessInstanceKey())
-                .elementInstanceKey(job.getElementInstanceKey())
-                .bpmnElementId(job.getElementId())
-                .jobKey(job.getKey())
-                .jobType(job.getType())
-                .workerName(WORKER_NAME)
+                .engineExecutionContext(EngineExecutionContext
+                        .builder()
+                        .bpmnElementId(job.getElementId())
+                        .bpmnProcessId(job.getBpmnProcessId())
+                        .elementInstanceKey(job.getElementInstanceKey())
+                        .processInstanceKey(job.getProcessInstanceKey())
+                        .processDefinitionKey(job.getProcessDefinitionKey())
+                        .build())
                 .orderId(readRequiredString(variables, "orderId"))
                 .workObject(readRequiredValue(variables, "workObject", WorkObjectModel.class))
                 .assignedResources(readAssignedResources(variables, job.getElementId()))

@@ -12,7 +12,6 @@ import java.util.List;
 public class OperationalExecutionRequest {
     private String orderId;
     private String bpmnElementId;
-    private String jobType;
     private WorkObjectModel workObject;
     private List<AssignedResourceModel> assignedResources;
 }

@@ -24,9 +24,6 @@ public class CreateExecutionRunRequest {
     @NotBlank
     private String bpmnElementId;
 
-    @NotBlank
-    private String jobType;
-
     @Valid
     @NotNull
     private WorkObjectModel workObject;

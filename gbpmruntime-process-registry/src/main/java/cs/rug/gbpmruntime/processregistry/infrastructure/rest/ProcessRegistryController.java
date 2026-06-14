@@ -9,9 +9,6 @@ import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotati
 import cs.rug.gbpmruntime.processregistry.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsRequest;
 import cs.rug.gbpmruntime.processregistry.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsResponse;
-import cs.rug.gbpmruntime.processregistry.api.operations.getprocessdefinition.GetProcessDefinitionOperation;
-import cs.rug.gbpmruntime.processregistry.api.operations.getprocessdefinition.GetProcessDefinitionRequest;
-import cs.rug.gbpmruntime.processregistry.api.operations.getprocessdefinition.GetProcessDefinitionResponse;
 import cs.rug.gbpmruntime.processregistry.api.operations.startprocessinstance.StartProcessInstanceOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.startprocessinstance.StartProcessInstanceRequest;
 import cs.rug.gbpmruntime.processregistry.api.operations.startprocessinstance.StartProcessInstanceResponse;
@@ -38,7 +35,6 @@ public class ProcessRegistryController {
 
     private final DeployProcessDefinitionOperation deployProcessDefinitionOperation;
     private final StartProcessInstanceOperation startProcessInstanceOperation;
-    private final GetProcessDefinitionOperation getProcessDefinitionOperation;
     private final FindActivityKeiAnnotationsOperation findActivityKeiAnnotationsOperation;
     private final FindProcessKeiAnnotationsOperation findProcessKeiAnnotationsOperation;
 
@@ -67,17 +63,6 @@ public class ProcessRegistryController {
                 .variables(variables)
                 .build();
         return ResponseEntity.ok(startProcessInstanceOperation.process(request));
-    }
-
-    @GetMapping("/{processDefinitionKey}")
-    public ResponseEntity<GetProcessDefinitionResponse> getProcessDefinition(
-            @PathVariable String processDefinitionKey
-    ) {
-        GetProcessDefinitionRequest request = GetProcessDefinitionRequest
-                .builder()
-                .processDefinitionKey(processDefinitionKey)
-                .build();
-        return ResponseEntity.ok(getProcessDefinitionOperation.process(request));
     }
 
     @GetMapping("/{processDefinitionKey}/activities/{bpmnElementId}/keis")

@@ -16,7 +16,6 @@ import java.util.List;
 public class CreateExecutionRunRequestDto {
     private String orderId;
     private String bpmnElementId;
-    private String jobType;
     private WorkObjectModel workObject;
     private List<AssignedResourceModel> assignedResources;
 }

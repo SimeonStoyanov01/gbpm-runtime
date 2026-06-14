@@ -1,6 +1,24 @@
 spring:
   application:
     name: camunda-8-integration
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: ${SERVER_PORT:8090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
@@ -23,12 +41,3 @@ camunda8integration:
     engine-task-completed:
       exchange-name: ${CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE:gbpmruntime.camunda8.events}
       routing-key: ${CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY:engine.task.completed}
-
-server:
-  port: ${SERVER_PORT:8080}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info

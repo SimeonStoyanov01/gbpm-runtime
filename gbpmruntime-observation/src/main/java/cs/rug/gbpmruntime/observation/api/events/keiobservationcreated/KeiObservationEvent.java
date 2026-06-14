@@ -1,6 +1,8 @@
-package cs.rug.camunda8integration.api.events.enginetaskcompleted;
+package cs.rug.gbpmruntime.observation.api.events.keiobservationcreated;
 
-import cs.rug.camunda8integration.api.model.EngineExecutionContext;
+import cs.rug.gbpmruntime.observation.api.model.EngineExecutionContext;
+import cs.rug.gbpmruntime.observation.api.model.KeiAnnotation;
+import cs.rug.gbpmruntime.observation.api.model.ResourceUsageFact;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,12 +15,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EngineTaskCompletedEvent {
+public class KeiObservationEvent {
     private String eventId;
     private String eventType;
     private String contractVersion;
+    private String sourceEventId;
     private Instant occurredAt;
+
     private EngineExecutionContext execution;
     private String taskStatus;
     private List<ResourceUsageFact> resourceUsages;
+    private List<KeiAnnotation> keiAnnotations;
 }

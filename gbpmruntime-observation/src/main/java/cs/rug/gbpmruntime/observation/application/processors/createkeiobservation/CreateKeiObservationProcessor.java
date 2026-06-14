@@ -1,12 +1,13 @@
 package cs.rug.gbpmruntime.observation.application.processors.createkeiobservation;
 
-import cs.rug.gbpmruntime.observation.api.events.EngineTaskCompletedEvent;
-import cs.rug.gbpmruntime.observation.api.events.BpmnContext;
-import cs.rug.gbpmruntime.observation.api.events.EngineContext;
-import cs.rug.gbpmruntime.observation.api.events.KeiAnnotationPayload;
-import cs.rug.gbpmruntime.observation.api.events.KeiObservationEvent;
-import cs.rug.gbpmruntime.observation.api.operations.publishkeiobservation.PublishKeiObservationEventOperation;
-import cs.rug.gbpmruntime.observation.api.operations.publishkeiobservation.PublishKeiObservationEventRequest;
+import cs.rug.gbpmruntime.observation.api.events.keiobservationcreated.KeiObservationEvent;
+import cs.rug.gbpmruntime.observation.api.model.KeiAnnotation;
+import cs.rug.gbpmruntime.observation.api.operations.createkeiobservation.CreateKeiObservationOperation;
+import cs.rug.gbpmruntime.observation.api.operations.createkeiobservation.CreateKeiObservationRequest;
+import cs.rug.gbpmruntime.observation.api.operations.requestkeicalculation.RequestKeiCalculationOperation;
+import cs.rug.gbpmruntime.observation.api.operations.requestkeicalculation.RequestKeiCalculationRequest;
+import cs.rug.gbpmruntime.observation.application.factory.KeiObservationEventFactory;
+import cs.rug.gbpmruntime.observation.application.out.KeiObservationEventPublisher;
 import cs.rug.gbpmruntime.processregistry.api.model.KeiAnnotationModel;
 import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsOperation;
 import cs.rug.gbpmruntime.processregistry.api.operations.findactivitykeiannotations.FindActivityKeiAnnotationsRequest;
@@ -15,54 +16,59 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CreateKeiObservationProcessor {
-
-    private static final String EVENT_TYPE = "KEI_OBSERVATION_CREATED";
-    private static final String CONTRACT_VERSION = "1.0";
+public class CreateKeiObservationProcessor implements CreateKeiObservationOperation {
 
     private final FindActivityKeiAnnotationsOperation findActivityKeiAnnotationsOperation;
-    private final PublishKeiObservationEventOperation publishKeiObservationEventOperation;
+    private final KeiObservationEventPublisher keiObservationEventPublisher;
+    private final RequestKeiCalculationOperation requestKeiCalculationOperation;
+    private final KeiObservationEventFactory keiObservationEventFactory;
 
-    public void process(EngineTaskCompletedEvent sourceEvent) {
-        List<KeiAnnotationPayload> keiAnnotations = findKeiAnnotations(sourceEvent);
+    @Override
+    public void process(CreateKeiObservationRequest request) {
+        List<KeiAnnotation> keiAnnotations = findKeiAnnotations(request);
         if (keiAnnotations.isEmpty()) {
             log.info(
                     "Engine task completed event has no KEI annotations: sourceEventId={}, processDefinitionKey={}, bpmnElementId={}",
-                    sourceEvent.getEventId(),
-                    sourceEvent.getProcessDefinitionKey(),
-                    sourceEvent.getBpmnElementId()
+                    request.getSourceEventId(),
+                    request.getExecution().getProcessDefinitionKey(),
+                    request.getExecution().getBpmnElementId()
             );
             return;
         }
 
-        KeiObservationEvent observationEvent = buildObservationEvent(sourceEvent, keiAnnotations);
-        publishKeiObservationEventOperation.process(PublishKeiObservationEventRequest
-                .builder()
-                .event(observationEvent)
-                .build());
+        KeiObservationEvent observationEvent = keiObservationEventFactory.create(request, keiAnnotations);
+        keiObservationEventPublisher.publish(observationEvent);
 
         log.info(
                 "Published KEI observation event: eventId={}, sourceEventId={}, processDefinitionKey={}, bpmnElementId={}, keiAnnotationCount={}",
                 observationEvent.getEventId(),
                 observationEvent.getSourceEventId(),
-                sourceEvent.getProcessDefinitionKey(),
-                sourceEvent.getBpmnElementId(),
+                request.getExecution().getProcessDefinitionKey(),
+                request.getExecution().getBpmnElementId(),
                 keiAnnotations.size()
         );
+
+        requestKeiCalculationOperation.process(RequestKeiCalculationRequest
+                .builder()
+                .observationId(observationEvent.getEventId())
+                .sourceEventId(observationEvent.getSourceEventId())
+                .execution(observationEvent.getExecution())
+                .resourceUsages(observationEvent.getResourceUsages())
+                .keiAnnotations(observationEvent.getKeiAnnotations())
+                .build());
     }
 
-    private List<KeiAnnotationPayload> findKeiAnnotations(EngineTaskCompletedEvent sourceEvent) {
+    private List<KeiAnnotation> findKeiAnnotations(CreateKeiObservationRequest request) {
+        
         FindActivityKeiAnnotationsResponse response = findActivityKeiAnnotationsOperation.process(FindActivityKeiAnnotationsRequest
                 .builder()
-                .processDefinitionKey(sourceEvent.getProcessDefinitionKey())
-                .bpmnElementId(sourceEvent.getBpmnElementId())
+                .processDefinitionKey(request.getExecution().getProcessDefinitionKey())
+                .bpmnElementId(request.getExecution().getBpmnElementId())
                 .build());
 
         if (response.getBpmn4esKeiAnnotations() == null) {
@@ -71,46 +77,12 @@ public class CreateKeiObservationProcessor {
 
         return response.getBpmn4esKeiAnnotations()
                 .stream()
-                .map(this::toPayload)
+                .map(this::toKeiAnnotation)
                 .toList();
     }
 
-    private KeiObservationEvent buildObservationEvent(
-            EngineTaskCompletedEvent sourceEvent,
-            List<KeiAnnotationPayload> keiAnnotations
-    ) {
-        return KeiObservationEvent
-                .builder()
-                .eventId(UUID.randomUUID().toString())
-                .eventType(EVENT_TYPE)
-                .contractVersion(CONTRACT_VERSION)
-                .sourceEventId(sourceEvent.getEventId())
-                .occurredAt(Instant.now())
-                .engine(EngineContext
-                        .builder()
-                        .engineType(sourceEvent.getEngineType())
-                        .processDefinitionKey(sourceEvent.getProcessDefinitionKey())
-                        .bpmnProcessId(sourceEvent.getBpmnProcessId())
-                        .processInstanceKey(sourceEvent.getProcessInstanceKey())
-                        .elementInstanceKey(sourceEvent.getElementInstanceKey())
-                        .jobKey(sourceEvent.getJobKey())
-                        .jobType(sourceEvent.getJobType())
-                        .workerName(sourceEvent.getWorkerName())
-                        .build())
-                .bpmn(BpmnContext
-                        .builder()
-                        .processId(sourceEvent.getBpmnProcessId())
-                        .elementId(sourceEvent.getBpmnElementId())
-                        .build())
-                .variablesBefore(sourceEvent.getVariablesBefore())
-                .businessOutput(sourceEvent.getBusinessOutput())
-                .workerObservation(sourceEvent.getWorkerObservation())
-                .keiAnnotations(keiAnnotations)
-                .build();
-    }
-
-    private KeiAnnotationPayload toPayload(KeiAnnotationModel keiAnnotationModel) {
-        return KeiAnnotationPayload
+    private KeiAnnotation toKeiAnnotation(KeiAnnotationModel keiAnnotationModel) {
+        return KeiAnnotation
                 .builder()
                 .id(keiAnnotationModel.getId())
                 .unit(keiAnnotationModel.getUnit())
@@ -118,4 +90,5 @@ public class CreateKeiObservationProcessor {
                 .icon(keiAnnotationModel.getIcon())
                 .build();
     }
+
 }

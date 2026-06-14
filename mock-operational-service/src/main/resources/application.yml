@@ -1,6 +1,15 @@
 spring:
   application:
     name: mock-operational-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
 
 server:
   port: ${SERVER_PORT:8091}

@@ -1,6 +1,6 @@
 package cs.rug.camunda8integration.application.processors.executetransportbatch;
 
-import cs.rug.camunda8integration.api.events.enginetaskcompleted.EngineExecutionContext;
+import cs.rug.camunda8integration.api.model.EngineExecutionContext;
 import cs.rug.camunda8integration.api.events.enginetaskcompleted.EngineTaskCompletedEvent;
 import cs.rug.camunda8integration.api.operations.executetransportbatch.ExecuteTransportBatchOperation;
 import cs.rug.camunda8integration.api.operations.executetransportbatch.ExecuteTransportBatchRequest;
@@ -31,8 +31,7 @@ public class ExecuteTransportBatchProcessor implements ExecuteTransportBatchOper
         OperationalExecutionResult executionResult = operationalExecutionClient.execute(OperationalExecutionRequest
                 .builder()
                 .orderId(request.getOrderId())
-                .bpmnElementId(request.getBpmnElementId())
-                .jobType(request.getJobType())
+                .bpmnElementId(request.getEngineExecutionContext().getBpmnElementId())
                 .workObject(request.getWorkObject())
                 .assignedResources(request.getAssignedResources())
                 .build());
@@ -66,14 +65,11 @@ public class ExecuteTransportBatchProcessor implements ExecuteTransportBatchOper
                 .execution(EngineExecutionContext
                         .builder()
                         .engineType(ENGINE_TYPE)
-                        .processDefinitionKey(request.getProcessDefinitionKey())
-                        .bpmnProcessId(request.getBpmnProcessId())
-                        .processInstanceKey(request.getProcessInstanceKey())
-                        .elementInstanceKey(request.getElementInstanceKey())
-                        .bpmnElementId(request.getBpmnElementId())
-                        .jobKey(request.getJobKey())
-                        .jobType(request.getJobType())
-                        .workerName(request.getWorkerName())
+                        .processDefinitionKey(request.getEngineExecutionContext().getProcessDefinitionKey())
+                        .bpmnProcessId(request.getEngineExecutionContext().getBpmnProcessId())
+                        .processInstanceKey(request.getEngineExecutionContext().getProcessInstanceKey())
+                        .elementInstanceKey(request.getEngineExecutionContext().getElementInstanceKey())
+                        .bpmnElementId(request.getEngineExecutionContext().getBpmnElementId())
                         .build())
                 .taskStatus(executionResult.getStatus())
                 .resourceUsages(executionResult.getResourceUsages())
