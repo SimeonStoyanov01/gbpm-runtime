@@ -10,6 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - co2-calculation-postgres-data:/var/lib/postgresql/data
+      - ../../bootstrap/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
 
 volumes:
   co2-calculation-postgres-data:
