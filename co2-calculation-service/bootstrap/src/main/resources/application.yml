@@ -18,6 +18,17 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:gbpmruntime}
     password: ${RABBITMQ_PASSWORD:gbpmruntime}
+  datasource:
+    url: ${CO2_CALCULATION_DATASOURCE_URL:jdbc:postgresql://localhost:5432/co2_calculation}
+    username: ${CO2_CALCULATION_DATASOURCE_USERNAME:co2_calculation}
+    password: ${CO2_CALCULATION_DATASOURCE_PASSWORD:co2_calculation}
+  jpa:
+    hibernate:
+      ddl-auto: ${CO2_CALCULATION_JPA_DDL_AUTO:none}
+    open-in-view: false
+  sql:
+    init:
+      mode: ${CO2_CALCULATION_SQL_INIT_MODE:always}
 
 gbpmruntime:
   messaging:

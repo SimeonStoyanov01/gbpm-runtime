@@ -4,7 +4,7 @@ import cs.rug.co2calculationservice.api.model.CalculationDescriptor;
 import cs.rug.co2calculationservice.api.model.CalculationError;
 import cs.rug.co2calculationservice.api.model.CalculationResult;
 import cs.rug.co2calculationservice.api.model.EngineExecutionContext;
-import cs.rug.co2calculationservice.api.model.Kei;
+import cs.rug.co2calculationservice.api.model.KeiAnnotation;
 import cs.rug.co2calculationservice.api.model.ResourceBreakdown;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +27,7 @@ public class KeiCalculationCompletedEvent {
     private String sourceEventId;
     private Instant occurredAt;
     private CalculationDescriptor calculation;
-    private Kei kei;
+    private KeiAnnotation kei;
     private EngineExecutionContext execution;
     private CalculationResult result;
     private List<ResourceBreakdown> resourceBreakdown;

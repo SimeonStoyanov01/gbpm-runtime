@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: co2-calculation-postgres
+    environment:
+      POSTGRES_DB: co2_calculation
+      POSTGRES_USER: co2_calculation
+      POSTGRES_PASSWORD: co2_calculation
+    ports:
+      - "5432:5432"
+    volumes:
+      - co2-calculation-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  co2-calculation-postgres-data:

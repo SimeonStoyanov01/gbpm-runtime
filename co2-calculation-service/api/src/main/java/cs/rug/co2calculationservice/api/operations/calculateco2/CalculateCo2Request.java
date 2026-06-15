@@ -4,7 +4,10 @@ import cs.rug.co2calculationservice.api.base.ProcessorRequest;
 import cs.rug.co2calculationservice.api.model.CalculationDescriptor;
 import cs.rug.co2calculationservice.api.model.CalculationInputs;
 import cs.rug.co2calculationservice.api.model.EngineExecutionContext;
-import cs.rug.co2calculationservice.api.model.Kei;
+import cs.rug.co2calculationservice.api.model.KeiAnnotation;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,11 +18,28 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CalculateCo2Request implements ProcessorRequest {
+    @NotBlank
     private String calculationRequestId;
+
+    @NotBlank
     private String observationId;
+
+    @NotBlank
     private String sourceEventId;
+
+    @Valid
+    @NotNull
     private CalculationDescriptor calculation;
-    private Kei kei;
+
+    @Valid
+    @NotNull
+    private KeiAnnotation kei;
+
+    @Valid
+    @NotNull
     private EngineExecutionContext execution;
+
+    @Valid
+    @NotNull
     private CalculationInputs inputs;
 }
