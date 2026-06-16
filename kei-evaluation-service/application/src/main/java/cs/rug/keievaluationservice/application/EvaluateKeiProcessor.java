@@ -2,12 +2,13 @@ package cs.rug.keievaluationservice.application;
 
 import cs.rug.keievaluationservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
 import cs.rug.keievaluationservice.api.events.evaluationcompleted.KeiEvaluationCompletedEvent;
+import cs.rug.keievaluationservice.api.events.thresholdviolationdetected.ThresholdViolationDetectedEvent;
 import cs.rug.keievaluationservice.api.model.CalculatedResult;
 import cs.rug.keievaluationservice.api.model.EvaluationDetails;
 import cs.rug.keievaluationservice.api.operations.evaluatekei.EvaluateKeiOperation;
 import cs.rug.keievaluationservice.api.operations.evaluatekei.EvaluateKeiRequest;
 import cs.rug.keievaluationservice.api.operations.evaluatekei.EvaluateKeiResponse;
-import cs.rug.keievaluationservice.application.out.EvaluationResultPublisher;
+import cs.rug.keievaluationservice.application.out.EvaluationEventPublisher;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +28,25 @@ import java.util.stream.Collectors;
 public class EvaluateKeiProcessor implements EvaluateKeiOperation {
 
     private static final String EVENT_TYPE = "KEI_EVALUATION_COMPLETED";
+    private static final String VIOLATION_EVENT_TYPE = "THRESHOLD_VIOLATION_DETECTED";
     private static final String CONTRACT_VERSION = "1.0";
     private static final String WITHIN_TARGET_STATUS = "WITHIN_TARGET";
     private static final String VIOLATED_STATUS = "VIOLATED";
     private static final String LESS_THAN_OR_EQUAL_OPERATOR = "LESS_THAN_OR_EQUAL";
 
-    private final EvaluationResultPublisher evaluationResultPublisher;
+    private final EvaluationEventPublisher evaluationEventPublisher;
     private final Validator validator;
 
     @Override
     public EvaluateKeiResponse process(EvaluateKeiRequest request) {
-        validate(request);
+        Optional<String> validationError = validate(request);
+        if (validationError.isPresent()) {
+            log.warn("Skipping invalid KEI calculation completed event: {}", validationError.get());
+            return EvaluateKeiResponse
+                    .builder()
+                    .evaluated(false)
+                    .build();
+        }
 
         KeiCalculationCompletedEvent event = request.getEvent();
         log.info(
@@ -62,7 +71,8 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
         }
 
         KeiEvaluationCompletedEvent evaluationEvent = createEvaluationEvent(event, targetValue.get());
-        evaluationResultPublisher.publish(evaluationEvent);
+        evaluationEventPublisher.publishEvaluation(evaluationEvent);
+        publishViolationIfNeeded(evaluationEvent);
 
         return EvaluateKeiResponse
                 .builder()
@@ -70,6 +80,29 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
                 .evaluated(true)
                 .event(evaluationEvent)
                 .build();
+    }
+
+    private void publishViolationIfNeeded(KeiEvaluationCompletedEvent event) {
+        if (!VIOLATED_STATUS.equals(event.getEvaluation().getStatus())) {
+            return;
+        }
+
+        evaluationEventPublisher.publishViolation(ThresholdViolationDetectedEvent
+                .builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventType(VIOLATION_EVENT_TYPE)
+                .contractVersion(CONTRACT_VERSION)
+                .occurredAt(Instant.now())
+                .processDefinitionKey(event.getExecution().getProcessDefinitionKey())
+                .bpmnProcessId(event.getExecution().getBpmnProcessId())
+                .serviceTaskId(event.getExecution().getBpmnElementId())
+                .processInstanceKey(event.getExecution().getProcessInstanceKey())
+                .emissionType(event.getKei().getId())
+                .calculatedValue(event.getCalculatedResult().getValue())
+                .targetValue(event.getEvaluation().getTargetValue())
+                .difference(event.getEvaluation().getDifference())
+                .status(event.getEvaluation().getStatus())
+                .build());
     }
 
     private KeiEvaluationCompletedEvent createEvaluationEvent(
@@ -112,22 +145,23 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
         if (targetValue == null || targetValue.isBlank()) {
             return Optional.empty();
         }
-
         try {
             return Optional.of(new BigDecimal(targetValue));
-        } catch (NumberFormatException exception) {
+        } catch (NumberFormatException e) {
+            log.warn("Skipping evaluation: targetValue is not a valid number: '{}'", targetValue);
             return Optional.empty();
         }
     }
 
-    private void validate(EvaluateKeiRequest request) {
+    private Optional<String> validate(EvaluateKeiRequest request) {
         Set<ConstraintViolation<EvaluateKeiRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             String message = violations
                     .stream()
                     .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                     .collect(Collectors.joining("; "));
-            throw new IllegalArgumentException("Invalid KEI calculation completed event: " + message);
+            return Optional.of(message);
         }
+        return Optional.empty();
     }
 }

@@ -19,13 +19,19 @@ public class KeiCalculationRequestedEventListener {
 
     @RabbitListener(queues = "${gbpmruntime.messaging.calculation-request.queue-name}")
     public void handle(byte[] payload) {
-        KeiCalculationRequestedEvent event = readEvent(payload);
+        KeiCalculationRequestedEvent event;
+        try {
+            event = readEvent(payload);
+        } catch (IllegalArgumentException exception) {
+            log.warn("Skipping invalid KEI calculation request event: {}", exception.getMessage());
+            return;
+        }
+
         log.info(
-                "Received KEI calculation request: eventId={}, observationId={}, sourceEventId={}, keiId={}",
+                "Received KEI calculation request: eventId={}, observationId={}, sourceEventId={}",
                 event.getEventId(),
                 event.getObservationId(),
-                event.getSourceEventId(),
-                event.getKei() == null ? null : event.getKei().getId()
+                event.getSourceEventId()
         );
 
         calculateCo2Operation.process(calculationRequestEventMapper.toRequest(event));

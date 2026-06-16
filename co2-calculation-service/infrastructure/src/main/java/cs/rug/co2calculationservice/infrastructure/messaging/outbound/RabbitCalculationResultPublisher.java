@@ -1,6 +1,7 @@
 package cs.rug.co2calculationservice.infrastructure.messaging.outbound;
 
 import cs.rug.co2calculationservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
+import cs.rug.co2calculationservice.api.events.calculationfailed.KeiCalculationFailedEvent;
 import cs.rug.co2calculationservice.application.out.CalculationResultPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Message;
@@ -20,15 +21,24 @@ public class RabbitCalculationResultPublisher implements CalculationResultPublis
     private final CalculationResultRabbitMqProperties properties;
 
     @Override
-    public void publish(KeiCalculationCompletedEvent event) {
+    public void publishCompleted(KeiCalculationCompletedEvent event) {
         rabbitTemplate.send(
                 properties.getExchangeName(),
-                properties.getRoutingKey(),
+                properties.getCompletedRoutingKey(),
                 buildJsonMessage(event)
         );
     }
 
-    private Message buildJsonMessage(KeiCalculationCompletedEvent event) {
+    @Override
+    public void publishFailed(KeiCalculationFailedEvent event) {
+        rabbitTemplate.send(
+                properties.getExchangeName(),
+                properties.getFailedRoutingKey(),
+                buildJsonMessage(event)
+        );
+    }
+
+    private Message buildJsonMessage(Object event) {
         try {
             return MessageBuilder
                     .withBody(objectMapper.writeValueAsBytes(event))

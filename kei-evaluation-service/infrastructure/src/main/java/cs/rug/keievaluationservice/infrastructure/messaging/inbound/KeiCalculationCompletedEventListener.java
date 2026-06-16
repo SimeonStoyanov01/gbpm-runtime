@@ -19,7 +19,14 @@ public class KeiCalculationCompletedEventListener {
 
     @RabbitListener(queues = "${gbpmruntime.messaging.calculation-result.queue-name}")
     public void handle(byte[] payload) {
-        KeiCalculationCompletedEvent event = readEvent(payload);
+        KeiCalculationCompletedEvent event;
+        try {
+            event = readEvent(payload);
+        } catch (IllegalArgumentException exception) {
+            log.warn("Skipping invalid KEI calculation completed event: {}", exception.getMessage());
+            return;
+        }
+
         log.info(
                 "Received KEI calculation completed event: eventId={}, observationId={}",
                 event.getEventId(),

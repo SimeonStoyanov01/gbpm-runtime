@@ -1,4 +1,4 @@
-package cs.rug.co2calculationservice.infrastructure.messaging.outbound;
+package cs.rug.keievaluationservice.infrastructure.messaging.outbound;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -9,14 +9,14 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 @Validated
-@ConfigurationProperties(prefix = "gbpmruntime.messaging.calculation-result")
-public class CalculationResultRabbitMqProperties {
+@ConfigurationProperties(prefix = "gbpmruntime.messaging.evaluation.events")
+public class EvaluationEventRabbitMqProperties {
     @NotBlank
     private String exchangeName;
 
     @NotBlank
-    private String completedRoutingKey;
+    private String evaluationRoutingKey;
 
     @NotBlank
-    private String failedRoutingKey;
+    private String violationRoutingKey;
 }

@@ -10,9 +10,9 @@ import java.util.List;
 @Getter
 public class CalculationOutcome {
 
-    private static final String SUCCEEDED_STATUS = "SUCCEEDED";
-    private static final String FAILED_STATUS = "FAILED";
-    private static final String RESULT_UNIT = "kgCO2e";
+    public static final String SUCCEEDED_STATUS = "SUCCEEDED";
+    public static final String FAILED_STATUS = "FAILED";
+    private static final String RESULT_UNIT = "kg";
 
     private final String status;
     private final BigDecimal value;

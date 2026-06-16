@@ -1,25 +1,25 @@
 package cs.rug.co2calculationservice.application.factory;
 
-import cs.rug.co2calculationservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
-import cs.rug.co2calculationservice.api.model.CalculationResult;
+import cs.rug.co2calculationservice.api.events.calculationfailed.KeiCalculationFailedEvent;
+import cs.rug.co2calculationservice.api.model.CalculationError;
 import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Request;
-import cs.rug.co2calculationservice.application.model.CalculationOutcome;
+import cs.rug.co2calculationservice.application.CalculationFailureException;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Component
-public class CalculationCompletedEventFactory {
+public class CalculationFailedEventFactory {
 
-    private static final String EVENT_TYPE = "KEI_CALCULATION_COMPLETED";
+    private static final String EVENT_TYPE = "KEI_CALCULATION_FAILED";
     private static final String CONTRACT_VERSION = "1.0";
 
-    public KeiCalculationCompletedEvent create(
+    public KeiCalculationFailedEvent create(
             CalculateCo2Request request,
-            CalculationOutcome outcome
+            CalculationFailureException exception
     ) {
-        return KeiCalculationCompletedEvent
+        return KeiCalculationFailedEvent
                 .builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventType(EVENT_TYPE)
@@ -31,13 +31,11 @@ public class CalculationCompletedEventFactory {
                 .calculation(request.getCalculation())
                 .kei(request.getKei())
                 .execution(request.getExecution())
-                .result(CalculationResult
+                .error(CalculationError
                         .builder()
-                        .status(outcome.getStatus())
-                        .value(outcome.getValue())
-                        .unit(outcome.getUnit())
+                        .code(exception.getCode())
+                        .message(exception.getMessage())
                         .build())
-                .resourceBreakdown(outcome.getResourceBreakdown())
                 .build();
     }
 }

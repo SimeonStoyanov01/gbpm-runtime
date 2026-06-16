@@ -6,14 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties({
-        EvaluationResultRabbitMqProperties.class,
-        ThresholdViolationRabbitMqProperties.class
-})
-public class EvaluationResultRabbitMqConfiguration {
+@EnableConfigurationProperties(EvaluationEventRabbitMqProperties.class)
+public class EvaluationEventRabbitMqConfiguration {
 
     @Bean
-    public TopicExchange evaluationResultExchange(EvaluationResultRabbitMqProperties properties) {
+    public TopicExchange evaluationEventExchange(EvaluationEventRabbitMqProperties properties) {
         return new TopicExchange(properties.getExchangeName(), true, false);
     }
 }

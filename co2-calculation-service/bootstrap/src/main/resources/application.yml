@@ -38,4 +38,5 @@ gbpmruntime:
       queue-name: ${GBPMRUNTIME_CALCULATION_REQUEST_QUEUE:gbpmruntime.co2-calculation.kei-calculation-requested}
     calculation-result:
       exchange-name: ${GBPMRUNTIME_CALCULATION_RESULT_EXCHANGE:gbpmruntime.calculation.events}
-      routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_ROUTING_KEY:kei.calculation.completed}
+      completed-routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_COMPLETED_ROUTING_KEY:kei.calculation.completed}
+      failed-routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_FAILED_ROUTING_KEY:kei.calculation.failed}

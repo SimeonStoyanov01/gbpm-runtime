@@ -1,12 +1,14 @@
 package cs.rug.co2calculationservice.application;
 
 import cs.rug.co2calculationservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
+import cs.rug.co2calculationservice.api.events.calculationfailed.KeiCalculationFailedEvent;
 import cs.rug.co2calculationservice.api.model.ResourceBreakdown;
 import cs.rug.co2calculationservice.api.model.ResourceUsage;
 import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Operation;
 import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Request;
 import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Response;
 import cs.rug.co2calculationservice.application.factory.CalculationCompletedEventFactory;
+import cs.rug.co2calculationservice.application.factory.CalculationFailedEventFactory;
 import cs.rug.co2calculationservice.application.model.CalculationOutcome;
 import cs.rug.co2calculationservice.application.model.EmissionFactor;
 import cs.rug.co2calculationservice.application.model.ResourceProfile;
@@ -32,7 +34,7 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
 
     private static final String POPESCU_RESOURCE_CO2_STRATEGY = "POPESCU_RESOURCE_CO2";
     private static final String CARBON_EMISSIONS_KEI_ID = "carbon-emissions";
-    private static final String RESULT_UNIT = "kgCO2e";
+    private static final String RESULT_UNIT = "kg";
     private static final int RESULT_SCALE = 4;
 
     private final ResourceProfileLookup resourceProfileLookup;
@@ -40,28 +42,35 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
     private final CalculationResultPublisher calculationResultPublisher;
     private final Validator validator;
     private final CalculationCompletedEventFactory calculationCompletedEventFactory;
+    private final CalculationFailedEventFactory calculationFailedEventFactory;
 
     @Override
     public CalculateCo2Response process(CalculateCo2Request request) {
         Objects.requireNonNull(request, "request must not be null");
 
-        CalculationOutcome outcome;
         try {
             validate(request);
-            outcome = calculate(request);
+            CalculationOutcome outcome = calculate(request);
+            KeiCalculationCompletedEvent event = calculationCompletedEventFactory.create(request, outcome);
+            calculationResultPublisher.publishCompleted(event);
+
+            return CalculateCo2Response
+                    .builder()
+                    .eventId(event.getEventId())
+                    .status(outcome.getStatus())
+                    .event(event)
+                    .build();
         } catch (CalculationFailureException exception) {
-            outcome = CalculationOutcome.failed(exception.getCode(), exception.getMessage());
+            CalculationOutcome outcome = CalculationOutcome.failed(exception.getCode(), exception.getMessage());
+            KeiCalculationFailedEvent event = calculationFailedEventFactory.create(request, exception);
+            calculationResultPublisher.publishFailed(event);
+
+            return CalculateCo2Response
+                    .builder()
+                    .eventId(event.getEventId())
+                    .status(outcome.getStatus())
+                    .build();
         }
-
-        KeiCalculationCompletedEvent event = calculationCompletedEventFactory.create(request, outcome);
-        calculationResultPublisher.publish(event);
-
-        return CalculateCo2Response
-                .builder()
-                .eventId(event.getEventId())
-                .status(outcome.getStatus())
-                .event(event)
-                .build();
     }
 
     private void validate(CalculateCo2Request request) {

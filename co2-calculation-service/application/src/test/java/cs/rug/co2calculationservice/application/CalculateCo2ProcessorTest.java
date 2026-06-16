@@ -1,6 +1,7 @@
 package cs.rug.co2calculationservice.application;
 
 import cs.rug.co2calculationservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
+import cs.rug.co2calculationservice.api.events.calculationfailed.KeiCalculationFailedEvent;
 import cs.rug.co2calculationservice.api.model.CalculationDescriptor;
 import cs.rug.co2calculationservice.api.model.CalculationInputs;
 import cs.rug.co2calculationservice.api.model.EngineExecutionContext;
@@ -11,6 +12,7 @@ import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Resp
 import cs.rug.co2calculationservice.application.model.EmissionFactor;
 import cs.rug.co2calculationservice.application.model.ResourceProfile;
 import cs.rug.co2calculationservice.application.factory.CalculationCompletedEventFactory;
+import cs.rug.co2calculationservice.application.factory.CalculationFailedEventFactory;
 import cs.rug.co2calculationservice.application.out.CalculationResultPublisher;
 import cs.rug.co2calculationservice.application.out.EmissionFactorLookup;
 import cs.rug.co2calculationservice.application.out.ResourceProfileLookup;
@@ -38,7 +40,8 @@ class CalculateCo2ProcessorTest {
                 new StaticEmissionFactorLookup(),
                 publisher,
                 VALIDATOR,
-                new CalculationCompletedEventFactory()
+                new CalculationCompletedEventFactory(),
+                new CalculationFailedEventFactory()
         );
 
         CalculateCo2Response response = processor.process(CalculateCo2Request
@@ -79,14 +82,14 @@ class CalculateCo2ProcessorTest {
 
         assertThat(response.getStatus()).isEqualTo("SUCCEEDED");
         assertThat(response.getEvent().getResult().getValue()).isEqualByComparingTo("108.2212");
-        assertThat(response.getEvent().getResult().getUnit()).isEqualTo("kgCO2e");
+        assertThat(response.getEvent().getResult().getUnit()).isEqualTo("kg");
         assertThat(response.getEvent().getResourceBreakdown()).hasSize(1);
         assertThat(response.getEvent().getResourceBreakdown().getFirst().getEmissionValue())
                 .isEqualByComparingTo("108.2212");
         assertThat(response.getEvent().getCalculationRequestId()).isEqualTo("calculation-request-1");
         assertThat(response.getEvent().getObservationId()).isEqualTo("observation-1");
         assertThat(response.getEvent().getSourceEventId()).isEqualTo("source-event-1");
-        assertThat(response.getEvent()).isSameAs(publisher.publishedEvent);
+        assertThat(response.getEvent()).isSameAs(publisher.publishedCompletedEvent);
     }
 
     @Test
@@ -97,7 +100,8 @@ class CalculateCo2ProcessorTest {
                 new StaticEmissionFactorLookup(),
                 publisher,
                 VALIDATOR,
-                new CalculationCompletedEventFactory()
+                new CalculationCompletedEventFactory(),
+                new CalculationFailedEventFactory()
         );
 
         CalculateCo2Response response = processor.process(CalculateCo2Request
@@ -135,9 +139,10 @@ class CalculateCo2ProcessorTest {
                 .build());
 
         assertThat(response.getStatus()).isEqualTo("FAILED");
-        assertThat(response.getEvent()).isSameAs(publisher.publishedEvent);
-        assertThat(response.getEvent().getErrors())
-                .singleElement()
+        assertThat(response.getEvent()).isNull();
+        assertThat(response.getEventId()).isEqualTo(publisher.publishedFailedEvent.getEventId());
+        assertThat(publisher.publishedCompletedEvent).isNull();
+        assertThat(publisher.publishedFailedEvent.getError())
                 .satisfies(error -> {
                     assertThat(error.getCode()).isEqualTo("INVALID_CALCULATION_REQUEST");
                     assertThat(error.getMessage()).contains("timeUsed");
@@ -152,7 +157,8 @@ class CalculateCo2ProcessorTest {
                 new StaticEmissionFactorLookup(),
                 publisher,
                 VALIDATOR,
-                new CalculationCompletedEventFactory()
+                new CalculationCompletedEventFactory(),
+                new CalculationFailedEventFactory()
         );
 
         CalculateCo2Response response = processor.process(CalculateCo2Request
@@ -191,9 +197,10 @@ class CalculateCo2ProcessorTest {
                 .build());
 
         assertThat(response.getStatus()).isEqualTo("FAILED");
-        assertThat(response.getEvent()).isSameAs(publisher.publishedEvent);
-        assertThat(response.getEvent().getErrors())
-                .singleElement()
+        assertThat(response.getEvent()).isNull();
+        assertThat(response.getEventId()).isEqualTo(publisher.publishedFailedEvent.getEventId());
+        assertThat(publisher.publishedCompletedEvent).isNull();
+        assertThat(publisher.publishedFailedEvent.getError())
                 .satisfies(error -> assertThat(error.getCode()).isEqualTo("RESOURCE_USAGE_UNIT_MISMATCH"));
     }
 
@@ -235,11 +242,17 @@ class CalculateCo2ProcessorTest {
     }
 
     private static class CapturingPublisher implements CalculationResultPublisher {
-        private KeiCalculationCompletedEvent publishedEvent;
+        private KeiCalculationCompletedEvent publishedCompletedEvent;
+        private KeiCalculationFailedEvent publishedFailedEvent;
 
         @Override
-        public void publish(KeiCalculationCompletedEvent event) {
-            this.publishedEvent = event;
+        public void publishCompleted(KeiCalculationCompletedEvent event) {
+            this.publishedCompletedEvent = event;
+        }
+
+        @Override
+        public void publishFailed(KeiCalculationFailedEvent event) {
+            this.publishedFailedEvent = event;
         }
     }
 }

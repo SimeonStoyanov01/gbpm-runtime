@@ -1,7 +1,8 @@
 package cs.rug.keievaluationservice.infrastructure.messaging.outbound;
 
 import cs.rug.keievaluationservice.api.events.evaluationcompleted.KeiEvaluationCompletedEvent;
-import cs.rug.keievaluationservice.application.out.EvaluationResultPublisher;
+import cs.rug.keievaluationservice.api.events.thresholdviolationdetected.ThresholdViolationDetectedEvent;
+import cs.rug.keievaluationservice.application.out.EvaluationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
@@ -13,22 +14,31 @@ import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
-public class RabbitEvaluationResultPublisher implements EvaluationResultPublisher {
+public class RabbitEvaluationEventPublisher implements EvaluationEventPublisher {
 
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
-    private final EvaluationResultRabbitMqProperties properties;
+    private final EvaluationEventRabbitMqProperties properties;
 
     @Override
-    public void publish(KeiEvaluationCompletedEvent event) {
+    public void publishEvaluation(KeiEvaluationCompletedEvent event) {
         rabbitTemplate.send(
                 properties.getExchangeName(),
-                properties.getRoutingKey(),
+                properties.getEvaluationRoutingKey(),
                 buildJsonMessage(event)
         );
     }
 
-    private Message buildJsonMessage(KeiEvaluationCompletedEvent event) {
+    @Override
+    public void publishViolation(ThresholdViolationDetectedEvent event) {
+        rabbitTemplate.send(
+                properties.getExchangeName(),
+                properties.getViolationRoutingKey(),
+                buildJsonMessage(event)
+        );
+    }
+
+    private Message buildJsonMessage(Object event) {
         try {
             return MessageBuilder
                     .withBody(objectMapper.writeValueAsBytes(event))
