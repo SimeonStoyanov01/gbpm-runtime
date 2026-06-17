@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Getter
 @Builder
@@ -14,4 +15,5 @@ import java.math.BigDecimal;
 public class CalculatedResult {
     private BigDecimal value;
     private String unit;
+    private Instant calculatedAt;
 }

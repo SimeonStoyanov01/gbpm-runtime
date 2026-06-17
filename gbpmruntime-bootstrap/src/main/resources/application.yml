@@ -34,3 +34,6 @@ gbpmruntime:
 
 camunda8-integration:
   url: ${CAMUNDA8_INTEGRATION_URL:http://localhost:8090}
+
+monitoring-results-service:
+  url: ${MONITORING_RESULTS_SERVICE_URL:http://localhost:8094}

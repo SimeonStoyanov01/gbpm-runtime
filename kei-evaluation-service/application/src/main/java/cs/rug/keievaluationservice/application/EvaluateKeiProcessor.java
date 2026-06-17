@@ -129,6 +129,7 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
                         .builder()
                         .value(calculatedValue)
                         .unit(event.getResult().getUnit())
+                        .calculatedAt(event.getOccurredAt())
                         .build())
                 .evaluation(EvaluationDetails
                         .builder()

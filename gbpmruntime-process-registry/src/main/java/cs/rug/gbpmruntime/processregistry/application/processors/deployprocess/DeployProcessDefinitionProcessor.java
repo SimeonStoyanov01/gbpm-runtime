@@ -7,6 +7,7 @@ import cs.rug.gbpmruntime.processregistry.application.out.bpmn4es.Bpmn4esKeiAnno
 import cs.rug.gbpmruntime.processregistry.application.model.bpmn4es.ElementKeiAnnotations;
 import cs.rug.gbpmruntime.processregistry.application.out.engine.WorkflowEngineCommandClient;
 import cs.rug.gbpmruntime.processregistry.application.out.keiregistry.ProcessKeiAnnotationRegistry;
+import cs.rug.gbpmruntime.processregistry.application.out.monitoring.MonitoringProcessModelClient;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class DeployProcessDefinitionProcessor implements DeployProcessDefinition
     private final WorkflowEngineCommandClient workflowEngineCommandClient;
     private final Bpmn4esKeiAnnotationParser bpmn4esKeiAnnotationParser;
     private final ProcessKeiAnnotationRegistry processKeiAnnotationRegistry;
+    private final MonitoringProcessModelClient monitoringProcessModelClient;
 
     @Override
     public DeployProcessDefinitionResponse process(DeployProcessDefinitionRequest request) {
@@ -33,6 +35,7 @@ public class DeployProcessDefinitionProcessor implements DeployProcessDefinition
                 Long.valueOf(deployProcessDefinitionResponse.getProcessDefinitionKey()),
                 elementKeiAnnotations
         );
+        monitoringProcessModelClient.registerProcessModel(deployProcessDefinitionResponse, elementKeiAnnotations);
 
         return deployProcessDefinitionResponse;
     }

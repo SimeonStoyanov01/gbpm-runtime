@@ -1,3 +1,5 @@
+name: co2-calculation-local
+
 services:
   postgres:
     image: postgres:16
