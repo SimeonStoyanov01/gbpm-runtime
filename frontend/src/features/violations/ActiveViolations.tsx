@@ -1,0 +1,76 @@
+import { useState } from 'react';
+import type { ActiveViolationFilters, ThresholdViolation } from '../../api/types';
+import { Endpoint } from '../../components/Endpoint';
+import { EmptyState } from '../../components/EmptyState';
+import { Panel } from '../../components/Panel';
+import { StatusBadge } from '../../components/StatusBadge';
+import { formatDateTime } from '../../utils/format';
+
+type ActiveViolationsProps = {
+  violations: ThresholdViolation[];
+  onFilter: (filters: ActiveViolationFilters) => void;
+};
+
+export function ActiveViolations({ violations, onFilter }: ActiveViolationsProps) {
+  const [filters, setFilters] = useState<ActiveViolationFilters>({});
+
+  function updateFilter(key: keyof ActiveViolationFilters, value: string) {
+    setFilters((current) => ({ ...current, [key]: value }));
+  }
+
+  return (
+    <section id="violations">
+      <h2 className="section-title">Active Violations</h2>
+      <Panel title="Current threshold violations" action={<Endpoint>GET :8094 /api/monitoring/violations/active</Endpoint>}>
+        <div className="filter-bar" style={{ gridTemplateColumns: '1fr 1fr auto' }}>
+          <div>
+            <label>Process Definition Key</label>
+            <input value={filters.processDefinitionKey || ''} onChange={(event) => updateFilter('processDefinitionKey', event.target.value)} />
+          </div>
+          <div>
+            <label>BPMN Process ID</label>
+            <input value={filters.bpmnProcessId || ''} onChange={(event) => updateFilter('bpmnProcessId', event.target.value)} />
+          </div>
+          <button onClick={() => onFilter(filters)}>Apply filters</button>
+        </div>
+
+        {violations.length === 0 ? (
+          <EmptyState>No active threshold violations.</EmptyState>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Process</th>
+                  <th>Instance Key</th>
+                  <th>Service Task</th>
+                  <th>Emission Type</th>
+                  <th>Calculated</th>
+                  <th>Target</th>
+                  <th>Difference</th>
+                  <th>Status</th>
+                  <th>Occurred At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {violations.map((violation) => (
+                  <tr key={violation.eventId} className="violation-row">
+                    <td>{violation.bpmnProcessId || '-'}</td>
+                    <td className="mono">{violation.processInstanceKey || '-'}</td>
+                    <td>{violation.serviceTaskId || '-'}</td>
+                    <td>{violation.emissionType || '-'}</td>
+                    <td>{violation.calculatedValue ?? '-'}</td>
+                    <td>{violation.targetValue ?? '-'}</td>
+                    <td>{violation.difference ?? '-'}</td>
+                    <td><StatusBadge value={violation.status} /></td>
+                    <td>{formatDateTime(violation.occurredAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+    </section>
+  );
+}

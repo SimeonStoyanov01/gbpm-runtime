@@ -1,0 +1,16 @@
+:root {
+  --bg: #f5f7fa;
+  --surface: #fff;
+  --muted: #667085;
+  --line: #d8dee8;
+  --primary: #25476a;
+  --primary-soft: #e6eef7;
+  --success: #157347;
+  --success-bg: #e8f5ee;
+  --danger: #b42318;
+  --danger-bg: #fdecea;
+  --live: #edf7ff;
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --radius: 8px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
