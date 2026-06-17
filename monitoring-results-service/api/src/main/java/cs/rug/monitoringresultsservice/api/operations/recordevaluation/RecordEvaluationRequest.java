@@ -31,6 +31,7 @@ public class RecordEvaluationRequest implements ProcessorRequest {
     private String keiTargetValue;
     private BigDecimal calculatedValue;
     private String calculatedUnit;
+    private Instant calculatedAt;
     private BigDecimal targetValue;
     private BigDecimal difference;
     private String evaluationStatus;

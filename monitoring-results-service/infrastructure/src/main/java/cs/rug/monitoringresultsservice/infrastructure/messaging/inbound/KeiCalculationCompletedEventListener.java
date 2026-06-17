@@ -29,6 +29,15 @@ public class KeiCalculationCompletedEventListener {
         }
 
         log.info("Received KEI calculation completed event: eventId={}", event.getEventId());
+        if (hasTargetValue(event)) {
+            log.info(
+                    "Skipping calculation monitoring projection because target value is present: eventId={}, keiId={}",
+                    event.getEventId(),
+                    event.getKei().getId()
+            );
+            return;
+        }
+
         recordCalculationOperation.process(calculationCompletedEventMapper.toRequest(event));
     }
 
@@ -38,5 +47,9 @@ public class KeiCalculationCompletedEventListener {
         } catch (Exception exception) {
             throw new IllegalArgumentException("Failed to deserialize KEI calculation completed event.", exception);
         }
+    }
+
+    private boolean hasTargetValue(KeiCalculationCompletedEvent event) {
+        return event.getKei().getTargetValue() != null && !event.getKei().getTargetValue().isBlank();
     }
 }

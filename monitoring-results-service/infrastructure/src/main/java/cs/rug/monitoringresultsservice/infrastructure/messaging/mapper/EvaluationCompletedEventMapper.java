@@ -27,6 +27,7 @@ public class EvaluationCompletedEventMapper {
                 .keiTargetValue(event.getKei().getTargetValue())
                 .calculatedValue(event.getCalculatedResult().getValue())
                 .calculatedUnit(event.getCalculatedResult().getUnit())
+                .calculatedAt(event.getCalculatedResult().getCalculatedAt())
                 .targetValue(event.getEvaluation().getTargetValue())
                 .difference(event.getEvaluation().getDifference())
                 .evaluationStatus(event.getEvaluation().getStatus())

@@ -6,6 +6,10 @@ import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindA
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.ProcessModelElement;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.ProcessModelKeiAnnotation;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelResponse;
 import cs.rug.monitoringresultsservice.application.out.MonitoringRecordStore;
 import cs.rug.monitoringresultsservice.application.out.ThresholdViolationStore;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.BpmnElementEntity;
@@ -60,18 +64,7 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
                 .or(() -> findByExecution(processInstance, bpmnElement, keiAnnotation, request.getElementInstanceKey()))
                 .orElseGet(this::newResult);
 
-        result.setProcessInstance(processInstance);
-        result.setBpmnElement(bpmnElement);
-        result.setKeiAnnotation(keiAnnotation);
-        result.setElementInstanceKey(request.getElementInstanceKey());
-        result.setCalculationEventId(request.getEventId());
-        result.setCalculationRequestId(request.getCalculationRequestId());
-        result.setObservationId(request.getObservationId());
-        result.setSourceEventId(request.getSourceEventId());
-        result.setCalculatedValue(request.getCalculatedValue());
-        result.setCalculatedUnit(request.getCalculatedUnit());
-        result.setCalculatedAt(request.getOccurredAt());
-        result.setUpdatedAt(Instant.now());
+        applyCalculation(result, request, processInstance, bpmnElement, keiAnnotation);
 
         return toMonitoringRecord(keiResultRepository.save(result));
     }
@@ -99,22 +92,7 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
                 .or(() -> findByExecution(processInstance, bpmnElement, keiAnnotation, request.getElementInstanceKey()))
                 .orElseGet(this::newResult);
 
-        result.setProcessInstance(processInstance);
-        result.setBpmnElement(bpmnElement);
-        result.setKeiAnnotation(keiAnnotation);
-        result.setElementInstanceKey(request.getElementInstanceKey());
-        result.setCalculationEventId(request.getCalculationResultId());
-        result.setEvaluationEventId(request.getEventId());
-        result.setCalculationRequestId(request.getCalculationRequestId());
-        result.setObservationId(request.getObservationId());
-        result.setSourceEventId(request.getSourceEventId());
-        result.setCalculatedValue(request.getCalculatedValue());
-        result.setCalculatedUnit(request.getCalculatedUnit());
-        result.setTargetValue(request.getTargetValue());
-        result.setDifference(request.getDifference());
-        result.setEvaluationStatus(request.getEvaluationStatus());
-        result.setEvaluatedAt(request.getOccurredAt());
-        result.setUpdatedAt(Instant.now());
+        applyEvaluation(result, request, processInstance, bpmnElement, keiAnnotation);
 
         return toMonitoringRecord(keiResultRepository.save(result));
     }
@@ -138,6 +116,48 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
 
     @Override
     @Transactional
+    public RegisterProcessModelResponse registerProcessModel(RegisterProcessModelRequest request) {
+        ProcessDefinitionEntity processDefinition = processDefinition(
+                request.getProcessDefinitionKey(),
+                request.getBpmnProcessId()
+        );
+        applyProcessModel(processDefinition, request);
+        processDefinitionRepository.save(processDefinition);
+
+        int annotationCount = 0;
+        if (request.getElements() != null) {
+            for (ProcessModelElement element : request.getElements()) {
+                BpmnElementEntity bpmnElement = bpmnElement(processDefinition, element.getBpmnElementId());
+                applyProcessModelElement(bpmnElement, element);
+                bpmnElementRepository.save(bpmnElement);
+
+                if (element.getKeiAnnotations() != null) {
+                    for (ProcessModelKeiAnnotation annotation : element.getKeiAnnotations()) {
+                        KeiAnnotationEntity keiAnnotation = keiAnnotation(
+                                bpmnElement,
+                                annotation.getId(),
+                                annotation.getName(),
+                                annotation.getUnit(),
+                                annotation.getTargetValue()
+                        );
+                        applyProcessModelKeiAnnotation(keiAnnotation, annotation);
+                        keiAnnotationRepository.save(keiAnnotation);
+                        annotationCount++;
+                    }
+                }
+            }
+        }
+
+        return RegisterProcessModelResponse
+                .builder()
+                .processDefinitionKey(request.getProcessDefinitionKey())
+                .elementCount(request.getElements() == null ? 0 : request.getElements().size())
+                .keiAnnotationCount(annotationCount)
+                .build();
+    }
+
+    @Override
+    @Transactional
     public ThresholdViolation saveOrUpdateActiveViolation(ThresholdViolation violation) {
         ThresholdViolationEntity entity = thresholdViolationRepository
                 .findByEventId(violation.getEventId())
@@ -145,14 +165,7 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
 
         KeiResultEntity result = findResultForViolation(violation);
 
-        entity.setEventId(violation.getEventId());
-        entity.setKeiResult(result);
-        entity.setStatus(violation.getStatus());
-        entity.setCalculatedValue(violation.getCalculatedValue());
-        entity.setTargetValue(violation.getTargetValue());
-        entity.setDifference(violation.getDifference());
-        entity.setOccurredAt(violation.getOccurredAt());
-        entity.setUpdatedAt(Instant.now());
+        applyViolation(entity, violation, result);
 
         return toThresholdViolation(thresholdViolationRepository.save(entity));
     }
@@ -171,7 +184,10 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     private ProcessDefinitionEntity processDefinition(Long processDefinitionKey, String bpmnProcessId) {
         ProcessDefinitionEntity entity = processDefinitionRepository
                 .findByProcessDefinitionKey(processDefinitionKey)
-                .orElseGet(ProcessDefinitionEntity::new);
+                .orElseGet(() -> ProcessDefinitionEntity
+                        .builder()
+                        .processDefinitionKey(processDefinitionKey)
+                        .build());
 
         entity.setProcessDefinitionKey(processDefinitionKey);
         entity.setBpmnProcessId(bpmnProcessId);
@@ -184,7 +200,10 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     ) {
         ProcessInstanceEntity entity = processInstanceRepository
                 .findByProcessInstanceKey(processInstanceKey)
-                .orElseGet(ProcessInstanceEntity::new);
+                .orElseGet(() -> ProcessInstanceEntity
+                        .builder()
+                        .processInstanceKey(processInstanceKey)
+                        .build());
 
         entity.setProcessInstanceKey(processInstanceKey);
         entity.setProcessDefinition(processDefinition);
@@ -194,7 +213,11 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     private BpmnElementEntity bpmnElement(ProcessDefinitionEntity processDefinition, String bpmnElementId) {
         BpmnElementEntity entity = bpmnElementRepository
                 .findByProcessDefinitionAndBpmnElementId(processDefinition, bpmnElementId)
-                .orElseGet(BpmnElementEntity::new);
+                .orElseGet(() -> BpmnElementEntity
+                        .builder()
+                        .processDefinition(processDefinition)
+                        .bpmnElementId(bpmnElementId)
+                        .build());
 
         entity.setProcessDefinition(processDefinition);
         entity.setBpmnElementId(bpmnElementId);
@@ -210,7 +233,11 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     ) {
         KeiAnnotationEntity entity = keiAnnotationRepository
                 .findByBpmnElementAndKeiId(bpmnElement, keiId)
-                .orElseGet(KeiAnnotationEntity::new);
+                .orElseGet(() -> KeiAnnotationEntity
+                        .builder()
+                        .bpmnElement(bpmnElement)
+                        .keiId(keiId)
+                        .build());
 
         entity.setBpmnElement(bpmnElement);
         entity.setKeiId(keiId);
@@ -257,33 +284,125 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
                 )
                 .orElseGet(() -> {
                     KeiResultEntity result = newResult();
-                    result.setProcessInstance(processInstance);
-                    result.setBpmnElement(bpmnElement);
-                    result.setKeiAnnotation(keiAnnotation);
-                    result.setCalculatedValue(violation.getCalculatedValue());
-                    result.setTargetValue(violation.getTargetValue());
-                    result.setDifference(violation.getDifference());
-                    result.setEvaluationStatus(violation.getStatus());
-                    result.setEvaluatedAt(violation.getOccurredAt());
-                    result.setUpdatedAt(Instant.now());
+                    applyViolationMarker(result, violation, processInstance, bpmnElement, keiAnnotation);
                     return keiResultRepository.save(result);
                 });
     }
 
     private KeiResultEntity newResult() {
-        KeiResultEntity entity = new KeiResultEntity();
         Instant now = Instant.now();
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
-        return entity;
+        return KeiResultEntity
+                .builder()
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
     }
 
     private ThresholdViolationEntity newViolation() {
-        ThresholdViolationEntity entity = new ThresholdViolationEntity();
         Instant now = Instant.now();
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
-        return entity;
+        return ThresholdViolationEntity
+                .builder()
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    private void applyViolation(
+            ThresholdViolationEntity entity,
+            ThresholdViolation violation,
+            KeiResultEntity result
+    ) {
+        entity.setEventId(violation.getEventId());
+        entity.setKeiResult(result);
+        entity.setStatus(violation.getStatus());
+        entity.setCalculatedValue(violation.getCalculatedValue());
+        entity.setTargetValue(violation.getTargetValue());
+        entity.setDifference(violation.getDifference());
+        entity.setOccurredAt(violation.getOccurredAt());
+        entity.setUpdatedAt(Instant.now());
+    }
+
+    private void applyCalculation(
+            KeiResultEntity entity,
+            RecordCalculationRequest request,
+            ProcessInstanceEntity processInstance,
+            BpmnElementEntity bpmnElement,
+            KeiAnnotationEntity keiAnnotation
+    ) {
+        entity.setProcessInstance(processInstance);
+        entity.setBpmnElement(bpmnElement);
+        entity.setKeiAnnotation(keiAnnotation);
+        entity.setElementInstanceKey(request.getElementInstanceKey());
+        entity.setCalculationEventId(request.getEventId());
+        entity.setCalculationRequestId(request.getCalculationRequestId());
+        entity.setObservationId(request.getObservationId());
+        entity.setSourceEventId(request.getSourceEventId());
+        entity.setCalculatedValue(request.getCalculatedValue());
+        entity.setCalculatedUnit(request.getCalculatedUnit());
+        entity.setCalculatedAt(request.getOccurredAt());
+        entity.setUpdatedAt(Instant.now());
+    }
+
+    private void applyEvaluation(
+            KeiResultEntity entity,
+            RecordEvaluationRequest request,
+            ProcessInstanceEntity processInstance,
+            BpmnElementEntity bpmnElement,
+            KeiAnnotationEntity keiAnnotation
+    ) {
+        entity.setProcessInstance(processInstance);
+        entity.setBpmnElement(bpmnElement);
+        entity.setKeiAnnotation(keiAnnotation);
+        entity.setElementInstanceKey(request.getElementInstanceKey());
+        entity.setCalculationEventId(request.getCalculationResultId());
+        entity.setEvaluationEventId(request.getEventId());
+        entity.setCalculationRequestId(request.getCalculationRequestId());
+        entity.setObservationId(request.getObservationId());
+        entity.setSourceEventId(request.getSourceEventId());
+        entity.setCalculatedValue(request.getCalculatedValue());
+        entity.setCalculatedUnit(request.getCalculatedUnit());
+        entity.setCalculatedAt(request.getCalculatedAt());
+        entity.setTargetValue(request.getTargetValue());
+        entity.setDifference(request.getDifference());
+        entity.setEvaluationStatus(request.getEvaluationStatus());
+        entity.setEvaluatedAt(request.getOccurredAt());
+        entity.setUpdatedAt(Instant.now());
+    }
+
+    private void applyProcessModel(ProcessDefinitionEntity entity, RegisterProcessModelRequest request) {
+        entity.setDeploymentKey(request.getDeploymentKey());
+        entity.setVersion(request.getVersion());
+        entity.setDeployedAt(Instant.now());
+    }
+
+    private void applyProcessModelElement(BpmnElementEntity entity, ProcessModelElement element) {
+        entity.setElementName(element.getName());
+        entity.setElementType(element.getType());
+    }
+
+    private void applyProcessModelKeiAnnotation(
+            KeiAnnotationEntity entity,
+            ProcessModelKeiAnnotation annotation
+    ) {
+        entity.setIcon(annotation.getIcon());
+    }
+
+    private void applyViolationMarker(
+            KeiResultEntity entity,
+            ThresholdViolation violation,
+            ProcessInstanceEntity processInstance,
+            BpmnElementEntity bpmnElement,
+            KeiAnnotationEntity keiAnnotation
+    ) {
+        entity.setProcessInstance(processInstance);
+        entity.setBpmnElement(bpmnElement);
+        entity.setKeiAnnotation(keiAnnotation);
+        entity.setCalculatedValue(violation.getCalculatedValue());
+        entity.setTargetValue(violation.getTargetValue());
+        entity.setDifference(violation.getDifference());
+        entity.setEvaluationStatus(violation.getStatus());
+        entity.setEvaluatedAt(violation.getOccurredAt());
+        entity.setUpdatedAt(Instant.now());
     }
 
     private boolean matchesMonitoringFilter(KeiResultEntity result, FindMonitoringRecordsRequest request) {

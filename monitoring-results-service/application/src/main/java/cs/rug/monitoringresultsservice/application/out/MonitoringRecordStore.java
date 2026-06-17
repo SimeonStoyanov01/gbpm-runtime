@@ -5,6 +5,8 @@ import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelResponse;
 
 import java.util.List;
 
@@ -17,4 +19,6 @@ public interface MonitoringRecordStore {
     void saveViolationMarker(ThresholdViolation violation);
 
     List<MonitoringRecord> findMonitoringRecords(FindMonitoringRecordsRequest request);
+
+    RegisterProcessModelResponse registerProcessModel(RegisterProcessModelRequest request);
 }

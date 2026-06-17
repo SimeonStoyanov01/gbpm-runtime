@@ -11,11 +11,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(
         name = "kei_annotation",
@@ -46,4 +52,7 @@ public class KeiAnnotationEntity {
 
     @Column(name = "target_value")
     private String targetValue;
+
+    @Column(name = "icon")
+    private String icon;
 }

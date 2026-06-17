@@ -6,6 +6,8 @@ import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindA
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
+import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelResponse;
 import cs.rug.monitoringresultsservice.application.out.MonitoringRecordStore;
 import cs.rug.monitoringresultsservice.application.out.ThresholdViolationStore;
 
@@ -45,6 +47,24 @@ public class InMemoryMonitoringStore implements MonitoringRecordStore, Threshold
                 .stream()
                 .filter(record -> matchesMonitoringFilter(record, request))
                 .toList();
+    }
+
+    @Override
+    public RegisterProcessModelResponse registerProcessModel(RegisterProcessModelRequest request) {
+        int elementCount = request.getElements() == null ? 0 : request.getElements().size();
+        int annotationCount = request.getElements() == null
+                ? 0
+                : request.getElements()
+                        .stream()
+                        .mapToInt(element -> element.getKeiAnnotations() == null ? 0 : element.getKeiAnnotations().size())
+                        .sum();
+
+        return RegisterProcessModelResponse
+                .builder()
+                .processDefinitionKey(request.getProcessDefinitionKey())
+                .elementCount(elementCount)
+                .keiAnnotationCount(annotationCount)
+                .build();
     }
 
     @Override
