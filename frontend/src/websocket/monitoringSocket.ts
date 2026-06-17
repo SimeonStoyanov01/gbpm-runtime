@@ -5,13 +5,29 @@ export type MonitoringSocketHandlers = {
   onCalculation: (record: MonitoringRecord) => void;
   onEvaluation: (record: MonitoringRecord) => void;
   onViolation: (violation: ThresholdViolation) => void;
+  onStatus?: (status: MonitoringSocketStatus) => void;
+  onError?: (message: string) => void;
 };
 
+export type MonitoringSocketStatus = 'connecting' | 'connected' | 'disconnected';
+
 export function connectMonitoringSocket(handlers: MonitoringSocketHandlers): Client {
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const client = new Client({
-    brokerURL: `ws://${window.location.hostname}:8094/ws/monitoring`,
+    brokerURL: `${protocol}://${window.location.hostname}:8094/ws/monitoring`,
     reconnectDelay: 3000,
+    connectionTimeout: 5000,
+    onWebSocketClose: () => handlers.onStatus?.('disconnected'),
+    onWebSocketError: () => {
+      handlers.onStatus?.('disconnected');
+      handlers.onError?.('Monitoring WebSocket connection failed.');
+    },
+    onStompError: (frame) => {
+      handlers.onStatus?.('disconnected');
+      handlers.onError?.(frame.headers.message || 'Monitoring STOMP connection failed.');
+    },
     onConnect: () => {
+      handlers.onStatus?.('connected');
       client.subscribe('/topic/monitoring/calculations', (message) => {
         handlers.onCalculation(JSON.parse(message.body) as MonitoringRecord);
       });
@@ -24,6 +40,7 @@ export function connectMonitoringSocket(handlers: MonitoringSocketHandlers): Cli
     },
   });
 
+  handlers.onStatus?.('connecting');
   client.activate();
   return client;
 }

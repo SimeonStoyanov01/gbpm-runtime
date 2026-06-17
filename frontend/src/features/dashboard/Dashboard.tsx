@@ -3,13 +3,15 @@ import { Panel } from '../../components/Panel';
 import { StatusBadge } from '../../components/StatusBadge';
 import type { MonitoringRecord, ThresholdViolation } from '../../api/types';
 import { formatDateTime, formatMeasurement, latestByTime } from '../../utils/format';
+import { LiveResults } from './LiveResults';
 
 type DashboardProps = {
   records: MonitoringRecord[];
   violations: ThresholdViolation[];
+  socketStatus: string;
 };
 
-export function Dashboard({ records, violations }: DashboardProps) {
+export function Dashboard({ records, violations, socketStatus }: DashboardProps) {
   const latestRecord = latestByTime(records, (record) => record.evaluatedAt || record.calculatedAt);
   const violatedRecords = records.filter((record) => record.evaluationStatus === 'VIOLATED');
 
@@ -27,6 +29,10 @@ export function Dashboard({ records, violations }: DashboardProps) {
           sub={latestRecord?.keiId || 'No calculations yet'}
         />
       </div>
+
+      <Panel title="Live Results" action={<span className={`badge ${socketStatus === 'connected' ? 'live' : 'neutral'}`}>Socket {socketStatus}</span>}>
+        <LiveResults records={records} />
+      </Panel>
 
       <div className="grid-2" style={{ marginTop: 18 }}>
         <Panel title="Latest Monitoring Records" action={<span className="badge live">Live updated</span>}>

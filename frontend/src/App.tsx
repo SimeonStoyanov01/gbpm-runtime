@@ -14,6 +14,7 @@ import { Processes } from './features/processes/Processes';
 import { MonitoringRecords } from './features/records/MonitoringRecords';
 import { ActiveViolations } from './features/violations/ActiveViolations';
 import { connectMonitoringSocket } from './websocket/monitoringSocket';
+import type { MonitoringSocketStatus } from './websocket/monitoringSocket';
 
 export function App() {
   const [records, setRecords] = useState<MonitoringRecord[]>([]);
@@ -22,14 +23,15 @@ export function App() {
   const [evaluationEvents, setEvaluationEvents] = useState<MonitoringRecord[]>([]);
   const [violationEvents, setViolationEvents] = useState<ThresholdViolation[]>([]);
   const [latestDeployment, setLatestDeployment] = useState<DeployProcessResponse>();
+  const [socketStatus, setSocketStatus] = useState<MonitoringSocketStatus>('disconnected');
   const [error, setError] = useState<string>();
 
   async function loadRecords(filters?: MonitoringRecordFilters) {
-    setRecords(await findMonitoringRecords(filters));
+    setRecords(sortRecords(await findMonitoringRecords(filters)));
   }
 
   async function loadViolations(filters?: ActiveViolationFilters) {
-    setViolations(await findActiveViolations(filters));
+    setViolations(sortViolations(await findActiveViolations(filters)));
   }
 
   useEffect(() => {
@@ -52,6 +54,13 @@ export function App() {
         setViolationEvents((current) => [violation, ...current]);
         setViolations((current) => upsertViolation(current, violation));
       },
+      onStatus: (status) => {
+        setSocketStatus(status);
+        if (status === 'connected') {
+          setError(undefined);
+        }
+      },
+      onError: setError,
     });
 
     return () => {
@@ -67,7 +76,7 @@ export function App() {
           Latest deployment: <span className="mono">{latestDeployment.processDefinitionKey}</span> · {latestDeployment.bpmnProcessId}
         </p>
       )}
-      <Dashboard records={records} violations={violations} />
+      <Dashboard records={records} violations={violations} socketStatus={socketStatus} />
       <Processes onDeployment={setLatestDeployment} />
       <MonitoringRecords
         records={records}
@@ -94,17 +103,36 @@ function upsertRecord(records: MonitoringRecord[], record: MonitoringRecord): Mo
   );
 
   if (index === -1) {
-    return [record, ...records];
+    return sortRecords([record, ...records]);
   }
 
-  return records.map((existing, currentIndex) => currentIndex === index ? { ...existing, ...record } : existing);
+  return sortRecords(records.map((existing, currentIndex) => currentIndex === index ? { ...existing, ...record } : existing));
 }
 
 function upsertViolation(violations: ThresholdViolation[], violation: ThresholdViolation): ThresholdViolation[] {
   const index = violations.findIndex((existing) => existing.eventId === violation.eventId);
   if (index === -1) {
-    return [violation, ...violations];
+    return sortViolations([violation, ...violations]);
   }
 
-  return violations.map((existing, currentIndex) => currentIndex === index ? violation : existing);
+  return sortViolations(violations.map((existing, currentIndex) => currentIndex === index ? violation : existing));
+}
+
+function sortRecords(records: MonitoringRecord[]): MonitoringRecord[] {
+  return [...records].sort((left, right) => monitoringTime(right) - monitoringTime(left));
+}
+
+function sortViolations(violations: ThresholdViolation[]): ThresholdViolation[] {
+  return [...violations].sort((left, right) =>
+    parseTime(right.occurredAt) - parseTime(left.occurredAt),
+  );
+}
+
+function monitoringTime(record: MonitoringRecord): number {
+  return parseTime(record.evaluatedAt || record.calculatedAt);
+}
+
+function parseTime(value?: string): number {
+  const parsed = Date.parse(value || '');
+  return Number.isNaN(parsed) ? 0 : parsed;
 }
