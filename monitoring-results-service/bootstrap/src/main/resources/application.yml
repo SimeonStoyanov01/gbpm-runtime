@@ -1,0 +1,26 @@
+server:
+  port: ${MONITORING_RESULTS_SERVICE_PORT:8094}
+
+spring:
+  application:
+    name: monitoring-results-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:gbpmruntime}
+    password: ${RABBITMQ_PASSWORD:gbpmruntime}
+
+gbpmruntime:
+  messaging:
+    calculation-result:
+      exchange-name: ${GBPMRUNTIME_CALCULATION_RESULT_EXCHANGE:gbpmruntime.calculation.events}
+      routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_ROUTING_KEY:kei.calculation.completed}
+      queue-name: ${GBPMRUNTIME_MONITORING_CALCULATION_RESULT_QUEUE:gbpmruntime.monitoring.kei-calculation-completed}
+    evaluation-result:
+      exchange-name: ${GBPMRUNTIME_EVALUATION_RESULT_EXCHANGE:gbpmruntime.evaluation.events}
+      routing-key: ${GBPMRUNTIME_EVALUATION_RESULT_ROUTING_KEY:kei.evaluation.completed}
+      queue-name: ${GBPMRUNTIME_MONITORING_EVALUATION_RESULT_QUEUE:gbpmruntime.monitoring.kei-evaluation-completed}
+    threshold-violation:
+      exchange-name: ${GBPMRUNTIME_EVALUATION_RESULT_EXCHANGE:gbpmruntime.evaluation.events}
+      routing-key: ${GBPMRUNTIME_THRESHOLD_VIOLATION_ROUTING_KEY:kei.threshold.violation.detected}
+      queue-name: ${GBPMRUNTIME_MONITORING_THRESHOLD_VIOLATION_QUEUE:gbpmruntime.monitoring.threshold-violation-detected}
