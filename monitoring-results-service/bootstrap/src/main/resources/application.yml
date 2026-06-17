@@ -9,6 +9,18 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:gbpmruntime}
     password: ${RABBITMQ_PASSWORD:gbpmruntime}
+  datasource:
+    url: ${MONITORING_RESULTS_DATASOURCE_URL:jdbc:postgresql://localhost:5434/monitoring_results}
+    username: ${MONITORING_RESULTS_DATASOURCE_USERNAME:monitoring_results}
+    password: ${MONITORING_RESULTS_DATASOURCE_PASSWORD:monitoring_results}
+  jpa:
+    hibernate:
+      ddl-auto: ${MONITORING_RESULTS_JPA_DDL_AUTO:update}
+    open-in-view: false
+    properties:
+      hibernate:
+        schema_update:
+          unique_constraint_strategy: RECREATE_QUIETLY
 
 gbpmruntime:
   messaging:

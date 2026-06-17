@@ -8,13 +8,11 @@ import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCa
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
 import cs.rug.monitoringresultsservice.application.out.MonitoringRecordStore;
 import cs.rug.monitoringresultsservice.application.out.ThresholdViolationStore;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@Component
 public class InMemoryMonitoringStore implements MonitoringRecordStore, ThresholdViolationStore {
 
     private final ConcurrentMap<String, MonitoringRecord> recordsByCalculationEventId = new ConcurrentHashMap<>();

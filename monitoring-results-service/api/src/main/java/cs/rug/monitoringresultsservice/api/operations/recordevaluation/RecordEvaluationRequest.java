@@ -26,6 +26,9 @@ public class RecordEvaluationRequest implements ProcessorRequest {
     private Long elementInstanceKey;
     private String bpmnElementId;
     private String keiId;
+    private String keiName;
+    private String keiUnit;
+    private String keiTargetValue;
     private BigDecimal calculatedValue;
     private String calculatedUnit;
     private BigDecimal targetValue;
