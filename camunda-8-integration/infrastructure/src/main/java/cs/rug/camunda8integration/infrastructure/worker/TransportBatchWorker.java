@@ -1,6 +1,5 @@
 package cs.rug.camunda8integration.infrastructure.worker;
 
-import cs.rug.camunda8integration.api.model.AssignedResourceModel;
 import cs.rug.camunda8integration.api.model.EngineExecutionContext;
 import cs.rug.camunda8integration.api.model.WorkObjectModel;
 import cs.rug.camunda8integration.api.operations.executetransportbatch.ExecuteTransportBatchOperation;
@@ -15,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -24,15 +21,24 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TransportBatchWorker {
 
-    private static final String JOB_TYPE = "transport-batch";
-    private static final String WORKER_NAME = "transport-worker-1";
+    private static final String LEGACY_JOB_TYPE = "transport-batch";
+    private static final String DEFAULT_JOB_TYPE = "default-worker";
 
     private final ExecuteTransportBatchOperation executeTransportBatchOperation;
     private final EngineTaskCompletedEventPublisher engineTaskCompletedEventPublisher;
     private final ObjectMapper objectMapper;
 
-    @JobWorker(type = JOB_TYPE, name = WORKER_NAME)
+    @JobWorker(type = LEGACY_JOB_TYPE, name = "transport-worker-1")
     public void handleTransportBatch(JobClient jobClient, ActivatedJob job) {
+        handleJob(jobClient, job);
+    }
+
+    @JobWorker(type = DEFAULT_JOB_TYPE, name = "default-worker-1")
+    public void handleDefaultWorker(JobClient jobClient, ActivatedJob job) {
+        handleJob(jobClient, job);
+    }
+
+    private void handleJob(JobClient jobClient, ActivatedJob job) {
         ExecuteTransportBatchResponse response = executeTransportBatchOperation.process(
                 buildRequest(job)
         );
@@ -79,16 +85,15 @@ public class TransportBatchWorker {
                         .processInstanceKey(job.getProcessInstanceKey())
                         .processDefinitionKey(job.getProcessDefinitionKey())
                         .build())
-                .orderId(readRequiredString(variables, "orderId"))
+                .orderId(readOptionalString(variables, "orderId", String.valueOf(job.getProcessInstanceKey())))
                 .workObject(readRequiredValue(variables, "workObject", WorkObjectModel.class))
-                .assignedResources(readAssignedResources(variables, job.getElementId()))
                 .build();
     }
 
-    private String readRequiredString(Map<String, Object> variables, String name) {
+    private String readOptionalString(Map<String, Object> variables, String name, String fallback) {
         Object value = variables.get(name);
         if (value == null || value.toString().isBlank()) {
-            throw new IllegalArgumentException("Missing required process variable: " + name);
+            return fallback;
         }
 
         return value.toString();
@@ -101,22 +106,5 @@ public class TransportBatchWorker {
         }
 
         return objectMapper.convertValue(value, valueType);
-    }
-
-    private List<AssignedResourceModel> readAssignedResources(
-            Map<String, Object> variables,
-            String bpmnElementId
-    ) {
-        Object value = variables.get("resourceAssignments");
-        if (!(value instanceof Map<?, ?> assignmentsByElement)) {
-            throw new IllegalArgumentException("Missing required process variable: resourceAssignments");
-        }
-
-        Object assignedResources = assignmentsByElement.get(bpmnElementId);
-        if (assignedResources == null) {
-            throw new IllegalArgumentException("No resource assignment found for BPMN element: " + bpmnElementId);
-        }
-
-        return Arrays.asList(objectMapper.convertValue(assignedResources, AssignedResourceModel[].class));
     }
 }

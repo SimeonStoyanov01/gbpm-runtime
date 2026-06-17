@@ -4,7 +4,79 @@
     "objectType": "car",
     "material": "steel",
     "resourceName": "Welder",
-    "timeUsed": 999.0,
-    "unit": "minutes"
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_04tru70",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.08,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_15oxmp3",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_0vfi00b",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.5,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_08xdevs",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 4.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1d0ugzo",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 3.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1g2fx8l",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_06mjrx1",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1u7lv5m",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.75,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_09k6v2k",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.5,
+    "unit": "hour"
   }
 ]

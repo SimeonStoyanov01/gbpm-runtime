@@ -37,10 +37,6 @@ public class InMemoryMonitoringStore implements MonitoringRecordStore, Threshold
     }
 
     @Override
-    public void saveViolationMarker(ThresholdViolation violation) {
-    }
-
-    @Override
     public List<MonitoringRecord> findMonitoringRecords(FindMonitoringRecordsRequest request) {
         return recordsByCalculationEventId
                 .values()

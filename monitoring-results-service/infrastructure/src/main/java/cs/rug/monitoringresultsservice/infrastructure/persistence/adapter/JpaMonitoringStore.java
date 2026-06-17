@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -98,12 +99,6 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     }
 
     @Override
-    @Transactional
-    public void saveViolationMarker(ThresholdViolation violation) {
-        findResultForViolation(violation);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<MonitoringRecord> findMonitoringRecords(FindMonitoringRecordsRequest request) {
         return keiResultRepository
@@ -163,9 +158,12 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
                 .findByEventId(violation.getEventId())
                 .orElseGet(this::newViolation);
 
-        KeiResultEntity result = findResultForViolation(violation);
+        Optional<KeiResultEntity> result = findResultForViolation(violation);
+        if (result.isEmpty()) {
+            return violation;
+        }
 
-        applyViolation(entity, violation, result);
+        applyViolation(entity, violation, result.get());
 
         return toThresholdViolation(thresholdViolationRepository.save(entity));
     }
@@ -182,46 +180,33 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     }
 
     private ProcessDefinitionEntity processDefinition(Long processDefinitionKey, String bpmnProcessId) {
-        ProcessDefinitionEntity entity = processDefinitionRepository
+        processDefinitionRepository.upsert(processDefinitionKey, bpmnProcessId);
+        return processDefinitionRepository
                 .findByProcessDefinitionKey(processDefinitionKey)
-                .orElseGet(() -> ProcessDefinitionEntity
-                        .builder()
-                        .processDefinitionKey(processDefinitionKey)
-                        .build());
-
-        entity.setProcessDefinitionKey(processDefinitionKey);
-        entity.setBpmnProcessId(bpmnProcessId);
-        return processDefinitionRepository.save(entity);
+                .orElseThrow(() -> new IllegalStateException(
+                        "Process definition upsert did not return a row: " + processDefinitionKey
+                ));
     }
 
     private ProcessInstanceEntity processInstance(
             Long processInstanceKey,
             ProcessDefinitionEntity processDefinition
     ) {
-        ProcessInstanceEntity entity = processInstanceRepository
+        processInstanceRepository.upsert(processInstanceKey, processDefinition.getId());
+        return processInstanceRepository
                 .findByProcessInstanceKey(processInstanceKey)
-                .orElseGet(() -> ProcessInstanceEntity
-                        .builder()
-                        .processInstanceKey(processInstanceKey)
-                        .build());
-
-        entity.setProcessInstanceKey(processInstanceKey);
-        entity.setProcessDefinition(processDefinition);
-        return processInstanceRepository.save(entity);
+                .orElseThrow(() -> new IllegalStateException(
+                        "Process instance upsert did not return a row: " + processInstanceKey
+                ));
     }
 
     private BpmnElementEntity bpmnElement(ProcessDefinitionEntity processDefinition, String bpmnElementId) {
-        BpmnElementEntity entity = bpmnElementRepository
+        bpmnElementRepository.insertIfMissing(processDefinition.getId(), bpmnElementId);
+        return bpmnElementRepository
                 .findByProcessDefinitionAndBpmnElementId(processDefinition, bpmnElementId)
-                .orElseGet(() -> BpmnElementEntity
-                        .builder()
-                        .processDefinition(processDefinition)
-                        .bpmnElementId(bpmnElementId)
-                        .build());
-
-        entity.setProcessDefinition(processDefinition);
-        entity.setBpmnElementId(bpmnElementId);
-        return bpmnElementRepository.save(entity);
+                .orElseThrow(() -> new IllegalStateException(
+                        "BPMN element upsert did not return a row: " + bpmnElementId
+                ));
     }
 
     private KeiAnnotationEntity keiAnnotation(
@@ -231,23 +216,20 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
             String unit,
             String targetValue
     ) {
+        keiAnnotationRepository.insertIfMissing(bpmnElement.getId(), keiId);
         KeiAnnotationEntity entity = keiAnnotationRepository
                 .findByBpmnElementAndKeiId(bpmnElement, keiId)
-                .orElseGet(() -> KeiAnnotationEntity
-                        .builder()
-                        .bpmnElement(bpmnElement)
-                        .keiId(keiId)
-                        .build());
+                .orElseThrow(() -> new IllegalStateException(
+                        "KEI annotation upsert did not return a row: " + keiId
+                ));
 
-        entity.setBpmnElement(bpmnElement);
-        entity.setKeiId(keiId);
         entity.setName(name);
         entity.setUnit(unit);
         entity.setTargetValue(targetValue);
         return keiAnnotationRepository.save(entity);
     }
 
-    private java.util.Optional<KeiResultEntity> findByExecution(
+    private Optional<KeiResultEntity> findByExecution(
             ProcessInstanceEntity processInstance,
             BpmnElementEntity bpmnElement,
             KeiAnnotationEntity keiAnnotation,
@@ -261,7 +243,7 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
         );
     }
 
-    private KeiResultEntity findResultForViolation(ThresholdViolation violation) {
+    private Optional<KeiResultEntity> findResultForViolation(ThresholdViolation violation) {
         ProcessDefinitionEntity processDefinition = processDefinition(
                 violation.getProcessDefinitionKey(),
                 violation.getBpmnProcessId()
@@ -276,17 +258,11 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
                 null
         );
 
-        return keiResultRepository
-                .findFirstByProcessInstanceAndBpmnElementAndKeiAnnotationOrderByEvaluatedAtDesc(
-                        processInstance,
-                        bpmnElement,
-                        keiAnnotation
-                )
-                .orElseGet(() -> {
-                    KeiResultEntity result = newResult();
-                    applyViolationMarker(result, violation, processInstance, bpmnElement, keiAnnotation);
-                    return keiResultRepository.save(result);
-                });
+        return keiResultRepository.findFirstByProcessInstanceAndBpmnElementAndKeiAnnotationOrderByEvaluatedAtDesc(
+                processInstance,
+                bpmnElement,
+                keiAnnotation
+        );
     }
 
     private KeiResultEntity newResult() {
@@ -385,24 +361,6 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
             ProcessModelKeiAnnotation annotation
     ) {
         entity.setIcon(annotation.getIcon());
-    }
-
-    private void applyViolationMarker(
-            KeiResultEntity entity,
-            ThresholdViolation violation,
-            ProcessInstanceEntity processInstance,
-            BpmnElementEntity bpmnElement,
-            KeiAnnotationEntity keiAnnotation
-    ) {
-        entity.setProcessInstance(processInstance);
-        entity.setBpmnElement(bpmnElement);
-        entity.setKeiAnnotation(keiAnnotation);
-        entity.setCalculatedValue(violation.getCalculatedValue());
-        entity.setTargetValue(violation.getTargetValue());
-        entity.setDifference(violation.getDifference());
-        entity.setEvaluationStatus(violation.getStatus());
-        entity.setEvaluatedAt(violation.getOccurredAt());
-        entity.setUpdatedAt(Instant.now());
     }
 
     private boolean matchesMonitoringFilter(KeiResultEntity result, FindMonitoringRecordsRequest request) {

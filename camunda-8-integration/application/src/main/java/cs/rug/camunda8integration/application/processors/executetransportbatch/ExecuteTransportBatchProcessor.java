@@ -33,7 +33,6 @@ public class ExecuteTransportBatchProcessor implements ExecuteTransportBatchOper
                 .orderId(request.getOrderId())
                 .bpmnElementId(request.getEngineExecutionContext().getBpmnElementId())
                 .workObject(request.getWorkObject())
-                .assignedResources(request.getAssignedResources())
                 .build());
 
         if (!COMPLETED_TASK_STATUS.equals(executionResult.getStatus())) {

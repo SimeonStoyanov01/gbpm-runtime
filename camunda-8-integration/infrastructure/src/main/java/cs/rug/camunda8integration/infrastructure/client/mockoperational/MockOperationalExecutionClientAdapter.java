@@ -26,7 +26,6 @@ public class MockOperationalExecutionClientAdapter implements OperationalExecuti
                         .orderId(request.getOrderId())
                         .bpmnElementId(request.getBpmnElementId())
                         .workObject(request.getWorkObject())
-                        .assignedResources(request.getAssignedResources())
                         .build()
         );
 

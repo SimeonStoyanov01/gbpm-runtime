@@ -40,15 +40,13 @@ public class JsonExecutionRunLookup implements ExecutionRunLookup {
     public Optional<MockExecutionRunRecord> findExecutionRun(
             String bpmnElementId,
             String objectType,
-            String material,
-            List<String> assignedResourceNames
+            String material
     ) {
         return records
                 .stream()
                 .filter(record -> record.getBpmnElementId().equals(bpmnElementId))
                 .filter(record -> record.getObjectType().equals(objectType))
                 .filter(record -> record.getMaterial().equals(material))
-                .filter(record -> assignedResourceNames.contains(record.getResourceName()))
                 .findFirst();
     }
 }

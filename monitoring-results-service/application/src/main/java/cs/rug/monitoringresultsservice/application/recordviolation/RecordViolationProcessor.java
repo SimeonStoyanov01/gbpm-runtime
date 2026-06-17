@@ -4,7 +4,6 @@ import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
 import cs.rug.monitoringresultsservice.api.operations.recordviolation.RecordViolationOperation;
 import cs.rug.monitoringresultsservice.api.operations.recordviolation.RecordViolationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordviolation.RecordViolationResponse;
-import cs.rug.monitoringresultsservice.application.out.MonitoringRecordStore;
 import cs.rug.monitoringresultsservice.application.out.MonitoringUpdatePublisher;
 import cs.rug.monitoringresultsservice.application.out.ThresholdViolationStore;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RecordViolationProcessor implements RecordViolationOperation {
 
-    private final MonitoringRecordStore monitoringRecordStore;
     private final ThresholdViolationStore thresholdViolationStore;
     private final MonitoringUpdatePublisher monitoringUpdatePublisher;
 
@@ -35,7 +33,6 @@ public class RecordViolationProcessor implements RecordViolationOperation {
                 .status(request.getStatus())
                 .build();
 
-        monitoringRecordStore.saveViolationMarker(violation);
         ThresholdViolation activeViolation = thresholdViolationStore.saveOrUpdateActiveViolation(violation);
         monitoringUpdatePublisher.publishViolationUpdate(activeViolation);
 
