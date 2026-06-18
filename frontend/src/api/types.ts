@@ -54,6 +54,15 @@ export type MonitoringRecord = {
   evaluatedAt?: string;
 };
 
+export type ProcessInstanceDetails = {
+  processDefinitionKey?: number;
+  bpmnProcessId?: string;
+  processInstanceKey?: number;
+  bpmnXml?: string;
+  records: MonitoringRecord[];
+  violations: ThresholdViolation[];
+};
+
 export type ThresholdViolation = {
   eventId?: string;
   processDefinitionKey?: number;

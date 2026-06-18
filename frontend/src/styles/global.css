@@ -363,6 +363,126 @@ tbody tr:last-child td {
   background: #fff8f7;
 }
 
+.instance-list {
+  display: grid;
+  gap: 12px;
+}
+
+.instance-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.instance-summary {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto auto;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 0;
+  color: #17202a;
+  background: #f8fafc;
+  text-align: left;
+}
+
+.instance-summary:hover {
+  background: #eef6ff;
+}
+
+.instance-summary span:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.instance-details {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.instance-detail-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.metadata-grid div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.metadata-grid dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metadata-grid dd {
+  margin: 4px 0 0;
+  font-weight: 800;
+}
+
+.instance-detail-grid h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.diagram-panel {
+  min-height: 420px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.diagram-canvas {
+  height: 420px;
+}
+
+.diagram-marker-result .djs-visual > :first-child {
+  stroke: #0a7f51 !important;
+  stroke-width: 4px !important;
+}
+
+.diagram-marker-violated .djs-visual > :first-child {
+  stroke: #b42318 !important;
+  stroke-width: 5px !important;
+}
+
+.diagram-result-overlay {
+  max-width: 220px;
+  padding: 5px 8px;
+  border: 1px solid #badbcc;
+  border-radius: 8px;
+  color: #0a7f51;
+  background: #e9f7ef;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  white-space: nowrap;
+}
+
+.diagram-result-overlay.violated {
+  border-color: #f1b8b2;
+  color: #b42318;
+  background: #fff0ee;
+}
+
 .event-feed {
   display: grid;
   gap: 12px;
@@ -478,7 +598,9 @@ tbody tr:last-child td {
   }
 
   .result-card,
-  .result-metrics {
+  .result-metrics,
+  .instance-summary,
+  .metadata-grid {
     grid-template-columns: 1fr;
   }
 
