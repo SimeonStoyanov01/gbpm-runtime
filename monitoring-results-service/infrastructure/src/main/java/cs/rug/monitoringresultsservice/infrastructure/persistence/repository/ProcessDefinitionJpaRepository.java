@@ -15,15 +15,37 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
     @Modifying
     @Query(
             value = """
-                    INSERT INTO process_definition (process_definition_key, bpmn_process_id)
-                    VALUES (:processDefinitionKey, :bpmnProcessId)
+                    INSERT INTO process_definition (
+                        process_definition_key,
+                        bpmn_process_id,
+                        deployment_key,
+                        version,
+                        bpmn_xml,
+                        deployed_at
+                    )
+                    VALUES (
+                        :processDefinitionKey,
+                        :bpmnProcessId,
+                        :deploymentKey,
+                        :version,
+                        :bpmnXml,
+                        CASE WHEN :deploymentKey IS NULL THEN NULL ELSE CURRENT_TIMESTAMP END
+                    )
                     ON CONFLICT (process_definition_key)
-                    DO UPDATE SET bpmn_process_id = EXCLUDED.bpmn_process_id
+                    DO UPDATE SET
+                        bpmn_process_id = EXCLUDED.bpmn_process_id,
+                        deployment_key = COALESCE(EXCLUDED.deployment_key, process_definition.deployment_key),
+                        version = COALESCE(EXCLUDED.version, process_definition.version),
+                        bpmn_xml = COALESCE(EXCLUDED.bpmn_xml, process_definition.bpmn_xml),
+                        deployed_at = COALESCE(process_definition.deployed_at, EXCLUDED.deployed_at)
                     """,
             nativeQuery = true
     )
     void upsert(
             @Param("processDefinitionKey") Long processDefinitionKey,
-            @Param("bpmnProcessId") String bpmnProcessId
+            @Param("bpmnProcessId") String bpmnProcessId,
+            @Param("deploymentKey") Long deploymentKey,
+            @Param("version") Integer version,
+            @Param("bpmnXml") String bpmnXml
     );
 }

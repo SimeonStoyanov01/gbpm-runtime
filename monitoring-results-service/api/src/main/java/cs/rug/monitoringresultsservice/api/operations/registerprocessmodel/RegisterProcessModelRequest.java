@@ -18,5 +18,6 @@ public class RegisterProcessModelRequest implements ProcessorRequest {
     private String bpmnProcessId;
     private Integer version;
     private String resourceName;
+    private String bpmnXml;
     private List<ProcessModelElement> elements;
 }

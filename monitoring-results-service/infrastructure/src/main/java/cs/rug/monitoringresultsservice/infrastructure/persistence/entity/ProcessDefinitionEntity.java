@@ -48,4 +48,7 @@ public class ProcessDefinitionEntity {
 
     @Column(name = "deployed_at")
     private Instant deployedAt;
+
+    @Column(name = "bpmn_xml", columnDefinition = "TEXT")
+    private String bpmnXml;
 }

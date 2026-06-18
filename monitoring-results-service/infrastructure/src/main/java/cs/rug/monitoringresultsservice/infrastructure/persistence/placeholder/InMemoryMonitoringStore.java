@@ -4,6 +4,8 @@ import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
+import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsRequest;
+import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsResponse;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
@@ -43,6 +45,32 @@ public class InMemoryMonitoringStore implements MonitoringRecordStore, Threshold
                 .stream()
                 .filter(record -> matchesMonitoringFilter(record, request))
                 .toList();
+    }
+
+    @Override
+    public FindProcessInstanceDetailsResponse findProcessInstanceDetails(FindProcessInstanceDetailsRequest request) {
+        List<MonitoringRecord> records = recordsByCalculationEventId
+                .values()
+                .stream()
+                .filter(record -> matches(request.getProcessInstanceKey(), record.getProcessInstanceKey()))
+                .toList();
+
+        List<ThresholdViolation> violations = activeViolationsByEventId
+                .values()
+                .stream()
+                .filter(violation -> matches(request.getProcessInstanceKey(), violation.getProcessInstanceKey()))
+                .toList();
+
+        MonitoringRecord firstRecord = records.isEmpty() ? null : records.getFirst();
+
+        return FindProcessInstanceDetailsResponse
+                .builder()
+                .processDefinitionKey(firstRecord == null ? null : firstRecord.getProcessDefinitionKey())
+                .bpmnProcessId(firstRecord == null ? null : firstRecord.getBpmnProcessId())
+                .processInstanceKey(request.getProcessInstanceKey())
+                .records(records)
+                .violations(violations)
+                .build();
     }
 
     @Override

@@ -9,6 +9,7 @@ public interface MonitoringProcessModelClient {
 
     void registerProcessModel(
             DeployProcessDefinitionResponse deployedProcess,
+            byte[] bpmnXml,
             List<ElementKeiAnnotations> elementKeiAnnotations
     );
 }

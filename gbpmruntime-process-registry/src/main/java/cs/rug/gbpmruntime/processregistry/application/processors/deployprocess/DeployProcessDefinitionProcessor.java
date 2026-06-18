@@ -35,7 +35,11 @@ public class DeployProcessDefinitionProcessor implements DeployProcessDefinition
                 Long.valueOf(deployProcessDefinitionResponse.getProcessDefinitionKey()),
                 elementKeiAnnotations
         );
-        monitoringProcessModelClient.registerProcessModel(deployProcessDefinitionResponse, elementKeiAnnotations);
+        monitoringProcessModelClient.registerProcessModel(
+                deployProcessDefinitionResponse,
+                request.getBpmnXml(),
+                elementKeiAnnotations
+        );
 
         return deployProcessDefinitionResponse;
     }

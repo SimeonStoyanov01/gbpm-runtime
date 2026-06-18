@@ -10,6 +10,7 @@ import cs.rug.gbpmruntime.processregistry.infrastructure.client.monitoring.dto.R
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -21,6 +22,7 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
     @Override
     public void registerProcessModel(
             DeployProcessDefinitionResponse deployedProcess,
+            byte[] bpmnXml,
             List<ElementKeiAnnotations> elementKeiAnnotations
     ) {
         monitoringResultsFeignClient.registerProcessModel(RegisterProcessModelRequestDto
@@ -30,6 +32,7 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
                 .bpmnProcessId(deployedProcess.getBpmnProcessId())
                 .version(deployedProcess.getVersion())
                 .resourceName(deployedProcess.getResourceName())
+                .bpmnXml(new String(bpmnXml, StandardCharsets.UTF_8))
                 .elements(elementKeiAnnotations
                         .stream()
                         .map(this::toElementDto)

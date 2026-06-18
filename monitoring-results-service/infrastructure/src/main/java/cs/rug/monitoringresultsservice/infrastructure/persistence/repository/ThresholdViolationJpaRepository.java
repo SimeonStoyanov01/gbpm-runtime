@@ -15,4 +15,6 @@ public interface ThresholdViolationJpaRepository extends JpaRepository<Threshold
     );
 
     List<ThresholdViolationEntity> findByKeiResultProcessInstanceProcessDefinitionBpmnProcessId(String bpmnProcessId);
+
+    List<ThresholdViolationEntity> findByKeiResultProcessInstanceProcessInstanceKey(Long processInstanceKey);
 }

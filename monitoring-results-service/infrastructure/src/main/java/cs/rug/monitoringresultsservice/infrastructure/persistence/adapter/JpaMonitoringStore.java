@@ -4,6 +4,8 @@ import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
+import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsRequest;
+import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsResponse;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.ProcessModelElement;
@@ -110,14 +112,45 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public FindProcessInstanceDetailsResponse findProcessInstanceDetails(FindProcessInstanceDetailsRequest request) {
+        ProcessInstanceEntity processInstance = processInstanceRepository
+                .findByProcessInstanceKey(request.getProcessInstanceKey())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Process instance not found: " + request.getProcessInstanceKey()
+                ));
+
+        ProcessDefinitionEntity processDefinition = processInstance.getProcessDefinition();
+
+        return FindProcessInstanceDetailsResponse
+                .builder()
+                .processDefinitionKey(processDefinition.getProcessDefinitionKey())
+                .bpmnProcessId(processDefinition.getBpmnProcessId())
+                .processInstanceKey(processInstance.getProcessInstanceKey())
+                .bpmnXml(processDefinition.getBpmnXml())
+                .records(keiResultRepository
+                        .findByProcessInstanceProcessInstanceKey(processInstance.getProcessInstanceKey())
+                        .stream()
+                        .map(this::toMonitoringRecord)
+                        .toList())
+                .violations(thresholdViolationRepository
+                        .findByKeiResultProcessInstanceProcessInstanceKey(processInstance.getProcessInstanceKey())
+                        .stream()
+                        .map(this::toThresholdViolation)
+                        .toList())
+                .build();
+    }
+
+    @Override
     @Transactional
     public RegisterProcessModelResponse registerProcessModel(RegisterProcessModelRequest request) {
         ProcessDefinitionEntity processDefinition = processDefinition(
                 request.getProcessDefinitionKey(),
-                request.getBpmnProcessId()
+                request.getBpmnProcessId(),
+                request.getDeploymentKey(),
+                request.getVersion(),
+                request.getBpmnXml()
         );
-        applyProcessModel(processDefinition, request);
-        processDefinitionRepository.save(processDefinition);
 
         int annotationCount = 0;
         if (request.getElements() != null) {
@@ -180,7 +213,17 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
     }
 
     private ProcessDefinitionEntity processDefinition(Long processDefinitionKey, String bpmnProcessId) {
-        processDefinitionRepository.upsert(processDefinitionKey, bpmnProcessId);
+        return processDefinition(processDefinitionKey, bpmnProcessId, null, null, null);
+    }
+
+    private ProcessDefinitionEntity processDefinition(
+            Long processDefinitionKey,
+            String bpmnProcessId,
+            Long deploymentKey,
+            Integer version,
+            String bpmnXml
+    ) {
+        processDefinitionRepository.upsert(processDefinitionKey, bpmnProcessId, deploymentKey, version, bpmnXml);
         return processDefinitionRepository
                 .findByProcessDefinitionKey(processDefinitionKey)
                 .orElseThrow(() -> new IllegalStateException(
@@ -343,12 +386,6 @@ public class JpaMonitoringStore implements MonitoringRecordStore, ThresholdViola
         entity.setEvaluationStatus(request.getEvaluationStatus());
         entity.setEvaluatedAt(request.getOccurredAt());
         entity.setUpdatedAt(Instant.now());
-    }
-
-    private void applyProcessModel(ProcessDefinitionEntity entity, RegisterProcessModelRequest request) {
-        entity.setDeploymentKey(request.getDeploymentKey());
-        entity.setVersion(request.getVersion());
-        entity.setDeployedAt(Instant.now());
     }
 
     private void applyProcessModelElement(BpmnElementEntity entity, ProcessModelElement element) {
