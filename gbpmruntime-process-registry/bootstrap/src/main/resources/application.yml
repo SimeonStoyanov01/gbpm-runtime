@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: gbpmruntime-process-registry
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: ${PROCESS_REGISTRY_PORT:8080}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+camunda8-integration:
+  url: ${CAMUNDA8_INTEGRATION_URL:http://localhost:8090}
+
+monitoring-results-service:
+  url: ${MONITORING_RESULTS_SERVICE_URL:http://localhost:8094}
