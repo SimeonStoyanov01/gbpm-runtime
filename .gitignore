@@ -33,6 +33,8 @@ build/
 .vscode/
 
 codex-instructions/
+docs/
+**/target/
 
 .env
 *.env

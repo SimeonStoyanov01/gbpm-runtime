@@ -6,5 +6,5 @@ RUN mvn -pl :bootstrap -am clean package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /workspace/bootstrap/target/bootstrap-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8080
+EXPOSE 8090
 ENTRYPOINT ["java", "-jar", "app.jar"]

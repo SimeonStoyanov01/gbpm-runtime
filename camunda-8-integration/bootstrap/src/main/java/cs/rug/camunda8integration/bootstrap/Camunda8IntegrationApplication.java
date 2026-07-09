@@ -2,9 +2,7 @@ package cs.rug.camunda8integration.bootstrap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EnableFeignClients(basePackages = "cs.rug.camunda8integration.infrastructure.client")
 @SpringBootApplication(scanBasePackages = "cs.rug.camunda8integration")
 public class Camunda8IntegrationApplication {
 
