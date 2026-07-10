@@ -13,5 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ElementKeiAnnotations {
     private String bpmnElementId;
+    private String elementName;
+    private String elementType;
     private List<KeiMetadata> keiMetadata;
 }

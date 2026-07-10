@@ -28,10 +28,8 @@ public class KeiCalculationRequestedEventListener {
         }
 
         log.info(
-                "Received KEI calculation request: eventId={}, observationId={}, sourceEventId={}",
-                event.getEventId(),
-                event.getObservationId(),
-                event.getSourceEventId()
+                "Received KEI calculation request: eventId={}",
+                event.getEventId()
         );
 
         calculateCo2Operation.process(calculationRequestEventMapper.toRequest(event));

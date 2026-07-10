@@ -46,9 +46,6 @@ class CalculateCo2ProcessorTest {
 
         CalculateCo2Response response = processor.process(CalculateCo2Request
                 .builder()
-                .calculationRequestId("calculation-request-1")
-                .observationId("observation-1")
-                .sourceEventId("source-event-1")
                 .calculation(CalculationDescriptor
                         .builder()
                         .strategy("POPESCU_RESOURCE_CO2")
@@ -86,9 +83,6 @@ class CalculateCo2ProcessorTest {
         assertThat(response.getEvent().getResourceBreakdown()).hasSize(1);
         assertThat(response.getEvent().getResourceBreakdown().getFirst().getEmissionValue())
                 .isEqualByComparingTo("108.2212");
-        assertThat(response.getEvent().getCalculationRequestId()).isEqualTo("calculation-request-1");
-        assertThat(response.getEvent().getObservationId()).isEqualTo("observation-1");
-        assertThat(response.getEvent().getSourceEventId()).isEqualTo("source-event-1");
         assertThat(response.getEvent()).isSameAs(publisher.publishedCompletedEvent);
     }
 
@@ -106,9 +100,6 @@ class CalculateCo2ProcessorTest {
 
         CalculateCo2Response response = processor.process(CalculateCo2Request
                 .builder()
-                .calculationRequestId("calculation-request-1")
-                .observationId("observation-1")
-                .sourceEventId("source-event-1")
                 .calculation(CalculationDescriptor
                         .builder()
                         .strategy("POPESCU_RESOURCE_CO2")
@@ -163,9 +154,6 @@ class CalculateCo2ProcessorTest {
 
         CalculateCo2Response response = processor.process(CalculateCo2Request
                 .builder()
-                .calculationRequestId("calculation-request-1")
-                .observationId("observation-1")
-                .sourceEventId("source-event-1")
                 .calculation(CalculationDescriptor
                         .builder()
                         .strategy("POPESCU_RESOURCE_CO2")

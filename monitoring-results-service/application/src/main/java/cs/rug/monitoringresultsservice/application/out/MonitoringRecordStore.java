@@ -6,8 +6,6 @@ import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails
 import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsResponse;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
-import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
-import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelResponse;
 
 import java.util.List;
 
@@ -20,6 +18,4 @@ public interface MonitoringRecordStore {
     List<MonitoringRecord> findMonitoringRecords(FindMonitoringRecordsRequest request);
 
     FindProcessInstanceDetailsResponse findProcessInstanceDetails(FindProcessInstanceDetailsRequest request);
-
-    RegisterProcessModelResponse registerProcessModel(RegisterProcessModelRequest request);
 }

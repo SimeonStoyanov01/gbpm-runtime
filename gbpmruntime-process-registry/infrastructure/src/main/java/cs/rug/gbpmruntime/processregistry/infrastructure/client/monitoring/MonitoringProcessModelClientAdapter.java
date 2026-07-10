@@ -44,6 +44,8 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
         return ProcessModelElementDto
                 .builder()
                 .bpmnElementId(elementKeiAnnotations.getBpmnElementId())
+                .name(elementKeiAnnotations.getElementName())
+                .type(elementKeiAnnotations.getElementType())
                 .keiAnnotations(elementKeiAnnotations
                         .getKeiMetadata()
                         .stream()

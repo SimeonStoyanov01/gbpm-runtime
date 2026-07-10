@@ -94,9 +94,6 @@ class EvaluateKeiProcessorTest {
                 .eventId("calculation-event-1")
                 .eventType("KEI_CALCULATION_COMPLETED")
                 .contractVersion("1.0")
-                .calculationRequestId("calculation-request-1")
-                .observationId("observation-1")
-                .sourceEventId("engine-event-1")
                 .occurredAt(Instant.parse("2026-06-13T14:55:00Z"))
                 .calculation(CalculationDescriptor
                         .builder()

@@ -19,7 +19,6 @@ public class KeiObservationEvent {
     private String eventId;
     private String eventType;
     private String contractVersion;
-    private String sourceEventId;
     private Instant occurredAt;
 
     private EngineExecutionContext execution;

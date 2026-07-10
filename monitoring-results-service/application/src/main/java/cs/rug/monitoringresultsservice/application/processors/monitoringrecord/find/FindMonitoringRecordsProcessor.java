@@ -1,4 +1,4 @@
-package cs.rug.monitoringresultsservice.application.query;
+package cs.rug.monitoringresultsservice.application.processors.monitoringrecord.find;
 
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsOperation;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;

@@ -1,4 +1,4 @@
-package cs.rug.monitoringresultsservice.application.query;
+package cs.rug.monitoringresultsservice.application.processors.thresholdviolation;
 
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsOperation;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;

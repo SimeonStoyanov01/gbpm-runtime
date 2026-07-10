@@ -11,8 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({
         CalculationResultRabbitMqProperties.class,
-        EvaluationResultRabbitMqProperties.class,
-        ThresholdViolationRabbitMqProperties.class
+        EvaluationResultRabbitMqProperties.class
 })
 public class MonitoringRabbitMqConfiguration {
 
@@ -57,28 +56,6 @@ public class MonitoringRabbitMqConfiguration {
         return BindingBuilder
                 .bind(monitoringEvaluationResultQueue)
                 .to(monitoringEvaluationResultExchange)
-                .with(properties.getRoutingKey());
-    }
-
-    @Bean
-    public Queue monitoringThresholdViolationQueue(ThresholdViolationRabbitMqProperties properties) {
-        return new Queue(properties.getQueueName(), true);
-    }
-
-    @Bean
-    public TopicExchange monitoringThresholdViolationExchange(ThresholdViolationRabbitMqProperties properties) {
-        return new TopicExchange(properties.getExchangeName(), true, false);
-    }
-
-    @Bean
-    public Binding monitoringThresholdViolationBinding(
-            Queue monitoringThresholdViolationQueue,
-            TopicExchange monitoringThresholdViolationExchange,
-            ThresholdViolationRabbitMqProperties properties
-    ) {
-        return BindingBuilder
-                .bind(monitoringThresholdViolationQueue)
-                .to(monitoringThresholdViolationExchange)
                 .with(properties.getRoutingKey());
     }
 }

@@ -4,8 +4,9 @@ import cs.rug.co2calculationservice.infrastructure.persistence.entity.EmissionFa
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface EmissionFactorRepository extends JpaRepository<EmissionFactorEntity, Long> {
+public interface EmissionFactorRepository extends JpaRepository<EmissionFactorEntity, UUID> {
 
     Optional<EmissionFactorEntity> findByReferenceSetIdIgnoreCaseAndFuelTypeIgnoreCase(
             String referenceSetId,

@@ -40,6 +40,8 @@ class Bpmn4esKeiMetadataParserTest {
         assertThat(metadata).hasSize(1);
         ElementKeiAnnotations mapping = metadata.getFirst();
         assertThat(mapping.getBpmnElementId()).isEqualTo("Activity_0tw2fu0");
+        assertThat(mapping.getElementName()).isEqualTo("Check inventory");
+        assertThat(mapping.getElementType()).isEqualTo("serviceTask");
         assertThat(mapping.getKeiMetadata()).hasSize(1);
         KeiMetadata keiDefinition = mapping.getKeiMetadata().getFirst();
         assertThat(keiDefinition.getId()).isEqualTo("renewable-energy");
@@ -69,6 +71,8 @@ class Bpmn4esKeiMetadataParserTest {
 
         assertThat(metadata).hasSize(1);
         assertThat(metadata.getFirst().getBpmnElementId()).isEqualTo("Activity_UserTask");
+        assertThat(metadata.getFirst().getElementName()).isNull();
+        assertThat(metadata.getFirst().getElementType()).isEqualTo("userTask");
         assertThat(metadata.getFirst().getKeiMetadata())
                 .extracting(KeiMetadata::getId)
                 .containsExactly("energy-consumption");

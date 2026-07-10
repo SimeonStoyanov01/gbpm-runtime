@@ -30,15 +30,6 @@ public class KeiCalculationCompletedEvent {
     @NotBlank
     private String contractVersion;
 
-    @NotBlank
-    private String calculationRequestId;
-
-    @NotBlank
-    private String observationId;
-
-    @NotBlank
-    private String sourceEventId;
-
     @NotNull
     private Instant occurredAt;
 

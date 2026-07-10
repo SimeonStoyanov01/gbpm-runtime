@@ -16,8 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestKeiCalculationRequest implements ProcessorRequest {
-    private String observationId;
-    private String sourceEventId;
     private EngineExecutionContext execution;
     private List<ResourceUsageFact> resourceUsages;
     private List<KeiAnnotation> keiAnnotations;

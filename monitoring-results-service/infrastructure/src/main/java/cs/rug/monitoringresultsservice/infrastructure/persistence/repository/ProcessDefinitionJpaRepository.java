@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDefinitionEntity, Long> {
+public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDefinitionEntity, UUID> {
 
     Optional<ProcessDefinitionEntity> findByProcessDefinitionKey(Long processDefinitionKey);
 
@@ -16,6 +17,7 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
     @Query(
             value = """
                     INSERT INTO process_definition (
+                        id,
                         process_definition_key,
                         bpmn_process_id,
                         deployment_key,
@@ -24,6 +26,7 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
                         deployed_at
                     )
                     VALUES (
+                        :id,
                         :processDefinitionKey,
                         :bpmnProcessId,
                         :deploymentKey,
@@ -41,7 +44,8 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
                     """,
             nativeQuery = true
     )
-    void upsert(
+    void saveRegisteredProcessDefinition(
+            @Param("id") UUID id,
             @Param("processDefinitionKey") Long processDefinitionKey,
             @Param("bpmnProcessId") String bpmnProcessId,
             @Param("deploymentKey") Long deploymentKey,

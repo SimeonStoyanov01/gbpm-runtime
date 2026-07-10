@@ -10,9 +10,6 @@ public class CalculationRequestEventMapper {
     public CalculateCo2Request toRequest(KeiCalculationRequestedEvent event) {
         return CalculateCo2Request
                 .builder()
-                .calculationRequestId(event.getEventId())
-                .observationId(event.getObservationId())
-                .sourceEventId(event.getSourceEventId())
                 .calculation(event.getCalculation())
                 .kei(event.getKei())
                 .execution(event.getExecution())

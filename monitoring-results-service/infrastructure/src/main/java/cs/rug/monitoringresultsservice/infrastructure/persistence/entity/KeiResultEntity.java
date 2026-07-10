@@ -19,6 +19,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -46,8 +47,8 @@ import java.time.Instant;
 public class KeiResultEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "process_instance_id")
@@ -69,15 +70,6 @@ public class KeiResultEntity {
 
     @Column(name = "evaluation_event_id", unique = true)
     private String evaluationEventId;
-
-    @Column(name = "calculation_request_id")
-    private String calculationRequestId;
-
-    @Column(name = "observation_id")
-    private String observationId;
-
-    @Column(name = "source_event_id")
-    private String sourceEventId;
 
     @Column(name = "calculated_value", precision = 19, scale = 6)
     private BigDecimal calculatedValue;

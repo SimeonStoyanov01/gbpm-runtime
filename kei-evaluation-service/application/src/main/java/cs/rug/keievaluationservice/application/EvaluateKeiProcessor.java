@@ -50,9 +50,8 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
 
         KeiCalculationCompletedEvent event = request.getEvent();
         log.info(
-                "Received calculation result for evaluation: calculationResultId={}, observationId={}, keiId={}",
+                "Received calculation result for evaluation: calculationResultId={}, keiId={}",
                 event.getEventId(),
-                event.getObservationId(),
                 event.getKei().getId()
         );
 
@@ -118,9 +117,6 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
                 .eventType(EVENT_TYPE)
                 .contractVersion(CONTRACT_VERSION)
                 .calculationResultId(event.getEventId())
-                .calculationRequestId(event.getCalculationRequestId())
-                .observationId(event.getObservationId())
-                .sourceEventId(event.getSourceEventId())
                 .occurredAt(Instant.now())
                 .calculation(event.getCalculation())
                 .kei(event.getKei())

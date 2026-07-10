@@ -25,7 +25,6 @@ public class EngineTaskCompletedEventListener {
         );
         createKeiObservationOperation.process(CreateKeiObservationRequest
                 .builder()
-                .sourceEventId(event.getEventId())
                 .execution(event.getExecution())
                 .taskStatus(event.getTaskStatus())
                 .resourceUsages(event.getResourceUsages())

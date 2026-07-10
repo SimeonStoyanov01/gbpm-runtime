@@ -7,23 +7,25 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface ProcessInstanceJpaRepository extends JpaRepository<ProcessInstanceEntity, Long> {
+public interface ProcessInstanceJpaRepository extends JpaRepository<ProcessInstanceEntity, UUID> {
 
     Optional<ProcessInstanceEntity> findByProcessInstanceKey(Long processInstanceKey);
 
     @Modifying
     @Query(
             value = """
-                    INSERT INTO process_instance (process_instance_key, process_definition_id)
-                    VALUES (:processInstanceKey, :processDefinitionId)
+                    INSERT INTO process_instance (id, process_instance_key, process_definition_id)
+                    VALUES (:id, :processInstanceKey, :processDefinitionId)
                     ON CONFLICT (process_instance_key)
                     DO UPDATE SET process_definition_id = EXCLUDED.process_definition_id
                     """,
             nativeQuery = true
     )
-    void upsert(
+    void saveProcessInstance(
+            @Param("id") UUID id,
             @Param("processInstanceKey") Long processInstanceKey,
-            @Param("processDefinitionId") Long processDefinitionId
+            @Param("processDefinitionId") UUID processDefinitionId
     );
 }

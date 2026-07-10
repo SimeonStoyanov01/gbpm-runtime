@@ -8,8 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface BpmnElementJpaRepository extends JpaRepository<BpmnElementEntity, Long> {
+public interface BpmnElementJpaRepository extends JpaRepository<BpmnElementEntity, UUID> {
 
     Optional<BpmnElementEntity> findByProcessDefinitionAndBpmnElementId(
             ProcessDefinitionEntity processDefinition,
@@ -19,15 +20,16 @@ public interface BpmnElementJpaRepository extends JpaRepository<BpmnElementEntit
     @Modifying
     @Query(
             value = """
-                    INSERT INTO bpmn_element (process_definition_id, bpmn_element_id)
-                    VALUES (:processDefinitionId, :bpmnElementId)
+                    INSERT INTO bpmn_element (id, process_definition_id, bpmn_element_id)
+                    VALUES (:id, :processDefinitionId, :bpmnElementId)
                     ON CONFLICT (process_definition_id, bpmn_element_id)
                     DO NOTHING
                     """,
             nativeQuery = true
     )
     void insertIfMissing(
-            @Param("processDefinitionId") Long processDefinitionId,
+            @Param("id") UUID id,
+            @Param("processDefinitionId") UUID processDefinitionId,
             @Param("bpmnElementId") String bpmnElementId
     );
 }

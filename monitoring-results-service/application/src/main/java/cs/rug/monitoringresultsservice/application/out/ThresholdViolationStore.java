@@ -7,7 +7,5 @@ import java.util.List;
 
 public interface ThresholdViolationStore {
 
-    ThresholdViolation saveOrUpdateActiveViolation(ThresholdViolation violation);
-
     List<ThresholdViolation> findActiveViolations(FindActiveViolationsRequest request);
 }

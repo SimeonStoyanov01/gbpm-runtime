@@ -38,9 +38,7 @@ public class RequestKeiCalculationProcessor implements RequestKeiCalculationOper
         List<ResourceUsageFact> resourceUsages = request.getResourceUsages();
         if (resourceUsages == null || resourceUsages.isEmpty()) {
             log.info(
-                    "Skipping KEI calculation request because resource usage data is missing: observationId={}, sourceEventId={}, bpmnElementId={}",
-                    request.getObservationId(),
-                    request.getSourceEventId(),
+                    "Skipping KEI calculation request because resource usage data is missing: bpmnElementId={}",
                     request.getExecution().getBpmnElementId()
             );
             return;
@@ -56,10 +54,8 @@ public class RequestKeiCalculationProcessor implements RequestKeiCalculationOper
             keiCalculationRequestedEventPublisher.publish(calculationRequestedEvent);
 
             log.info(
-                    "Published KEI calculation request event: eventId={}, observationId={}, sourceEventId={}, keiId={}, resourceUsageCount={}",
+                    "Published KEI calculation request event: eventId={}, keiId={}, resourceUsageCount={}",
                     calculationRequestedEvent.getEventId(),
-                    calculationRequestedEvent.getObservationId(),
-                    calculationRequestedEvent.getSourceEventId(),
                     keiAnnotation.getId(),
                     resourceUsages.size()
             );

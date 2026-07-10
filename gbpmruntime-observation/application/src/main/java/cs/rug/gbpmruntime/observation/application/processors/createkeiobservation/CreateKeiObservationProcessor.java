@@ -30,8 +30,7 @@ public class CreateKeiObservationProcessor implements CreateKeiObservationOperat
         List<KeiAnnotation> keiAnnotations = findKeiAnnotations(request);
         if (keiAnnotations.isEmpty()) {
             log.info(
-                    "Engine task completed event has no KEI annotations: sourceEventId={}, processDefinitionKey={}, bpmnElementId={}",
-                    request.getSourceEventId(),
+                    "Engine task completed event has no KEI annotations: processDefinitionKey={}, bpmnElementId={}",
                     request.getExecution().getProcessDefinitionKey(),
                     request.getExecution().getBpmnElementId()
             );
@@ -42,9 +41,8 @@ public class CreateKeiObservationProcessor implements CreateKeiObservationOperat
         keiObservationEventPublisher.publish(observationEvent);
 
         log.info(
-                "Published KEI observation event: eventId={}, sourceEventId={}, processDefinitionKey={}, bpmnElementId={}, keiAnnotationCount={}",
+                "Published KEI observation event: eventId={}, processDefinitionKey={}, bpmnElementId={}, keiAnnotationCount={}",
                 observationEvent.getEventId(),
-                observationEvent.getSourceEventId(),
                 request.getExecution().getProcessDefinitionKey(),
                 request.getExecution().getBpmnElementId(),
                 keiAnnotations.size()
@@ -52,8 +50,6 @@ public class CreateKeiObservationProcessor implements CreateKeiObservationOperat
 
         requestKeiCalculationOperation.process(RequestKeiCalculationRequest
                 .builder()
-                .observationId(observationEvent.getEventId())
-                .sourceEventId(observationEvent.getSourceEventId())
                 .execution(observationEvent.getExecution())
                 .resourceUsages(observationEvent.getResourceUsages())
                 .keiAnnotations(observationEvent.getKeiAnnotations())

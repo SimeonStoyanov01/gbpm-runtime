@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProcessModelKeiAnnotationDto {
     private String id;
-    private String name;
     private String unit;
     private String targetValue;
     private String icon;

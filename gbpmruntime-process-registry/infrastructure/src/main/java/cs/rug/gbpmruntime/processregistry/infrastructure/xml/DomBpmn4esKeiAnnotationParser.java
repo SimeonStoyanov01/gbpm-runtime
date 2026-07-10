@@ -91,6 +91,8 @@ public class DomBpmn4esKeiAnnotationParser implements Bpmn4esKeiAnnotationParser
 
         return Optional.of(ElementKeiAnnotations.builder()
                 .bpmnElementId(bpmnParentElement.get().getAttribute("id"))
+                .elementName(findAttributeValue(bpmnParentElement.get(), "name").orElse(null))
+                .elementType(bpmnParentElement.get().getLocalName())
                 .keiMetadata(keiMetadata)
                 .build());
     }

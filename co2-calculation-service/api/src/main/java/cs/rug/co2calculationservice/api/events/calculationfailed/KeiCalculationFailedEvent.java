@@ -19,9 +19,6 @@ public class KeiCalculationFailedEvent {
     private String eventId;
     private String eventType;
     private String contractVersion;
-    private String calculationRequestId;
-    private String observationId;
-    private String sourceEventId;
     private Instant occurredAt;
     private CalculationDescriptor calculation;
     private KeiAnnotation kei;

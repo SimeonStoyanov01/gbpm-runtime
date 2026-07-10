@@ -30,8 +30,6 @@ public class KeiCalculationRequestedEventFactory {
                 .eventId(UUID.randomUUID().toString())
                 .eventType(EVENT_TYPE)
                 .contractVersion(CONTRACT_VERSION)
-                .observationId(request.getObservationId())
-                .sourceEventId(request.getSourceEventId())
                 .occurredAt(Instant.now())
                 .calculation(CalculationRequestDescriptor
                         .builder()

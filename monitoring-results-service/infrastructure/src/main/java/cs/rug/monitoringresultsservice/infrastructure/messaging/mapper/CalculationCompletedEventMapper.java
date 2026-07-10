@@ -11,9 +11,6 @@ public class CalculationCompletedEventMapper {
         return RecordCalculationRequest
                 .builder()
                 .eventId(event.getEventId())
-                .calculationRequestId(event.getCalculationRequestId())
-                .observationId(event.getObservationId())
-                .sourceEventId(event.getSourceEventId())
                 .occurredAt(event.getOccurredAt())
                 .processDefinitionKey(event.getExecution().getProcessDefinitionKey())
                 .bpmnProcessId(event.getExecution().getBpmnProcessId())
@@ -21,9 +18,6 @@ public class CalculationCompletedEventMapper {
                 .elementInstanceKey(event.getExecution().getElementInstanceKey())
                 .bpmnElementId(event.getExecution().getBpmnElementId())
                 .keiId(event.getKei().getId())
-                .keiName(event.getKei().getName())
-                .keiUnit(event.getKei().getUnit())
-                .keiTargetValue(event.getKei().getTargetValue())
                 .calculatedValue(event.getResult().getValue())
                 .calculatedUnit(event.getResult().getUnit())
                 .build();

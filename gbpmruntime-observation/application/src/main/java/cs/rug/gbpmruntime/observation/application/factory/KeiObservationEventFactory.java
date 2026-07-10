@@ -24,7 +24,6 @@ public class KeiObservationEventFactory {
                 .eventId(UUID.randomUUID().toString())
                 .eventType(EVENT_TYPE)
                 .contractVersion(CONTRACT_VERSION)
-                .sourceEventId(request.getSourceEventId())
                 .occurredAt(Instant.now())
                 .execution(request.getExecution())
                 .taskStatus(request.getTaskStatus())

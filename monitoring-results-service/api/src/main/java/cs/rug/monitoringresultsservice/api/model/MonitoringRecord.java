@@ -15,9 +15,6 @@ import java.time.Instant;
 public class MonitoringRecord {
     private String calculationEventId;
     private String evaluationEventId;
-    private String calculationRequestId;
-    private String observationId;
-    private String sourceEventId;
     private Long processDefinitionKey;
     private String bpmnProcessId;
     private Long processInstanceKey;

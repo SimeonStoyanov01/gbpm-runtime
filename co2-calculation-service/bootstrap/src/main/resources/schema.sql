@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS resource_profiles (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reference_set_id VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(255) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS resource_profiles (
 );
 
 CREATE TABLE IF NOT EXISTS emission_factors (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reference_set_id VARCHAR(255) NOT NULL,
     fuel_type VARCHAR(255) NOT NULL,
     unit VARCHAR(255) NOT NULL,

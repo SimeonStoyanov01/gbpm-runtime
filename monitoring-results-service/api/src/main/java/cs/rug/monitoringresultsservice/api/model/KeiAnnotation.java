@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KeiAnnotation {
     private String id;
-    private String name;
     private String unit;
     private String targetValue;
 }

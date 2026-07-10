@@ -36,9 +36,6 @@ export type FindProcessKeisResponse = {
 export type MonitoringRecord = {
   calculationEventId?: string;
   evaluationEventId?: string;
-  calculationRequestId?: string;
-  observationId?: string;
-  sourceEventId?: string;
   processDefinitionKey?: number;
   bpmnProcessId?: string;
   processInstanceKey?: number;

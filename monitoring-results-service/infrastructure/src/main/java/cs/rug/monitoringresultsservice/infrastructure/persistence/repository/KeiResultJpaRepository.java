@@ -8,8 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface KeiResultJpaRepository extends JpaRepository<KeiResultEntity, Long> {
+public interface KeiResultJpaRepository extends JpaRepository<KeiResultEntity, UUID> {
 
     Optional<KeiResultEntity> findByCalculationEventId(String calculationEventId);
 
@@ -20,12 +21,6 @@ public interface KeiResultJpaRepository extends JpaRepository<KeiResultEntity, L
             BpmnElementEntity bpmnElement,
             KeiAnnotationEntity keiAnnotation,
             Long elementInstanceKey
-    );
-
-    Optional<KeiResultEntity> findFirstByProcessInstanceAndBpmnElementAndKeiAnnotationOrderByEvaluatedAtDesc(
-            ProcessInstanceEntity processInstance,
-            BpmnElementEntity bpmnElement,
-            KeiAnnotationEntity keiAnnotation
     );
 
     List<KeiResultEntity> findByProcessInstanceProcessInstanceKey(Long processInstanceKey);

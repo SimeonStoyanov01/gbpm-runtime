@@ -8,23 +8,25 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface KeiAnnotationJpaRepository extends JpaRepository<KeiAnnotationEntity, Long> {
+public interface KeiAnnotationJpaRepository extends JpaRepository<KeiAnnotationEntity, UUID> {
 
     Optional<KeiAnnotationEntity> findByBpmnElementAndKeiId(BpmnElementEntity bpmnElement, String keiId);
 
     @Modifying
     @Query(
             value = """
-                    INSERT INTO kei_annotation (bpmn_element_id, kei_id)
-                    VALUES (:bpmnElementId, :keiId)
+                    INSERT INTO kei_annotation (id, bpmn_element_id, kei_id)
+                    VALUES (:id, :bpmnElementId, :keiId)
                     ON CONFLICT (bpmn_element_id, kei_id)
                     DO NOTHING
                     """,
             nativeQuery = true
     )
     void insertIfMissing(
-            @Param("bpmnElementId") Long bpmnElementId,
+            @Param("id") UUID id,
+            @Param("bpmnElementId") UUID bpmnElementId,
             @Param("keiId") String keiId
     );
 }

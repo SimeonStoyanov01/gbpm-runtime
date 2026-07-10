@@ -28,9 +28,8 @@ public class KeiCalculationCompletedEventListener {
         }
 
         log.info(
-                "Received KEI calculation completed event: eventId={}, observationId={}",
-                event.getEventId(),
-                event.getObservationId()
+                "Received KEI calculation completed event: eventId={}",
+                event.getEventId()
         );
 
         evaluateKeiOperation.process(calculationResultEventMapper.toRequest(event));

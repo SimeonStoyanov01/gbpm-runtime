@@ -16,9 +16,6 @@ import java.time.Instant;
 public class RecordEvaluationRequest implements ProcessorRequest {
     private String eventId;
     private String calculationResultId;
-    private String calculationRequestId;
-    private String observationId;
-    private String sourceEventId;
     private Instant occurredAt;
     private Long processDefinitionKey;
     private String bpmnProcessId;
@@ -26,9 +23,6 @@ public class RecordEvaluationRequest implements ProcessorRequest {
     private Long elementInstanceKey;
     private String bpmnElementId;
     private String keiId;
-    private String keiName;
-    private String keiUnit;
-    private String keiTargetValue;
     private BigDecimal calculatedValue;
     private String calculatedUnit;
     private Instant calculatedAt;

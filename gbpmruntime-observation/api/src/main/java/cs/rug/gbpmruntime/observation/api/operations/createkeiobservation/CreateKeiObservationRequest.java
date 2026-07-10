@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateKeiObservationRequest implements ProcessorRequest {
-    private String sourceEventId;
     private EngineExecutionContext execution;
     private String taskStatus;
     private List<ResourceUsageFact> resourceUsages;

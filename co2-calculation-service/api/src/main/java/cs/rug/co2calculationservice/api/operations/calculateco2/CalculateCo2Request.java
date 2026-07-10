@@ -6,7 +6,6 @@ import cs.rug.co2calculationservice.api.model.CalculationInputs;
 import cs.rug.co2calculationservice.api.model.EngineExecutionContext;
 import cs.rug.co2calculationservice.api.model.KeiAnnotation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,15 +17,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CalculateCo2Request implements ProcessorRequest {
-    @NotBlank
-    private String calculationRequestId;
-
-    @NotBlank
-    private String observationId;
-
-    @NotBlank
-    private String sourceEventId;
-
     @Valid
     @NotNull
     private CalculationDescriptor calculation;

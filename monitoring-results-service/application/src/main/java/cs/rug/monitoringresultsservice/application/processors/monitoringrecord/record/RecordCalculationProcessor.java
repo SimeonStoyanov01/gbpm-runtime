@@ -1,4 +1,4 @@
-package cs.rug.monitoringresultsservice.application.recordcalculation;
+package cs.rug.monitoringresultsservice.application.processors.monitoringrecord.record;
 
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationOperation;

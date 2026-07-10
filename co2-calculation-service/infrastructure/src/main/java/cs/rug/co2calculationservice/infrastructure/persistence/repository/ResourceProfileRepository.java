@@ -4,8 +4,9 @@ import cs.rug.co2calculationservice.infrastructure.persistence.entity.ResourcePr
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface ResourceProfileRepository extends JpaRepository<ResourceProfileEntity, Long> {
+public interface ResourceProfileRepository extends JpaRepository<ResourceProfileEntity, UUID> {
 
     Optional<ResourceProfileEntity> findByReferenceSetIdIgnoreCaseAndNameIgnoreCase(
             String referenceSetId,

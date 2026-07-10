@@ -15,9 +15,6 @@ import java.time.Instant;
 @AllArgsConstructor
 public class RecordCalculationRequest implements ProcessorRequest {
     private String eventId;
-    private String calculationRequestId;
-    private String observationId;
-    private String sourceEventId;
     private Instant occurredAt;
     private Long processDefinitionKey;
     private String bpmnProcessId;
@@ -25,9 +22,6 @@ public class RecordCalculationRequest implements ProcessorRequest {
     private Long elementInstanceKey;
     private String bpmnElementId;
     private String keiId;
-    private String keiName;
-    private String keiUnit;
-    private String keiTargetValue;
     private BigDecimal calculatedValue;
     private String calculatedUnit;
 }
