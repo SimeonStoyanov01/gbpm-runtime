@@ -17,7 +17,7 @@ public class KeiCalculationRequestedEventListener {
     private final CalculationRequestEventMapper calculationRequestEventMapper;
     private final CalculateCo2Operation calculateCo2Operation;
 
-    @RabbitListener(queues = "${gbpmruntime.messaging.calculation-request.queue-name}")
+    @RabbitListener(queues = "${runtime.messaging.calculation-request.queue-name}")
     public void handle(byte[] payload) {
         KeiCalculationRequestedEvent event;
         try {

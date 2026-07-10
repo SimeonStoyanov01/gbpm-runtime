@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
     <name>CO2 Calculation Service</name>
-    <description>Standalone CO2 calculation microservice for GBPMRuntime.</description>
+    <description>Standalone CO2 calculation microservice for Runtime.</description>
 
     <properties>
         <java.version>21</java.version>

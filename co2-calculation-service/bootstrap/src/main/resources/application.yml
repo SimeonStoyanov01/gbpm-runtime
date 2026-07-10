@@ -16,8 +16,8 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:gbpmruntime}
-    password: ${RABBITMQ_PASSWORD:gbpmruntime}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
   datasource:
     url: ${CO2_CALCULATION_DATASOURCE_URL:jdbc:postgresql://localhost:5432/co2_calculation}
     username: ${CO2_CALCULATION_DATASOURCE_USERNAME:co2_calculation}
@@ -30,13 +30,13 @@ spring:
     init:
       mode: ${CO2_CALCULATION_SQL_INIT_MODE:always}
 
-gbpmruntime:
+runtime:
   messaging:
     calculation-request:
-      exchange-name: ${GBPMRUNTIME_CALCULATION_REQUEST_EXCHANGE:gbpmruntime.observation.events}
-      routing-key: ${GBPMRUNTIME_CALCULATION_REQUEST_ROUTING_KEY:kei.calculation.requested}
-      queue-name: ${GBPMRUNTIME_CALCULATION_REQUEST_QUEUE:gbpmruntime.co2-calculation.kei-calculation-requested}
+      exchange-name: ${RUNTIME_CALCULATION_REQUEST_EXCHANGE:runtime.observation.events}
+      routing-key: ${RUNTIME_CALCULATION_REQUEST_ROUTING_KEY:kei.calculation.requested}
+      queue-name: ${RUNTIME_CALCULATION_REQUEST_QUEUE:runtime.co2-calculation.kei-calculation-requested}
     calculation-result:
-      exchange-name: ${GBPMRUNTIME_CALCULATION_RESULT_EXCHANGE:gbpmruntime.calculation.events}
-      completed-routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_COMPLETED_ROUTING_KEY:kei.calculation.completed}
-      failed-routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_FAILED_ROUTING_KEY:kei.calculation.failed}
+      exchange-name: ${RUNTIME_CALCULATION_RESULT_EXCHANGE:runtime.calculation.events}
+      completed-routing-key: ${RUNTIME_CALCULATION_RESULT_COMPLETED_ROUTING_KEY:kei.calculation.completed}
+      failed-routing-key: ${RUNTIME_CALCULATION_RESULT_FAILED_ROUTING_KEY:kei.calculation.failed}

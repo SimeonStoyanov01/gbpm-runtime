@@ -18,7 +18,6 @@ import java.time.Instant;
 public class KeiCalculationRequestedEvent {
     private String eventId;
     private String eventType;
-    private String contractVersion;
     private Instant occurredAt;
     private CalculationDescriptor calculation;
     private KeiAnnotation kei;

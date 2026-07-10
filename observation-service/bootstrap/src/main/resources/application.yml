@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: observation-service
+  main:
+    web-application-type: none
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
+
+process-registry:
+  url: ${PROCESS_REGISTRY_URL:http://localhost:8080}
+
+runtime:
+  observation:
+    messaging:
+      engine-events:
+        queue-name: ${RUNTIME_OBSERVATION_ENGINE_EVENTS_QUEUE:runtime.observation.engine-task-completed}
+        bindings:
+          - exchange-name: ${CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE:runtime.camunda8.events}
+            routing-key: ${CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY:engine.task.completed}
+      kei-observation-events:
+        exchange-name: ${RUNTIME_KEI_OBSERVATION_EXCHANGE:runtime.observation.events}
+        observation-created-routing-key: ${RUNTIME_KEI_OBSERVATION_ROUTING_KEY:kei.observation.created}
+        calculation-requested-routing-key: ${RUNTIME_KEI_CALCULATION_REQUESTED_ROUTING_KEY:kei.calculation.requested}

@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 @Validated
-@ConfigurationProperties(prefix = "gbpmruntime.messaging.evaluation.events")
+@ConfigurationProperties(prefix = "runtime.messaging.evaluation.events")
 public class EvaluationEventRabbitMqProperties {
     @NotBlank
     private String exchangeName;

@@ -20,7 +20,6 @@ import java.util.List;
 public class KeiCalculationCompletedEvent {
     private String eventId;
     private String eventType;
-    private String contractVersion;
     private Instant occurredAt;
     private CalculationDescriptor calculation;
     private KeiAnnotation kei;

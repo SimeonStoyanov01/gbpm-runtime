@@ -17,7 +17,7 @@ export function Layout({ children }: LayoutProps) {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <h1>GBPMRuntime</h1>
+          <h1>Runtime</h1>
           <p>Runtime Environmental Monitoring</p>
         </div>
         <nav>

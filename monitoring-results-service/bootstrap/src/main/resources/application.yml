@@ -7,8 +7,8 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:gbpmruntime}
-    password: ${RABBITMQ_PASSWORD:gbpmruntime}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
   datasource:
     url: ${MONITORING_RESULTS_DATASOURCE_URL:jdbc:postgresql://localhost:5434/monitoring_results}
     username: ${MONITORING_RESULTS_DATASOURCE_USERNAME:monitoring_results}
@@ -22,13 +22,13 @@ spring:
         schema_update:
           unique_constraint_strategy: RECREATE_QUIETLY
 
-gbpmruntime:
+runtime:
   messaging:
     calculation-result:
-      exchange-name: ${GBPMRUNTIME_CALCULATION_RESULT_EXCHANGE:gbpmruntime.calculation.events}
-      routing-key: ${GBPMRUNTIME_CALCULATION_RESULT_ROUTING_KEY:kei.calculation.completed}
-      queue-name: ${GBPMRUNTIME_MONITORING_CALCULATION_RESULT_QUEUE:gbpmruntime.monitoring.kei-calculation-completed}
+      exchange-name: ${RUNTIME_CALCULATION_RESULT_EXCHANGE:runtime.calculation.events}
+      routing-key: ${RUNTIME_CALCULATION_RESULT_ROUTING_KEY:kei.calculation.completed}
+      queue-name: ${RUNTIME_MONITORING_CALCULATION_RESULT_QUEUE:runtime.monitoring.kei-calculation-completed}
     evaluation-result:
-      exchange-name: ${GBPMRUNTIME_EVALUATION_RESULT_EXCHANGE:gbpmruntime.evaluation.events}
-      routing-key: ${GBPMRUNTIME_EVALUATION_RESULT_ROUTING_KEY:kei.evaluation.completed}
-      queue-name: ${GBPMRUNTIME_MONITORING_EVALUATION_RESULT_QUEUE:gbpmruntime.monitoring.kei-evaluation-completed}
+      exchange-name: ${RUNTIME_EVALUATION_RESULT_EXCHANGE:runtime.evaluation.events}
+      routing-key: ${RUNTIME_EVALUATION_RESULT_ROUTING_KEY:kei.evaluation.completed}
+      queue-name: ${RUNTIME_MONITORING_EVALUATION_RESULT_QUEUE:runtime.monitoring.kei-evaluation-completed}

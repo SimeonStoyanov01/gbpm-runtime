@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
     <name>KEI Evaluation Service</name>
-    <description>Standalone KEI evaluation microservice for GBPMRuntime.</description>
+    <description>Standalone KEI evaluation microservice for Runtime.</description>
 
     <properties>
         <java.version>21</java.version>

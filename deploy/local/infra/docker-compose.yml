@@ -1,12 +1,12 @@
-name: gbpmruntime-infra-local
+name: runtime-infra-local
 
 services:
   rabbitmq:
     image: rabbitmq:3.13-management
-    container_name: gbpmruntime-rabbitmq
+    container_name: runtime-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: gbpmruntime
-      RABBITMQ_DEFAULT_PASS: gbpmruntime
+      RABBITMQ_DEFAULT_USER: runtime
+      RABBITMQ_DEFAULT_PASS: runtime
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - gbpmruntime-local
+      - runtime-local
 
   co2-calculation-postgres:
     image: postgres:16
@@ -38,7 +38,7 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - gbpmruntime-local
+      - runtime-local
 
   monitoring-results-postgres:
     image: postgres:16
@@ -57,7 +57,7 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - gbpmruntime-local
+      - runtime-local
 
 volumes:
   rabbitmq-data:
@@ -65,5 +65,5 @@ volumes:
   monitoring-results-postgres-data:
 
 networks:
-  gbpmruntime-local:
+  runtime-local:
     external: true

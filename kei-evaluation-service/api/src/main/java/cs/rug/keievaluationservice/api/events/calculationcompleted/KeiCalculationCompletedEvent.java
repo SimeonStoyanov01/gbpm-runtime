@@ -28,7 +28,6 @@ public class KeiCalculationCompletedEvent {
     private String eventType;
 
     @NotBlank
-    private String contractVersion;
 
     @NotNull
     private Instant occurredAt;

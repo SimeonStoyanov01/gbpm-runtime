@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "gbpmruntime.messaging.evaluation-result")
+@ConfigurationProperties(prefix = "runtime.messaging.evaluation-result")
 public class EvaluationResultRabbitMqProperties {
     private String exchangeName;
     private String routingKey;

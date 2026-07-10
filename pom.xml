@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cs.rug.gbpmruntime</groupId>
-    <artifactId>gbpmruntime</artifactId>
+    <groupId>cs.rug.runtime</groupId>
+    <artifactId>runtime</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>GBPMRuntime</name>
-    <description>Convenience aggregator for GBPMRuntime services.</description>
+    <name>Runtime</name>
+    <description>Convenience aggregator for Runtime services.</description>
 
     <modules>
-        <module>gbpmruntime-process-registry</module>
-        <module>gbpmruntime-observation</module>
+        <module>process-registry-service</module>
+        <module>observation-service</module>
         <module>camunda-8-integration</module>
         <module>camunda-8-worker-service</module>
         <module>co2-calculation-service</module>

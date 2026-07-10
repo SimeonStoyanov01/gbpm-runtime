@@ -18,7 +18,7 @@ public class KeiEvaluationCompletedEventListener {
     private final EvaluationCompletedEventMapper evaluationCompletedEventMapper;
     private final RecordEvaluationOperation recordEvaluationOperation;
 
-    @RabbitListener(queues = "${gbpmruntime.messaging.evaluation-result.queue-name}")
+    @RabbitListener(queues = "${runtime.messaging.evaluation-result.queue-name}")
     public void handle(byte[] payload) {
         KeiEvaluationCompletedEvent event;
         try {

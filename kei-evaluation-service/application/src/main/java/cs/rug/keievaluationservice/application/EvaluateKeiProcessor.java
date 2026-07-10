@@ -29,7 +29,6 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
 
     private static final String EVENT_TYPE = "KEI_EVALUATION_COMPLETED";
     private static final String VIOLATION_EVENT_TYPE = "THRESHOLD_VIOLATION_DETECTED";
-    private static final String CONTRACT_VERSION = "1.0";
     private static final String WITHIN_TARGET_STATUS = "WITHIN_TARGET";
     private static final String VIOLATED_STATUS = "VIOLATED";
     private static final String LESS_THAN_OR_EQUAL_OPERATOR = "LESS_THAN_OR_EQUAL";
@@ -90,7 +89,6 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
                 .builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventType(VIOLATION_EVENT_TYPE)
-                .contractVersion(CONTRACT_VERSION)
                 .occurredAt(Instant.now())
                 .processDefinitionKey(event.getExecution().getProcessDefinitionKey())
                 .bpmnProcessId(event.getExecution().getBpmnProcessId())
@@ -115,7 +113,6 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
                 .builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventType(EVENT_TYPE)
-                .contractVersion(CONTRACT_VERSION)
                 .calculationResultId(event.getEventId())
                 .occurredAt(Instant.now())
                 .calculation(event.getCalculation())

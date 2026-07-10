@@ -32,7 +32,6 @@ public class TransportBatchWorker {
     private static final String DEFAULT_JOB_TYPE = "default-worker";
     private static final String ENGINE_TYPE = "CAMUNDA_8";
     private static final String EVENT_TYPE = "ENGINE_TASK_COMPLETED";
-    private static final String CONTRACT_VERSION = "1.0";
     private static final String COMPLETED_TASK_STATUS = "COMPLETED";
 
     private final MockOperationalServiceClient mockOperationalServiceClient;
@@ -100,7 +99,6 @@ public class TransportBatchWorker {
                 .builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventType(EVENT_TYPE)
-                .contractVersion(CONTRACT_VERSION)
                 .occurredAt(Instant.now())
                 .execution(EngineExecutionContext
                         .builder()

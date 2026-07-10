@@ -16,7 +16,7 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Camunda 8 Worker Service</name>
-    <description>Standalone Zeebe worker for GBPMRuntime process execution events.</description>
+    <description>Standalone Zeebe worker for Runtime process execution events.</description>
 
     <properties>
         <java.version>21</java.version>

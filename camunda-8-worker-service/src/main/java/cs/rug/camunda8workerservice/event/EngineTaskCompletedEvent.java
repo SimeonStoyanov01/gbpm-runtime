@@ -16,7 +16,6 @@ import java.util.List;
 public class EngineTaskCompletedEvent {
     private String eventId;
     private String eventType;
-    private String contractVersion;
     private Instant occurredAt;
     private EngineExecutionContext execution;
     private String taskStatus;

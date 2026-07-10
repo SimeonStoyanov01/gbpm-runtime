@@ -1,5 +1,5 @@
-# Local Camunda 8 runtime and GBPMRuntime Camunda adapter services.
-name: gbpmruntime-camunda8-local
+# Local Camunda 8 runtime and Runtime Camunda adapter services.
+name: runtime-camunda8-local
 
 services:
   orchestration:
@@ -21,7 +21,7 @@ services:
       - source: orchestration-config
         target: /usr/local/camunda/config/application.yaml
     networks:
-      - gbpmruntime-local
+      - runtime-local
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -48,7 +48,7 @@ services:
     volumes:
       - elastic:/usr/share/elasticsearch/data
     networks:
-      - gbpmruntime-local
+      - runtime-local
 
   camunda-8-integration:
     build:
@@ -65,7 +65,7 @@ services:
       orchestration:
         condition: service_healthy
     networks:
-      - gbpmruntime-local
+      - runtime-local
 
   camunda-8-worker-service:
     build:
@@ -76,24 +76,24 @@ services:
       CAMUNDA_REST_ADDRESS: http://orchestration:8080
       CAMUNDA_GRPC_ADDRESS: http://orchestration:26500
       MOCK_OPERATIONAL_SERVICE_URL: http://mock-operational-service:8091
-      RABBITMQ_HOST: gbpmruntime-rabbitmq
+      RABBITMQ_HOST: runtime-rabbitmq
       RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: gbpmruntime
-      RABBITMQ_PASSWORD: gbpmruntime
-      CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE: gbpmruntime.camunda8.events
+      RABBITMQ_USERNAME: runtime
+      RABBITMQ_PASSWORD: runtime
+      CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE: runtime.camunda8.events
       CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY: engine.task.completed
     depends_on:
       orchestration:
         condition: service_healthy
     networks:
-      - gbpmruntime-local
+      - runtime-local
 
 volumes:
   zeebe:
   elastic:
 
 networks:
-  gbpmruntime-local:
+  runtime-local:
     external: true
 
 configs:

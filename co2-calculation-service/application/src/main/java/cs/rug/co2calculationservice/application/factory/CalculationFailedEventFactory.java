@@ -13,7 +13,6 @@ import java.util.UUID;
 public class CalculationFailedEventFactory {
 
     private static final String EVENT_TYPE = "KEI_CALCULATION_FAILED";
-    private static final String CONTRACT_VERSION = "1.0";
 
     public KeiCalculationFailedEvent create(
             CalculateCo2Request request,
@@ -23,7 +22,6 @@ public class CalculationFailedEventFactory {
                 .builder()
                 .eventId(UUID.randomUUID().toString())
                 .eventType(EVENT_TYPE)
-                .contractVersion(CONTRACT_VERSION)
                 .occurredAt(Instant.now())
                 .calculation(request.getCalculation())
                 .kei(request.getKei())

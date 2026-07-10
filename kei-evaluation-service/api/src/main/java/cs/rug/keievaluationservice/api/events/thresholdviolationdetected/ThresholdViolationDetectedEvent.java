@@ -15,7 +15,6 @@ import java.time.Instant;
 public class ThresholdViolationDetectedEvent {
     private String eventId;
     private String eventType;
-    private String contractVersion;
     private Instant occurredAt;
     private Long processDefinitionKey;
     private String bpmnProcessId;

@@ -15,8 +15,8 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:gbpmruntime}
-    password: ${RABBITMQ_PASSWORD:gbpmruntime}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
 
 camunda:
   client:
@@ -32,5 +32,5 @@ camunda8worker:
       url: ${MOCK_OPERATIONAL_SERVICE_URL:http://localhost:8091}
   messaging:
     engine-task-completed:
-      exchange-name: ${CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE:gbpmruntime.camunda8.events}
+      exchange-name: ${CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE:runtime.camunda8.events}
       routing-key: ${CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY:engine.task.completed}

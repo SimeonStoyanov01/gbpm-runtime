@@ -18,7 +18,7 @@ public class KeiCalculationCompletedEventListener {
     private final CalculationCompletedEventMapper calculationCompletedEventMapper;
     private final RecordCalculationOperation recordCalculationOperation;
 
-    @RabbitListener(queues = "${gbpmruntime.messaging.calculation-result.queue-name}")
+    @RabbitListener(queues = "${runtime.messaging.calculation-result.queue-name}")
     public void handle(byte[] payload) {
         KeiCalculationCompletedEvent event;
         try {
