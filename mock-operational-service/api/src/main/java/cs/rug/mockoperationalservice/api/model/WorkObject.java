@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkObjectModel {
+public class WorkObject {
     @NotBlank
     private String objectId;
 

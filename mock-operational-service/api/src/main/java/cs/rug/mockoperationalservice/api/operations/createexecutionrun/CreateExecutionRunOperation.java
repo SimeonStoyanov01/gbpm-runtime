@@ -1,5 +1,7 @@
 package cs.rug.mockoperationalservice.api.operations.createexecutionrun;
 
-public interface CreateExecutionRunOperation {
-    CreateExecutionRunResponse process(CreateExecutionRunRequest request);
+import cs.rug.mockoperationalservice.api.base.Processor;
+
+public interface CreateExecutionRunOperation
+        extends Processor<CreateExecutionRunRequest, CreateExecutionRunResponse> {
 }

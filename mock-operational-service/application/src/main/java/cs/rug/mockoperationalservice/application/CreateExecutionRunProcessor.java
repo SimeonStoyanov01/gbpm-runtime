@@ -1,7 +1,7 @@
 package cs.rug.mockoperationalservice.application;
 
 import cs.rug.mockoperationalservice.api.exceptions.ExecutionRunNotFoundException;
-import cs.rug.mockoperationalservice.api.model.ResourceUsageModel;
+import cs.rug.mockoperationalservice.api.model.ResourceUsage;
 import cs.rug.mockoperationalservice.api.operations.createexecutionrun.CreateExecutionRunOperation;
 import cs.rug.mockoperationalservice.api.operations.createexecutionrun.CreateExecutionRunRequest;
 import cs.rug.mockoperationalservice.api.operations.createexecutionrun.CreateExecutionRunResponse;
@@ -39,7 +39,7 @@ public class CreateExecutionRunProcessor implements CreateExecutionRunOperation 
                 .builder()
                 .runId("RUN-" + UUID.randomUUID())
                 .status(COMPLETED_STATUS)
-                .resourceUsages(List.of(ResourceUsageModel
+                .resourceUsages(List.of(ResourceUsage
                         .builder()
                         .resourceName(record.getResourceName())
                         .timeUsed(record.getTimeUsed())

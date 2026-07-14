@@ -1,4 +1,4 @@
-package cs.rug.camunda8workerservice.client.dto;
+package cs.rug.camunda8workerservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResourceUsageDto {
+public class ResourceUsage {
     private String resourceName;
-    private String timeUsed;
+    private Double timeUsed;
     private String unit;
 }

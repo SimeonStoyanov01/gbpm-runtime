@@ -27,6 +27,13 @@ camunda:
     grpc-address: ${CAMUNDA_GRPC_ADDRESS:http://localhost:26500}
 
 camunda8worker:
+  worker:
+    job-type: ${CAMUNDA8_WORKER_JOB_TYPE:default-worker}
+    name: ${CAMUNDA8_WORKER_NAME:generic-camunda-worker}
+    engine-type: ${CAMUNDA8_WORKER_ENGINE_TYPE:CAMUNDA_8}
+    successful-status: ${CAMUNDA8_WORKER_SUCCESSFUL_STATUS:COMPLETED}
+    order-id-variable: ${CAMUNDA8_WORKER_ORDER_ID_VARIABLE:orderId}
+    work-object-variable: ${CAMUNDA8_WORKER_WORK_OBJECT_VARIABLE:workObject}
   clients:
     mock-operational-service:
       url: ${MOCK_OPERATIONAL_SERVICE_URL:http://localhost:8091}

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResourceUsageModel {
+public class ResourceUsage {
     private String resourceName;
     private Double timeUsed;
     private String unit;

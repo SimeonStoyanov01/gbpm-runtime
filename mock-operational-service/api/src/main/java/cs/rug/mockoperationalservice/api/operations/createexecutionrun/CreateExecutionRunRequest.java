@@ -1,6 +1,6 @@
 package cs.rug.mockoperationalservice.api.operations.createexecutionrun;
 
-import cs.rug.mockoperationalservice.api.model.WorkObjectModel;
+import cs.rug.mockoperationalservice.api.model.WorkObject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,5 +22,5 @@ public class CreateExecutionRunRequest {
 
     @Valid
     @NotNull
-    private WorkObjectModel workObject;
+    private WorkObject workObject;
 }

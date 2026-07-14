@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkObjectModel {
+public class WorkObject {
     private String objectId;
     private String type;
     private String material;

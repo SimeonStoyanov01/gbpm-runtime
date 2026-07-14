@@ -1,6 +1,6 @@
 package cs.rug.mockoperationalservice.api.operations.createexecutionrun;
 
-import cs.rug.mockoperationalservice.api.model.ResourceUsageModel;
+import cs.rug.mockoperationalservice.api.model.ResourceUsage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +15,5 @@ import java.util.List;
 public class CreateExecutionRunResponse {
     private String runId;
     private String status;
-    private List<ResourceUsageModel> resourceUsages;
+    private List<ResourceUsage> resourceUsages;
 }
