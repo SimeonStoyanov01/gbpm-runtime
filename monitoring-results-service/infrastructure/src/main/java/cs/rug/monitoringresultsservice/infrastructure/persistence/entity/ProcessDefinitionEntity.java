@@ -41,6 +41,9 @@ public class ProcessDefinitionEntity {
     @Column(name = "bpmn_process_id")
     private String bpmnProcessId;
 
+    @Column(name = "resource_name")
+    private String resourceName;
+
     @Column(name = "deployment_key")
     private Long deploymentKey;
 

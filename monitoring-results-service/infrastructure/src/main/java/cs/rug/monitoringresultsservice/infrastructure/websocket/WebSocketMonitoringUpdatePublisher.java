@@ -1,7 +1,6 @@
 package cs.rug.monitoringresultsservice.infrastructure.websocket;
 
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
-import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
 import cs.rug.monitoringresultsservice.application.out.MonitoringUpdatePublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -28,7 +27,7 @@ public class WebSocketMonitoringUpdatePublisher implements MonitoringUpdatePubli
     }
 
     @Override
-    public void publishViolationUpdate(ThresholdViolation violation) {
-        messagingTemplate.convertAndSend(VIOLATIONS_TOPIC, violation);
+    public void publishViolationUpdate(MonitoringRecord record) {
+        messagingTemplate.convertAndSend(VIOLATIONS_TOPIC, record);
     }
 }

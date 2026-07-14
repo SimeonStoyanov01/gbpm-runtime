@@ -2,20 +2,21 @@ package cs.rug.monitoringresultsservice.application.out;
 
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
+import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsResponse;
-import cs.rug.monitoringresultsservice.api.operations.recordcalculation.RecordCalculationRequest;
-import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationRequest;
 
 import java.util.List;
 
 public interface MonitoringRecordStore {
 
-    MonitoringRecord saveCalculation(RecordCalculationRequest request);
+    MonitoringRecord saveCalculation(MonitoringRecord record);
 
-    MonitoringRecord saveEvaluation(RecordEvaluationRequest request);
+    MonitoringRecord saveEvaluation(MonitoringRecord record);
 
     List<MonitoringRecord> findMonitoringRecords(FindMonitoringRecordsRequest request);
+
+    List<MonitoringRecord> findActiveViolations(FindActiveViolationsRequest request);
 
     FindProcessInstanceDetailsResponse findProcessInstanceDetails(FindProcessInstanceDetailsRequest request);
 }

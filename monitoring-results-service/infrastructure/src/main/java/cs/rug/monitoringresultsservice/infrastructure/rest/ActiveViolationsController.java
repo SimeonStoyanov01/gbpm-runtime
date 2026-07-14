@@ -1,6 +1,6 @@
 package cs.rug.monitoringresultsservice.infrastructure.rest;
 
-import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
+import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsOperation;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +18,16 @@ public class ActiveViolationsController {
     private final FindActiveViolationsOperation findActiveViolationsOperation;
 
     @GetMapping("/api/monitoring/violations/active")
-    public ResponseEntity<List<ThresholdViolation>> findActiveViolations(
+    public ResponseEntity<List<MonitoringRecord>> findActiveViolations(
             @RequestParam(required = false) Long processDefinitionKey,
             @RequestParam(required = false) String bpmnProcessId
     ) {
-        List<ThresholdViolation> violations = findActiveViolationsOperation
+        List<MonitoringRecord> violations = findActiveViolationsOperation
                 .process(FindActiveViolationsRequest
                         .builder()
                         .processDefinitionKey(processDefinitionKey)
                         .bpmnProcessId(bpmnProcessId)
-                        .build())
-                .getViolations();
+                        .build());
 
         return ResponseEntity.ok(violations);
     }

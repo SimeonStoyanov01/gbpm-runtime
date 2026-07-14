@@ -1,10 +1,7 @@
 package cs.rug.monitoringresultsservice.api.events.evaluationcompleted;
 
-import cs.rug.monitoringresultsservice.api.model.CalculatedResult;
-import cs.rug.monitoringresultsservice.api.model.CalculationDescriptor;
-import cs.rug.monitoringresultsservice.api.model.EngineExecutionContext;
+import cs.rug.monitoringresultsservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
 import cs.rug.monitoringresultsservice.api.model.EvaluationDetails;
-import cs.rug.monitoringresultsservice.api.model.KeiAnnotation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,12 +15,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class KeiEvaluationCompletedEvent {
     private String eventId;
-    private String eventType;
-    private String calculationResultId;
     private Instant occurredAt;
-    private CalculationDescriptor calculation;
-    private KeiAnnotation kei;
-    private EngineExecutionContext execution;
-    private CalculatedResult calculatedResult;
+    private KeiCalculationCompletedEvent calculationEvent;
     private EvaluationDetails evaluation;
 }

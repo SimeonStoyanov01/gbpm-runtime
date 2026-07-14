@@ -65,6 +65,18 @@ public class KeiResultEntity {
     @Column(name = "element_instance_key")
     private Long elementInstanceKey;
 
+    @Column(name = "engine_type")
+    private String engineType;
+
+    @Column(name = "calculator_id")
+    private String calculatorId;
+
+    @Column(name = "calculation_method")
+    private String calculationMethod;
+
+    @Column(name = "reference_set_id")
+    private String referenceSetId;
+
     @Column(name = "calculation_event_id", unique = true)
     private String calculationEventId;
 

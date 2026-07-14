@@ -28,7 +28,10 @@ public class KeiCalculationCompletedEventListener {
             return;
         }
 
-        log.info("Received KEI calculation completed event: eventId={}", event.getEventId());
+        log.info(
+                "Received KEI calculation completed event: eventId={}",
+                event.getEventId()
+        );
         if (hasTargetValue(event)) {
             log.info(
                     "Skipping calculation monitoring projection because target value is present: eventId={}, keiId={}",
@@ -38,7 +41,7 @@ public class KeiCalculationCompletedEventListener {
             return;
         }
 
-        recordCalculationOperation.process(calculationCompletedEventMapper.toRequest(event));
+        recordCalculationOperation.process(calculationCompletedEventMapper.toMonitoringRecord(event));
     }
 
     private KeiCalculationCompletedEvent readEvent(byte[] payload) {

@@ -1,6 +1,6 @@
 package cs.rug.monitoringresultsservice.api.operations.registerprocessmodel;
 
-import cs.rug.monitoringresultsservice.api.base.Processor;
+import cs.rug.monitoringresultsservice.api.base.VoidProcessor;
 
-public interface RegisterProcessModelOperation extends Processor<RegisterProcessModelRequest, RegisterProcessModelResponse> {
+public interface RegisterProcessModelOperation extends VoidProcessor<RegisterProcessModelRequest> {
 }

@@ -1,6 +1,10 @@
 package cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords;
 
 import cs.rug.monitoringresultsservice.api.base.Processor;
+import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 
-public interface FindMonitoringRecordsOperation extends Processor<FindMonitoringRecordsRequest, FindMonitoringRecordsResponse> {
+import java.util.List;
+
+public interface FindMonitoringRecordsOperation
+        extends Processor<FindMonitoringRecordsRequest, List<MonitoringRecord>> {
 }

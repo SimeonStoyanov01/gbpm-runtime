@@ -9,12 +9,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MonitoringRecord {
     private String calculationEventId;
     private String evaluationEventId;
+    private String engineType;
+    private String calculatorId;
+    private String calculationMethod;
+    private String referenceSetId;
     private Long processDefinitionKey;
     private String bpmnProcessId;
     private Long processInstanceKey;

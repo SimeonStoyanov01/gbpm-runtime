@@ -1,7 +1,6 @@
 package cs.rug.monitoringresultsservice.application.out;
 
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
-import cs.rug.monitoringresultsservice.api.model.ThresholdViolation;
 
 public interface MonitoringUpdatePublisher {
 
@@ -9,5 +8,5 @@ public interface MonitoringUpdatePublisher {
 
     void publishEvaluationUpdate(MonitoringRecord record);
 
-    void publishViolationUpdate(ThresholdViolation violation);
+    void publishViolationUpdate(MonitoringRecord record);
 }

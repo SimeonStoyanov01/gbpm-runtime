@@ -20,6 +20,7 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
                         id,
                         process_definition_key,
                         bpmn_process_id,
+                        resource_name,
                         deployment_key,
                         version,
                         bpmn_xml,
@@ -29,6 +30,7 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
                         :id,
                         :processDefinitionKey,
                         :bpmnProcessId,
+                        :resourceName,
                         :deploymentKey,
                         :version,
                         :bpmnXml,
@@ -37,6 +39,7 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
                     ON CONFLICT (process_definition_key)
                     DO UPDATE SET
                         bpmn_process_id = EXCLUDED.bpmn_process_id,
+                        resource_name = COALESCE(EXCLUDED.resource_name, process_definition.resource_name),
                         deployment_key = COALESCE(EXCLUDED.deployment_key, process_definition.deployment_key),
                         version = COALESCE(EXCLUDED.version, process_definition.version),
                         bpmn_xml = COALESCE(EXCLUDED.bpmn_xml, process_definition.bpmn_xml),
@@ -48,6 +51,7 @@ public interface ProcessDefinitionJpaRepository extends JpaRepository<ProcessDef
             @Param("id") UUID id,
             @Param("processDefinitionKey") Long processDefinitionKey,
             @Param("bpmnProcessId") String bpmnProcessId,
+            @Param("resourceName") String resourceName,
             @Param("deploymentKey") Long deploymentKey,
             @Param("version") Integer version,
             @Param("bpmnXml") String bpmnXml

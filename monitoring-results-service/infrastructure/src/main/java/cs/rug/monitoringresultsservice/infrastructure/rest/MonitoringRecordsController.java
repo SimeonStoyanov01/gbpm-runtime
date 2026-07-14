@@ -31,8 +31,7 @@ public class MonitoringRecordsController {
                         .processDefinitionKey(processDefinitionKey)
                         .bpmnProcessId(bpmnProcessId)
                         .evaluationStatus(evaluationStatus)
-                        .build())
-                .getRecords();
+                        .build());
 
         return ResponseEntity.ok(records);
     }

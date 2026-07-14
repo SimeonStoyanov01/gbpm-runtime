@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalculationDescriptor {
-    private String type;
-    private String method;
-    private String version;
+public class CalculationMetadata {
+    private String calculatorId;
+    private String calculationMethod;
+    private String referenceSetId;
 }

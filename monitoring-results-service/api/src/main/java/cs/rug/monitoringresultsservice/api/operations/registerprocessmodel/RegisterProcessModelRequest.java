@@ -1,6 +1,5 @@
 package cs.rug.monitoringresultsservice.api.operations.registerprocessmodel;
 
-import cs.rug.monitoringresultsservice.api.base.ProcessorRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterProcessModelRequest implements ProcessorRequest {
+public class RegisterProcessModelRequest {
     private Long deploymentKey;
     private Long processDefinitionKey;
     private String bpmnProcessId;

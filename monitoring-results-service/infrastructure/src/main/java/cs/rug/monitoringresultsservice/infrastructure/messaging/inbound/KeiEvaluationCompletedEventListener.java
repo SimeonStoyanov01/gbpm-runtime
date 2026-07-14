@@ -28,8 +28,11 @@ public class KeiEvaluationCompletedEventListener {
             return;
         }
 
-        log.info("Received KEI evaluation completed event: eventId={}", event.getEventId());
-        recordEvaluationOperation.process(evaluationCompletedEventMapper.toRequest(event));
+        log.info(
+                "Received KEI evaluation completed event: eventId={}",
+                event.getEventId()
+        );
+        recordEvaluationOperation.process(evaluationCompletedEventMapper.toMonitoringRecord(event));
     }
 
     private KeiEvaluationCompletedEvent readEvent(byte[] payload) {

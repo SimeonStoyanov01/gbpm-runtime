@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EngineExecutionContext {
+    private String engineType;
     private Long processDefinitionKey;
     private String bpmnProcessId;
     private Long processInstanceKey;

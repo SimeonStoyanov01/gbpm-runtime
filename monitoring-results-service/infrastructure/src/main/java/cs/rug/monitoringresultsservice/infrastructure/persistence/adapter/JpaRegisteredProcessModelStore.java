@@ -3,7 +3,6 @@ package cs.rug.monitoringresultsservice.infrastructure.persistence.adapter;
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.ProcessModelElement;
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.ProcessModelKeiAnnotation;
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
-import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelResponse;
 import cs.rug.monitoringresultsservice.application.out.RegisteredProcessModelStore;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.BpmnElementEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiAnnotationEntity;
@@ -27,10 +26,9 @@ public class JpaRegisteredProcessModelStore implements RegisteredProcessModelSto
 
     @Override
     @Transactional
-    public RegisterProcessModelResponse registerProcessModel(RegisterProcessModelRequest request) {
+    public void registerProcessModel(RegisterProcessModelRequest request) {
         ProcessDefinitionEntity processDefinition = saveProcessDefinition(request);
 
-        int annotationCount = 0;
         if (request.getElements() != null) {
             for (ProcessModelElement element : request.getElements()) {
                 BpmnElementEntity bpmnElement = saveBpmnElement(processDefinition, element);
@@ -38,18 +36,11 @@ public class JpaRegisteredProcessModelStore implements RegisteredProcessModelSto
                 if (element.getKeiAnnotations() != null) {
                     for (ProcessModelKeiAnnotation annotation : element.getKeiAnnotations()) {
                         saveKeiAnnotation(bpmnElement, annotation);
-                        annotationCount++;
                     }
                 }
             }
         }
 
-        return RegisterProcessModelResponse
-                .builder()
-                .processDefinitionKey(request.getProcessDefinitionKey())
-                .elementCount(request.getElements() == null ? 0 : request.getElements().size())
-                .keiAnnotationCount(annotationCount)
-                .build();
     }
 
     private ProcessDefinitionEntity saveProcessDefinition(RegisterProcessModelRequest request) {
@@ -57,6 +48,7 @@ public class JpaRegisteredProcessModelStore implements RegisteredProcessModelSto
                 UUID.randomUUID(),
                 request.getProcessDefinitionKey(),
                 request.getBpmnProcessId(),
+                request.getResourceName(),
                 request.getDeploymentKey(),
                 request.getVersion(),
                 request.getBpmnXml()
