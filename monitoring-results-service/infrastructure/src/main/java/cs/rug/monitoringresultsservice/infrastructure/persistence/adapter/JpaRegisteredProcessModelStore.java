@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -41,6 +42,47 @@ public class JpaRegisteredProcessModelStore implements RegisteredProcessModelSto
             }
         }
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProcessModelElement> findProcessModel(Long processDefinitionKey) {
+        return processDefinitionRepository
+                .findByProcessDefinitionKey(processDefinitionKey)
+                .map(this::toProcessModelElements)
+                .orElseGet(List::of);
+    }
+
+    private List<ProcessModelElement> toProcessModelElements(ProcessDefinitionEntity processDefinition) {
+        return bpmnElementRepository
+                .findByProcessDefinitionOrderByBpmnElementId(processDefinition)
+                .stream()
+                .map(this::toProcessModelElement)
+                .toList();
+    }
+
+    private ProcessModelElement toProcessModelElement(BpmnElementEntity element) {
+        return ProcessModelElement
+                .builder()
+                .bpmnElementId(element.getBpmnElementId())
+                .name(element.getElementName())
+                .type(element.getElementType())
+                .keiAnnotations(keiAnnotationRepository
+                        .findByBpmnElementOrderByKeiId(element)
+                        .stream()
+                        .map(this::toProcessModelKeiAnnotation)
+                        .toList())
+                .build();
+    }
+
+    private ProcessModelKeiAnnotation toProcessModelKeiAnnotation(KeiAnnotationEntity annotation) {
+        return ProcessModelKeiAnnotation
+                .builder()
+                .id(annotation.getKeiId())
+                .unit(annotation.getUnit())
+                .targetValue(annotation.getTargetValue())
+                .icon(annotation.getIcon())
+                .build();
     }
 
     private ProcessDefinitionEntity saveProcessDefinition(RegisterProcessModelRequest request) {

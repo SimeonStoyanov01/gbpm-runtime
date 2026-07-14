@@ -12,4 +12,6 @@ public interface MonitoringProcessModelClient {
             byte[] bpmnXml,
             List<ElementKeiAnnotations> elementKeiAnnotations
     );
+
+    List<ElementKeiAnnotations> findProcessModel(Long processDefinitionKey);
 }

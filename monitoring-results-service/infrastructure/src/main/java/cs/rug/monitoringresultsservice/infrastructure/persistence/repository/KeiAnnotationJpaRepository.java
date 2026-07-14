@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface KeiAnnotationJpaRepository extends JpaRepository<KeiAnnotationEntity, UUID> {
+
+    List<KeiAnnotationEntity> findByBpmnElementOrderByKeiId(BpmnElementEntity bpmnElement);
 
     Optional<KeiAnnotationEntity> findByBpmnElementAndKeiId(BpmnElementEntity bpmnElement, String keiId);
 

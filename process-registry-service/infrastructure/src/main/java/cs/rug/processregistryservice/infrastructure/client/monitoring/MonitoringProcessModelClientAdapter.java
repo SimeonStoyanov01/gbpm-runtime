@@ -40,6 +40,39 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
                 .build());
     }
 
+    @Override
+    public List<ElementKeiAnnotations> findProcessModel(Long processDefinitionKey) {
+        return monitoringResultsFeignClient
+                .findProcessModel(processDefinitionKey)
+                .stream()
+                .map(this::toElementKeiAnnotations)
+                .toList();
+    }
+
+    private ElementKeiAnnotations toElementKeiAnnotations(ProcessModelElement element) {
+        return ElementKeiAnnotations
+                .builder()
+                .bpmnElementId(element.getBpmnElementId())
+                .elementName(element.getName())
+                .elementType(element.getType())
+                .keiAnnotations(element
+                        .getKeiAnnotations()
+                        .stream()
+                        .map(this::toKeiAnnotation)
+                        .toList())
+                .build();
+    }
+
+    private KeiAnnotation toKeiAnnotation(ProcessModelKeiAnnotation annotation) {
+        return KeiAnnotation
+                .builder()
+                .id(annotation.getId())
+                .unit(annotation.getUnit())
+                .targetValue(annotation.getTargetValue())
+                .icon(annotation.getIcon())
+                .build();
+    }
+
     private ProcessModelElement toElement(ElementKeiAnnotations elementKeiAnnotations) {
         return ProcessModelElement
                 .builder()
@@ -49,12 +82,12 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
                 .keiAnnotations(elementKeiAnnotations
                         .getKeiAnnotations()
                         .stream()
-                        .map(this::toKeiAnnotation)
+                        .map(this::toProcessModelKeiAnnotation)
                         .toList())
                 .build();
     }
 
-    private ProcessModelKeiAnnotation toKeiAnnotation(KeiAnnotation keiMetadata) {
+    private ProcessModelKeiAnnotation toProcessModelKeiAnnotation(KeiAnnotation keiMetadata) {
         return ProcessModelKeiAnnotation
                 .builder()
                 .id(keiMetadata.getId())

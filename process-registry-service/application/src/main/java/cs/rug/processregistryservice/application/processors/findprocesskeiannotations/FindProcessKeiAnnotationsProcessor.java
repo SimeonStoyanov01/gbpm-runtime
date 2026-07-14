@@ -3,7 +3,7 @@ package cs.rug.processregistryservice.application.processors.findprocesskeiannot
 import cs.rug.processregistryservice.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsOperation;
 import cs.rug.processregistryservice.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsRequest;
 import cs.rug.processregistryservice.api.operations.findprocesskeiannotations.FindProcessKeiAnnotationsResponse;
-import cs.rug.processregistryservice.application.out.keiregistry.ProcessKeiAnnotationRegistry;
+import cs.rug.processregistryservice.application.out.monitoring.MonitoringProcessModelClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FindProcessKeiAnnotationsProcessor implements FindProcessKeiAnnotationsOperation {
 
-    private final ProcessKeiAnnotationRegistry processKeiAnnotationRegistry;
+    private final MonitoringProcessModelClient monitoringProcessModelClient;
 
     @Override
     public FindProcessKeiAnnotationsResponse process(FindProcessKeiAnnotationsRequest request) {
         return FindProcessKeiAnnotationsResponse
                 .builder()
-                .elementKeiAnnotations(processKeiAnnotationRegistry
-                        .findKeiAnnotationsByProcessDefinitionKey(request.getProcessDefinitionKey()))
+                .elementKeiAnnotations(monitoringProcessModelClient
+                        .findProcessModel(request.getProcessDefinitionKey()))
                 .build();
     }
 }
