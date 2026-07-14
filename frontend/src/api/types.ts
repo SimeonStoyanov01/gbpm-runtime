@@ -16,6 +16,19 @@ export type StartProcessInstanceResponse = {
   status: string;
 };
 
+export type ActiveUserTask = {
+  userTaskKey: string;
+  name?: string;
+  bpmnElementId?: string;
+  state: string;
+  assignee?: string;
+  decisionVariable?: string;
+};
+
+export type FindActiveUserTasksResponse = {
+  userTasks: ActiveUserTask[];
+};
+
 export type KeiAnnotation = {
   id: string;
   unit?: string;

@@ -347,6 +347,55 @@ tbody tr:last-child td {
   line-height: 1.55;
 }
 
+.user-task-section {
+  margin-top: 18px;
+}
+
+.user-task-heading,
+.user-task-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.user-task-heading h4 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.user-task-heading .endpoint {
+  max-width: 70%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.user-task-list {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.user-task-row {
+  min-height: 62px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.user-task-row > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.user-task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.user-task-actions button {
+  min-width: 72px;
+}
+
 .empty-state.compact {
   margin-top: 0;
 }
@@ -629,5 +678,9 @@ tbody tr:last-child td {
 
   .chip {
     margin-top: 14px;
+  }
+
+  .user-task-heading {
+    align-items: flex-start;
   }
 }

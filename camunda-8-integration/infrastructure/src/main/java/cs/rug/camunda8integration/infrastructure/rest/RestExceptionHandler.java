@@ -2,6 +2,8 @@ package cs.rug.camunda8integration.infrastructure.rest;
 
 import cs.rug.camunda8integration.api.exceptions.EngineDeploymentException;
 import cs.rug.camunda8integration.api.exceptions.EngineProcessStartException;
+import cs.rug.camunda8integration.api.exceptions.EngineUserTaskException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -42,10 +44,19 @@ public class RestExceptionHandler {
         return problem(HttpStatus.BAD_REQUEST, "Malformed request", "The request body could not be read.");
     }
 
-    @ExceptionHandler({EngineDeploymentException.class, EngineProcessStartException.class})
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolation(ConstraintViolationException exception) {
+        return problem(HttpStatus.BAD_REQUEST, "Request validation failed", exception.getMessage());
+    }
+
+    @ExceptionHandler({
+            EngineDeploymentException.class,
+            EngineProcessStartException.class,
+            EngineUserTaskException.class
+    })
     public ResponseEntity<ProblemDetail> handleEngineFailure(RuntimeException exception) {
-        log.warn("Camunda command failed: {}", exception.getMessage(), exception);
-        return problem(HttpStatus.BAD_GATEWAY, "Workflow engine command failed", exception.getMessage());
+        log.warn("Camunda request failed: {}", exception.getMessage(), exception);
+        return problem(HttpStatus.BAD_GATEWAY, "Workflow engine request failed", exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

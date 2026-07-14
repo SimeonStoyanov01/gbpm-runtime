@@ -29,8 +29,8 @@ public class GenericCamundaWorker {
     private final ObjectMapper objectMapper;
 
     @JobWorker(
-            type = "${camunda8worker.worker.job-type}",
-            name = "${camunda8worker.worker.name}",
+            type = "default-worker",
+            name = "generic-camunda-worker",
             autoComplete = false
     )
     public void handleJob(JobClient jobClient, ActivatedJob job) {

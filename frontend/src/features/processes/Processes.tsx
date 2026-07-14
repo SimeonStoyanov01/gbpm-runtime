@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { completeUserTask, findActiveUserTasks } from '../../api/camunda8IntegrationApi';
 import { deployProcess, findProcessKeis, startProcessInstance } from '../../api/processRegistryApi';
 import type {
+  ActiveUserTask,
   DeployProcessResponse,
   ElementKeiAnnotations,
   FindProcessKeisResponse,
@@ -19,8 +21,37 @@ export function Processes({ onDeployment }: ProcessesProps) {
   const [variablesJson, setVariablesJson] = useState('{}');
   const [startedInstance, setStartedInstance] = useState<StartProcessInstanceResponse>();
   const [keiResponse, setKeiResponse] = useState<FindProcessKeisResponse>();
+  const [activeUserTasks, setActiveUserTasks] = useState<ActiveUserTask[]>([]);
+  const [completingUserTaskKey, setCompletingUserTaskKey] = useState<string>();
+  const [userTaskError, setUserTaskError] = useState<string>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+
+  const refreshActiveUserTasks = useCallback(async (processInstanceKey: string) => {
+    try {
+      const response = await findActiveUserTasks(processInstanceKey);
+      setActiveUserTasks(response.userTasks);
+      setUserTaskError(undefined);
+    } catch (exception) {
+      setUserTaskError(exception instanceof Error ? exception.message : 'Failed to load active user tasks.');
+    }
+  }, []);
+
+  useEffect(() => {
+    const processInstanceKey = startedInstance?.processInstanceKey;
+    if (!processInstanceKey) {
+      setActiveUserTasks([]);
+      return;
+    }
+
+    void refreshActiveUserTasks(processInstanceKey);
+    const refreshTimer = window.setInterval(
+      () => void refreshActiveUserTasks(processInstanceKey),
+      2000,
+    );
+
+    return () => window.clearInterval(refreshTimer);
+  }, [refreshActiveUserTasks, startedInstance?.processInstanceKey]);
 
   async function handleDeploy(file?: File) {
     if (!file) {
@@ -72,6 +103,20 @@ export function Processes({ onDeployment }: ProcessesProps) {
     }
   }
 
+  async function handleCompleteUserTask(task: ActiveUserTask, decision?: boolean) {
+    setCompletingUserTaskKey(task.userTaskKey);
+    setUserTaskError(undefined);
+    try {
+      const variables = task.decisionVariable ? { [task.decisionVariable]: decision } : {};
+      await completeUserTask(task.userTaskKey, variables);
+      setActiveUserTasks((current) => current.filter((item) => item.userTaskKey !== task.userTaskKey));
+    } catch (exception) {
+      setUserTaskError(exception instanceof Error ? exception.message : 'Failed to complete user task.');
+    } finally {
+      setCompletingUserTaskKey(undefined);
+    }
+  }
+
   return (
     <section id="processes">
       <h2 className="section-title">Processes</h2>
@@ -111,13 +156,54 @@ export function Processes({ onDeployment }: ProcessesProps) {
             <button disabled={!processDefinitionKey || busy} onClick={handleStart}>Start process instance</button>
           </div>
           {startedInstance && (
-            <div className="result-box">
-              processDefinitionKey: "{startedInstance.processDefinitionKey}"<br />
-              bpmnProcessId: "{startedInstance.bpmnProcessId}"<br />
-              version: {startedInstance.version}<br />
-              processInstanceKey: "{startedInstance.processInstanceKey}"<br />
-              status: "{startedInstance.status}"
-            </div>
+            <>
+              <div className="result-box">
+                processDefinitionKey: "{startedInstance.processDefinitionKey}"<br />
+                bpmnProcessId: "{startedInstance.bpmnProcessId}"<br />
+                version: {startedInstance.version}<br />
+                processInstanceKey: "{startedInstance.processInstanceKey}"<br />
+                status: "{startedInstance.status}"
+              </div>
+
+              <div className="user-task-section">
+                <div className="user-task-heading">
+                  <h4>Active User Tasks</h4>
+                  <Endpoint>GET :8090 /api/v1/camunda8/process-instances/{'{key}'}/user-tasks</Endpoint>
+                </div>
+                {userTaskError && <p className="error">{userTaskError}</p>}
+                {activeUserTasks.length === 0 ? (
+                  <p className="hint">No active user tasks for this instance.</p>
+                ) : (
+                  <div className="user-task-list">
+                    {activeUserTasks.map((task) => (
+                      <div className="user-task-row" key={task.userTaskKey}>
+                        <span>
+                          <strong>{task.name || 'User task'}</strong>
+                          <span className="mono">{task.bpmnElementId || task.userTaskKey}</span>
+                        </span>
+                        <div className="user-task-actions">
+                          {task.decisionVariable && (
+                            <button
+                              className="secondary"
+                              disabled={completingUserTaskKey === task.userTaskKey}
+                              onClick={() => handleCompleteUserTask(task, false)}
+                            >
+                              No
+                            </button>
+                          )}
+                          <button
+                            disabled={completingUserTaskKey === task.userTaskKey}
+                            onClick={() => handleCompleteUserTask(task, true)}
+                          >
+                            {task.decisionVariable ? 'Yes' : 'Complete'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </Panel>
       </div>

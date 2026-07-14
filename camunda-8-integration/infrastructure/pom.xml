@@ -38,6 +38,11 @@
             <version>${camunda.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.camunda</groupId>
+            <artifactId>zeebe-bpmn-model</artifactId>
+            <version>${camunda.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
