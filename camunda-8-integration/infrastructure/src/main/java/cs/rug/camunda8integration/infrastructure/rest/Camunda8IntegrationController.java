@@ -6,6 +6,7 @@ import cs.rug.camunda8integration.api.operations.deployprocess.DeployProcessToEn
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineOperation;
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineRequest;
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,14 @@ public class Camunda8IntegrationController {
 
     @PostMapping(value = "/deploy", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DeployProcessToEngineResponse> deployProcessDefinition(
-            @RequestBody DeployProcessToEngineRequest request
+            @Valid @RequestBody DeployProcessToEngineRequest request
     ) {
         return ResponseEntity.ok(deployProcessToEngineOperation.process(request));
     }
 
     @PostMapping(value = "/instances", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StartProcessInEngineResponse> startProcessInstance(
-            @RequestBody StartProcessInEngineRequest request
+            @Valid @RequestBody StartProcessInEngineRequest request
     ) {
         return ResponseEntity.ok(startProcessInEngineOperation.process(request));
     }

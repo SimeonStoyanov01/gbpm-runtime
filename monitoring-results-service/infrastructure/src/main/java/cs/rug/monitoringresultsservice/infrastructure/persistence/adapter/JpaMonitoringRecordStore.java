@@ -1,5 +1,6 @@
 package cs.rug.monitoringresultsservice.infrastructure.persistence.adapter;
 
+import cs.rug.monitoringresultsservice.api.exceptions.ProcessInstanceNotFoundException;
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
@@ -104,9 +105,7 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
     public FindProcessInstanceDetailsResponse findProcessInstanceDetails(FindProcessInstanceDetailsRequest request) {
         ProcessInstanceEntity processInstance = processInstanceRepository
                 .findByProcessInstanceKey(request.getProcessInstanceKey())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Process instance not found: " + request.getProcessInstanceKey()
-                ));
+                .orElseThrow(() -> new ProcessInstanceNotFoundException(request.getProcessInstanceKey()));
         ProcessDefinitionEntity processDefinition = processInstance.getProcessDefinition();
         List<MonitoringRecord> records = keiResultRepository
                 .findByProcessInstanceProcessInstanceKey(processInstance.getProcessInstanceKey())

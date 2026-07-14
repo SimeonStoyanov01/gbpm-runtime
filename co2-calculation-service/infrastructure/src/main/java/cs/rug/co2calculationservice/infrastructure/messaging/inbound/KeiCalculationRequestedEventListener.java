@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
@@ -26,21 +27,20 @@ public class KeiCalculationRequestedEventListener {
             return;
         }
 
-        log.info(
-                "Received KEI calculation request: keiId={}, processInstanceKey={}, bpmnElementId={}",
-                event.getKei().getId(),
-                event.getExecution().getProcessInstanceKey(),
-                event.getExecution().getBpmnElementId()
-        );
-
         calculateCo2Operation.process(event);
     }
 
     private KeiCalculationRequestedEvent readEvent(byte[] payload) {
+        KeiCalculationRequestedEvent event;
         try {
-            return objectMapper.readValue(payload, KeiCalculationRequestedEvent.class);
-        } catch (Exception exception) {
+            event = objectMapper.readValue(payload, KeiCalculationRequestedEvent.class);
+        } catch (JacksonException exception) {
             throw new IllegalArgumentException("Failed to deserialize KEI calculation requested event.", exception);
         }
+
+        if (event == null) {
+            throw new IllegalArgumentException("KEI calculation requested event must not be null.");
+        }
+        return event;
     }
 }

@@ -1,6 +1,7 @@
 package cs.rug.camunda8integration.infrastructure.client.camunda8;
 
 import cs.rug.camunda8integration.api.exceptions.EngineDeploymentException;
+import cs.rug.camunda8integration.api.exceptions.EngineProcessStartException;
 import cs.rug.camunda8integration.api.operations.deployprocess.DeployProcessToEngineRequest;
 import cs.rug.camunda8integration.api.operations.deployprocess.DeployProcessToEngineResponse;
 import cs.rug.camunda8integration.api.operations.startprocess.StartProcessInEngineRequest;
@@ -24,11 +25,16 @@ public class Camunda8CommandClientAdapter implements Camunda8CommandClient {
 
     @Override
     public DeployProcessToEngineResponse deployProcess(DeployProcessToEngineRequest request) {
-        DeploymentEvent deploymentEvent = camundaClient
-                .newDeployResourceCommand()
-                .addResourceBytes(request.getResourceContent(), request.getResourceName())
-                .send()
-                .join();
+        DeploymentEvent deploymentEvent;
+        try {
+            deploymentEvent = camundaClient
+                    .newDeployResourceCommand()
+                    .addResourceBytes(request.getResourceContent(), request.getResourceName())
+                    .send()
+                    .join();
+        } catch (RuntimeException exception) {
+            throw new EngineDeploymentException("Failed to deploy BPMN resource to Camunda 8.", exception);
+        }
 
         if (deploymentEvent.getProcesses().isEmpty()) {
             throw new EngineDeploymentException("Camunda deployment did not return a process definition.");
@@ -49,12 +55,17 @@ public class Camunda8CommandClientAdapter implements Camunda8CommandClient {
 
     @Override
     public StartProcessInEngineResponse startProcess(StartProcessInEngineRequest request) {
-        ProcessInstanceEvent processInstanceEvent = camundaClient
-                .newCreateInstanceCommand()
-                .processDefinitionKey(Long.parseLong(request.getProcessDefinitionKey()))
-                .variables(normalizeVariables(request.getVariables()))
-                .send()
-                .join();
+        ProcessInstanceEvent processInstanceEvent;
+        try {
+            processInstanceEvent = camundaClient
+                    .newCreateInstanceCommand()
+                    .processDefinitionKey(Long.parseLong(request.getProcessDefinitionKey()))
+                    .variables(normalizeVariables(request.getVariables()))
+                    .send()
+                    .join();
+        } catch (RuntimeException exception) {
+            throw new EngineProcessStartException("Failed to start process instance in Camunda 8.", exception);
+        }
 
         return StartProcessInEngineResponse
                 .builder()

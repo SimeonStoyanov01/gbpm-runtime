@@ -30,7 +30,8 @@ public class GenericCamundaWorker {
 
     @JobWorker(
             type = "${camunda8worker.worker.job-type}",
-            name = "${camunda8worker.worker.name}"
+            name = "${camunda8worker.worker.name}",
+            autoComplete = false
     )
     public void handleJob(JobClient jobClient, ActivatedJob job) {
         CreateExecutionRunResponse executionRun = createExecutionRun(job);
@@ -41,13 +42,12 @@ public class GenericCamundaWorker {
         }
 
         EngineTaskCompletedEvent event = buildEngineTaskCompletedEvent(job, executionRun);
+        engineTaskCompletedEventPublisher.publish(event);
 
         jobClient
                 .newCompleteCommand(job.getKey())
                 .send()
                 .join();
-
-        publishEvent(event);
 
         log.info(
                 "Camunda job completed by generic worker: processInstanceKey={}, bpmnElementId={}, jobKey={}",
@@ -99,19 +99,6 @@ public class GenericCamundaWorker {
                         ? List.of()
                         : executionRun.getResourceUsages())
                 .build();
-    }
-
-    private void publishEvent(EngineTaskCompletedEvent event) {
-        try {
-            engineTaskCompletedEventPublisher.publish(event);
-        } catch (Exception exception) {
-            log.warn(
-                    "Failed to publish engine task completed event after Camunda job completion: processInstanceKey={}, bpmnElementId={}",
-                    event.getExecution().getProcessInstanceKey(),
-                    event.getExecution().getBpmnElementId(),
-                    exception
-            );
-        }
     }
 
     private String readOptionalString(Map<String, Object> variables, String name, String fallback) {

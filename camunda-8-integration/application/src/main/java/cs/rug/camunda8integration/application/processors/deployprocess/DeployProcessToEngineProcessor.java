@@ -1,6 +1,5 @@
 package cs.rug.camunda8integration.application.processors.deployprocess;
 
-import cs.rug.camunda8integration.api.exceptions.EngineDeploymentException;
 import cs.rug.camunda8integration.api.operations.deployprocess.DeployProcessToEngineOperation;
 import cs.rug.camunda8integration.api.operations.deployprocess.DeployProcessToEngineRequest;
 import cs.rug.camunda8integration.api.operations.deployprocess.DeployProcessToEngineResponse;
@@ -16,12 +15,6 @@ public class DeployProcessToEngineProcessor implements DeployProcessToEngineOper
 
     @Override
     public DeployProcessToEngineResponse process(DeployProcessToEngineRequest request) {
-        try {
-            return camunda8CommandClient.deployProcess(request);
-        } catch (EngineDeploymentException exception) {
-            throw exception;
-        } catch (Exception exception) {
-            throw new EngineDeploymentException("Failed to deploy BPMN resource to Camunda 8.", exception);
-        }
+        return camunda8CommandClient.deployProcess(request);
     }
 }

@@ -1,5 +1,6 @@
 package cs.rug.processregistryservice.infrastructure.rest;
 
+import cs.rug.processregistryservice.api.exceptions.InvalidProcessDefinitionException;
 import cs.rug.processregistryservice.api.operations.deployprocess.DeployProcessDefinitionOperation;
 import cs.rug.processregistryservice.api.operations.deployprocess.DeployProcessDefinitionRequest;
 import cs.rug.processregistryservice.api.operations.deployprocess.DeployProcessDefinitionResponse;
@@ -12,6 +13,9 @@ import cs.rug.processregistryservice.api.operations.findprocesskeiannotations.Fi
 import cs.rug.processregistryservice.api.operations.startprocessinstance.StartProcessInstanceOperation;
 import cs.rug.processregistryservice.api.operations.startprocessinstance.StartProcessInstanceRequest;
 import cs.rug.processregistryservice.api.operations.startprocessinstance.StartProcessInstanceResponse;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +28,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
 import java.util.Map;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api/process-definitions")
 public class ProcessRegistryController {
@@ -41,8 +47,14 @@ public class ProcessRegistryController {
     @PostMapping(value = "/deploy", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DeployProcessDefinitionResponse> deployProcessDefinition(
             @RequestPart("resource") MultipartFile resource,
-            @RequestParam(value = "targetEngine", defaultValue = "CAMUNDA_8") String targetEngine
+            @NotBlank @RequestParam(value = "targetEngine", defaultValue = "CAMUNDA_8") String targetEngine
     ) throws IOException {
+        if (resource.isEmpty()
+                || resource.getOriginalFilename() == null
+                || resource.getOriginalFilename().isBlank()) {
+            throw new InvalidProcessDefinitionException();
+        }
+
         DeployProcessDefinitionRequest request = DeployProcessDefinitionRequest
                 .builder()
                 .resourceName(resource.getOriginalFilename())
@@ -54,6 +66,7 @@ public class ProcessRegistryController {
 
     @PostMapping(value = "/{processDefinitionKey}/instances", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StartProcessInstanceResponse> startProcessInstance(
+            @Pattern(regexp = "\\d+", message = "must be a numeric process definition key")
             @PathVariable String processDefinitionKey,
             @RequestBody Map<String, Object> variables
     ) {
@@ -67,8 +80,8 @@ public class ProcessRegistryController {
 
     @GetMapping("/{processDefinitionKey}/activities/{bpmnElementId}/keis")
     public ResponseEntity<FindActivityKeiAnnotationsResponse> findActivityKeiAnnotations(
-            @PathVariable Long processDefinitionKey,
-            @PathVariable String bpmnElementId
+            @Positive @PathVariable Long processDefinitionKey,
+            @NotBlank @PathVariable String bpmnElementId
     ) {
         FindActivityKeiAnnotationsRequest request = FindActivityKeiAnnotationsRequest
                 .builder()
@@ -80,7 +93,7 @@ public class ProcessRegistryController {
 
     @GetMapping("/{processDefinitionKey}/keis")
     public ResponseEntity<FindProcessKeiAnnotationsResponse> findProcessKeiAnnotations(
-            @PathVariable Long processDefinitionKey
+            @Positive @PathVariable Long processDefinitionKey
     ) {
         FindProcessKeiAnnotationsRequest request = FindProcessKeiAnnotationsRequest
                 .builder()

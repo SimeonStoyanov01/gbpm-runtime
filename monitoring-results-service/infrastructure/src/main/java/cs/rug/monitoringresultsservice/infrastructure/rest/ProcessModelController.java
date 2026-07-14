@@ -2,6 +2,7 @@ package cs.rug.monitoringresultsservice.infrastructure.rest;
 
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelOperation;
 import cs.rug.monitoringresultsservice.api.operations.registerprocessmodel.RegisterProcessModelRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ public class ProcessModelController {
 
     @PostMapping("/api/monitoring/process-models")
     public ResponseEntity<Void> registerProcessModel(
-            @RequestBody RegisterProcessModelRequest request
+            @Valid @RequestBody RegisterProcessModelRequest request
     ) {
         registerProcessModelOperation.process(request);
         return ResponseEntity.noContent().build();

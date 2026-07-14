@@ -1,5 +1,7 @@
 package cs.rug.monitoringresultsservice.api.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +14,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CalculationResult {
+    @NotNull
     private BigDecimal value;
+
+    @NotBlank
     private String unit;
 }

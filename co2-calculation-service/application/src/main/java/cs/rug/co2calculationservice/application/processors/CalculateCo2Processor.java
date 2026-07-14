@@ -20,6 +20,7 @@ import cs.rug.co2calculationservice.application.out.ResourceProfileLookup;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CalculateCo2Processor implements CalculateCo2Operation {
 
@@ -53,11 +55,22 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
 
         try {
             validate(request);
+            log.info(
+                    "Calculating KEI: keiId={}, processInstanceKey={}, bpmnElementId={}",
+                    request.getKei().getId(),
+                    request.getExecution().getProcessInstanceKey(),
+                    request.getExecution().getBpmnElementId()
+            );
             CalculationOutcome outcome = calculate(request, calculation);
             KeiCalculationCompletedEvent event = calculationCompletedEventFactory.create(request, outcome, calculation);
             calculationResultPublisher.publishCompleted(event);
 
         } catch (CalculationFailureException exception) {
+            log.warn(
+                    "KEI calculation failed: code={}, message={}",
+                    exception.getCode(),
+                    exception.getMessage()
+            );
             KeiCalculationFailedEvent event = calculationFailedEventFactory.create(request, exception, calculation);
             calculationResultPublisher.publishFailed(event);
         }
