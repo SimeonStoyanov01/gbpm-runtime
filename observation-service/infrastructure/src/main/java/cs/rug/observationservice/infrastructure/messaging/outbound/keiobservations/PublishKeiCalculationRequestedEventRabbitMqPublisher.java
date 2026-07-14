@@ -2,7 +2,9 @@ package cs.rug.observationservice.infrastructure.messaging.outbound.keiobservati
 
 import cs.rug.observationservice.api.events.keicalculationrequested.KeiCalculationRequestedEvent;
 import cs.rug.observationservice.application.out.KeiCalculationRequestedEventPublisher;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
@@ -12,6 +14,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class PublishKeiCalculationRequestedEventRabbitMqPublisher
         implements KeiCalculationRequestedEventPublisher {
@@ -19,6 +22,16 @@ public class PublishKeiCalculationRequestedEventRabbitMqPublisher
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
     private final KeiCalculationRequestEventsRabbitMqProperties rabbitMqProperties;
+
+    @PostConstruct
+    void configureUnroutableMessageLogging() {
+        rabbitTemplate.setMandatory(true);
+        rabbitTemplate.setReturnsCallback(returned -> log.warn(
+                "KEI calculation request was not routed to a calculator: routingKey={}, reason={}",
+                returned.getRoutingKey(),
+                returned.getReplyText()
+        ));
+    }
 
     @Override
     public void publish(KeiCalculationRequestedEvent event) {

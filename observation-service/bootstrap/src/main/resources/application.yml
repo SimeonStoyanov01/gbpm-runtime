@@ -17,6 +17,7 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:runtime}
     password: ${RABBITMQ_PASSWORD:runtime}
+    publisher-returns: true
 
 process-registry:
   url: ${PROCESS_REGISTRY_URL:http://localhost:8080}
