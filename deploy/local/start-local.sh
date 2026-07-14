@@ -9,5 +9,5 @@ if ! docker network inspect "${NETWORK_NAME}" >/dev/null 2>&1; then
 fi
 
 docker compose -f "${SCRIPT_DIR}/infra/docker-compose.yml" up -d --wait
-docker compose -f "${SCRIPT_DIR}/camunda8/docker-compose.yml" up -d --wait
-docker compose -f "${SCRIPT_DIR}/runtime/docker-compose.yml" up -d
+docker compose -f "${SCRIPT_DIR}/camunda8/docker-compose.yml" up -d --build --wait
+docker compose -f "${SCRIPT_DIR}/runtime/docker-compose.yml" up -d --build
