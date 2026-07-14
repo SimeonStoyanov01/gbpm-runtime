@@ -1,6 +1,6 @@
 package cs.rug.observationservice.api.base;
 
 @FunctionalInterface
-public interface VoidProcessor<I> {
-    void process(I input);
+public interface Processor<I, O> {
+    O process(I input);
 }

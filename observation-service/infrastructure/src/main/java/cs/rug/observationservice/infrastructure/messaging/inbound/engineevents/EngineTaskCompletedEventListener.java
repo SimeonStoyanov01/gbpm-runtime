@@ -7,27 +7,43 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class EngineTaskCompletedEventListener {
 
+    private final ObjectMapper objectMapper;
     private final CreateKeiObservationOperation createKeiObservationOperation;
 
     @RabbitListener(queues = "${runtime.observation.messaging.engine-events.queue-name}")
-    public void handle(EngineTaskCompletedEvent event) {
+    public void handle(byte[] payload) {
+        EngineTaskCompletedEvent event;
+        try {
+            event = readEvent(payload);
+        } catch (IllegalArgumentException exception) {
+            log.warn("Skipping invalid engine task completed event: {}", exception.getMessage());
+            return;
+        }
+
         log.info(
-                "Received engine task completed event: eventId={}, processDefinitionKey={}, bpmnElementId={}",
-                event.getEventId(),
+                "Received engine task completed event: processDefinitionKey={}, bpmnElementId={}",
                 event.getExecution().getProcessDefinitionKey(),
                 event.getExecution().getBpmnElementId()
         );
         createKeiObservationOperation.process(CreateKeiObservationRequest
                 .builder()
                 .execution(event.getExecution())
-                .taskStatus(event.getTaskStatus())
                 .resourceUsages(event.getResourceUsages())
                 .build());
+    }
+
+    private EngineTaskCompletedEvent readEvent(byte[] payload) {
+        try {
+            return objectMapper.readValue(payload, EngineTaskCompletedEvent.class);
+        } catch (Exception exception) {
+            throw new IllegalArgumentException("Failed to deserialize engine task completed event.", exception);
+        }
     }
 }

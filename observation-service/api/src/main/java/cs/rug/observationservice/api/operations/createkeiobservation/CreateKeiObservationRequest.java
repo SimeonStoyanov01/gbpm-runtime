@@ -1,8 +1,7 @@
 package cs.rug.observationservice.api.operations.createkeiobservation;
 
-import cs.rug.observationservice.api.base.ProcessorRequest;
 import cs.rug.observationservice.api.model.EngineExecutionContext;
-import cs.rug.observationservice.api.model.ResourceUsageFact;
+import cs.rug.observationservice.api.model.ResourceUsage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateKeiObservationRequest implements ProcessorRequest {
+public class CreateKeiObservationRequest {
     private EngineExecutionContext execution;
-    private String taskStatus;
-    private List<ResourceUsageFact> resourceUsages;
+    private List<ResourceUsage> resourceUsages;
 }

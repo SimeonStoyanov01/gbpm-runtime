@@ -29,7 +29,6 @@ runtime:
         bindings:
           - exchange-name: ${CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE:runtime.camunda8.events}
             routing-key: ${CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY:engine.task.completed}
-      kei-observation-events:
-        exchange-name: ${RUNTIME_KEI_OBSERVATION_EXCHANGE:runtime.observation.events}
-        observation-created-routing-key: ${RUNTIME_KEI_OBSERVATION_ROUTING_KEY:kei.observation.created}
-        calculation-requested-routing-key: ${RUNTIME_KEI_CALCULATION_REQUESTED_ROUTING_KEY:kei.calculation.requested}
+      calculation-request-events:
+        exchange-name: ${RUNTIME_CALCULATION_REQUEST_EXCHANGE:runtime.observation.events}
+        calculation-requested-routing-key-prefix: ${RUNTIME_KEI_CALCULATION_REQUESTED_ROUTING_KEY_PREFIX:kei.calculation.requested}

@@ -1,6 +1,6 @@
 package cs.rug.observationservice.api.events.keicalculationrequested;
 
-import cs.rug.observationservice.api.model.ResourceUsageFact;
+import cs.rug.observationservice.api.model.ResourceUsage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +12,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalculationRequestInputs {
-    private List<ResourceUsageFact> resourceUsages;
+public class CalculationInputs {
+    private List<ResourceUsage> resourceUsages;
 }

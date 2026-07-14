@@ -18,15 +18,19 @@ public class PublishKeiCalculationRequestedEventRabbitMqPublisher
 
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
-    private final KeiObservationEventsRabbitMqProperties rabbitMqProperties;
+    private final KeiCalculationRequestEventsRabbitMqProperties rabbitMqProperties;
 
     @Override
     public void publish(KeiCalculationRequestedEvent event) {
         rabbitTemplate.send(
                 rabbitMqProperties.getExchangeName(),
-                rabbitMqProperties.getCalculationRequestedRoutingKey(),
+                routingKeyFor(event),
                 buildJsonMessage(event)
         );
+    }
+
+    private String routingKeyFor(KeiCalculationRequestedEvent event) {
+        return rabbitMqProperties.getCalculationRequestedRoutingKeyPrefix() + "." + event.getKei().getId();
     }
 
     private Message buildJsonMessage(KeiCalculationRequestedEvent event) {

@@ -6,13 +6,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Setter
 @Getter
-@ConfigurationProperties(prefix = "runtime.observation.messaging.kei-observation-events")
-public class KeiObservationEventsRabbitMqProperties {
+@ConfigurationProperties(prefix = "runtime.observation.messaging.calculation-request-events")
+public class KeiCalculationRequestEventsRabbitMqProperties {
 
     private String exchangeName;
 
-    private String observationCreatedRoutingKey;
-
-    private String calculationRequestedRoutingKey;
+    private String calculationRequestedRoutingKeyPrefix;
 
 }

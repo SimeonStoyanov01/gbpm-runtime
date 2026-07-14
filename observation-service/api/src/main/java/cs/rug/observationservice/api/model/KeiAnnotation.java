@@ -13,5 +13,4 @@ public class KeiAnnotation {
     private String id;
     private String unit;
     private String targetValue;
-    private String icon;
 }

@@ -2,7 +2,6 @@ package cs.rug.observationservice.infrastructure.client.processregistry;
 
 import cs.rug.observationservice.api.model.KeiAnnotation;
 import cs.rug.observationservice.application.out.KeiAnnotationLookupClient;
-import cs.rug.observationservice.infrastructure.client.processregistry.dto.ProcessRegistryKeiAnnotationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,27 +15,14 @@ public class ProcessRegistryKeiAnnotationLookupClient implements KeiAnnotationLo
 
     @Override
     public List<KeiAnnotation> findKeiAnnotations(Long processDefinitionKey, String bpmnElementId) {
-        List<ProcessRegistryKeiAnnotationDto> annotations = processRegistryFeignClient
+        List<KeiAnnotation> annotations = processRegistryFeignClient
                 .findActivityKeiAnnotations(processDefinitionKey, bpmnElementId)
-                .getBpmn4esKeiAnnotations();
+                .getKeiAnnotations();
 
         if (annotations == null) {
             return List.of();
         }
 
-        return annotations
-                .stream()
-                .map(this::toKeiAnnotation)
-                .toList();
-    }
-
-    private KeiAnnotation toKeiAnnotation(ProcessRegistryKeiAnnotationDto annotation) {
-        return KeiAnnotation
-                .builder()
-                .id(annotation.getId())
-                .unit(annotation.getUnit())
-                .targetValue(annotation.getTargetValue())
-                .icon(annotation.getIcon())
-                .build();
+        return annotations;
     }
 }
