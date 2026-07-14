@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 const sections = [
@@ -13,6 +14,21 @@ type LayoutProps = {
 };
 
 export function Layout({ children }: LayoutProps) {
+  const [activeSection, setActiveSection] = useState(sections[0][0]);
+
+  useEffect(() => {
+    function updateActiveSection() {
+      const visibleSection = [...sections]
+        .reverse()
+        .find(([id]) => (document.getElementById(id)?.getBoundingClientRect().top ?? Infinity) <= 160);
+      setActiveSection(visibleSection?.[0] || sections[0][0]);
+    }
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    return () => window.removeEventListener('scroll', updateActiveSection);
+  }, []);
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -21,8 +37,13 @@ export function Layout({ children }: LayoutProps) {
           <p>Runtime Environmental Monitoring</p>
         </div>
         <nav>
-          {sections.map(([id, label], index) => (
-            <a key={id} className={index === 0 ? 'active' : undefined} href={`#${id}`}>
+          {sections.map(([id, label]) => (
+            <a
+              key={id}
+              className={activeSection === id ? 'active' : undefined}
+              href={`#${id}`}
+              aria-current={activeSection === id ? 'location' : undefined}
+            >
               {label}
             </a>
           ))}
@@ -36,10 +57,6 @@ export function Layout({ children }: LayoutProps) {
               Backend-aligned MVP interface for deploying BPMN models, starting process instances,
               inspecting KEI annotations, and monitoring calculation, evaluation, and violation events.
             </p>
-          </div>
-          <div className="chip">
-            <span className="dot" />
-            REST initial state + STOMP live updates
           </div>
         </header>
         {children}

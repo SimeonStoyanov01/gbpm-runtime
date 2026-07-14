@@ -59,6 +59,7 @@ export type MonitoringRecord = {
   processInstanceKey?: number;
   elementInstanceKey?: number;
   bpmnElementId?: string;
+  elementName?: string;
   keiId?: string;
   calculatedValue?: number;
   calculatedUnit?: string;

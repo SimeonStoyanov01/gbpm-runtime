@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { findActiveViolations, findMonitoringRecords } from './api/monitoringApi';
 import type {
   ActiveViolationFilters,
-  DeployProcessResponse,
   MonitoringRecord,
   MonitoringRecordFilters,
 } from './api/types';
@@ -21,7 +20,7 @@ export function App() {
   const [calculationEvents, setCalculationEvents] = useState<MonitoringRecord[]>([]);
   const [evaluationEvents, setEvaluationEvents] = useState<MonitoringRecord[]>([]);
   const [violationEvents, setViolationEvents] = useState<MonitoringRecord[]>([]);
-  const [latestDeployment, setLatestDeployment] = useState<DeployProcessResponse>();
+  const [instanceRequest, setInstanceRequest] = useState<{ processInstanceKey: number; requestId: number }>();
   const [socketStatus, setSocketStatus] = useState<MonitoringSocketStatus>('disconnected');
   const [error, setError] = useState<string>();
 
@@ -70,22 +69,27 @@ export function App() {
   return (
     <Layout>
       {error && <p className="error">{error}</p>}
-      {latestDeployment && (
-        <p className="hint">
-          Latest deployment: <span className="mono">{latestDeployment.processDefinitionKey}</span> · {latestDeployment.bpmnProcessId}
-        </p>
-      )}
-      <Dashboard records={records} violations={violations} socketStatus={socketStatus} />
-      <Processes onDeployment={setLatestDeployment} />
+      <Dashboard
+        records={records}
+        violations={violations}
+        onOpenInstance={(processInstanceKey) => setInstanceRequest({ processInstanceKey, requestId: Date.now() })}
+      />
+      <Processes />
       <MonitoringRecords
         records={records}
+        instanceRequest={instanceRequest}
         onFilter={(filters) => loadRecords(filters).catch((exception) => setError(exception instanceof Error ? exception.message : 'Failed to load records.'))}
       />
       <ActiveViolations
         violations={violations}
         onFilter={(filters) => loadViolations(filters).catch((exception) => setError(exception instanceof Error ? exception.message : 'Failed to load violations.'))}
       />
-      <LiveEvents calculations={calculationEvents} evaluations={evaluationEvents} violations={violationEvents} />
+      <LiveEvents
+        calculations={calculationEvents}
+        evaluations={evaluationEvents}
+        violations={violationEvents}
+        socketStatus={socketStatus}
+      />
     </Layout>
   );
 }

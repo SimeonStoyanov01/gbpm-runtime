@@ -1,24 +1,27 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { findProcessInstanceDetails } from '../../api/monitoringApi';
 import type { MonitoringRecord, MonitoringRecordFilters, ProcessInstanceDetails } from '../../api/types';
 import { Endpoint } from '../../components/Endpoint';
 import { EmptyState } from '../../components/EmptyState';
+import { MonitoringRecordDialog } from '../../components/MonitoringRecordDialog';
 import { Panel } from '../../components/Panel';
 import { StatusBadge } from '../../components/StatusBadge';
-import { formatDateTime, formatMeasurement } from '../../utils/format';
+import { formatDateTime, formatMeasurement, formatVariance, monitoringStatus } from '../../utils/format';
 import { ProcessDiagramViewer } from './ProcessDiagramViewer';
 
 type MonitoringRecordsProps = {
   records: MonitoringRecord[];
+  instanceRequest?: { processInstanceKey: number; requestId: number };
   onFilter: (filters: MonitoringRecordFilters) => void;
 };
 
-export function MonitoringRecords({ records, onFilter }: MonitoringRecordsProps) {
+export function MonitoringRecords({ records, instanceRequest, onFilter }: MonitoringRecordsProps) {
   const [filters, setFilters] = useState<MonitoringRecordFilters>({});
   const [expandedInstanceKey, setExpandedInstanceKey] = useState<number>();
   const [detailsByInstance, setDetailsByInstance] = useState<Record<number, ProcessInstanceDetails>>({});
   const [loadingInstanceKey, setLoadingInstanceKey] = useState<number>();
   const [detailError, setDetailError] = useState<string>();
+  const [selectedRecord, setSelectedRecord] = useState<MonitoringRecord>();
 
   const groups = groupByProcessInstance(records);
 
@@ -26,16 +29,7 @@ export function MonitoringRecords({ records, onFilter }: MonitoringRecordsProps)
     setFilters((current) => ({ ...current, [key]: value }));
   }
 
-  async function toggleInstance(processInstanceKey?: number) {
-    if (!processInstanceKey) {
-      return;
-    }
-
-    if (expandedInstanceKey === processInstanceKey) {
-      setExpandedInstanceKey(undefined);
-      return;
-    }
-
+  const openInstance = useCallback(async (processInstanceKey: number) => {
     setExpandedInstanceKey(processInstanceKey);
     setDetailError(undefined);
 
@@ -52,6 +46,33 @@ export function MonitoringRecords({ records, onFilter }: MonitoringRecordsProps)
     } finally {
       setLoadingInstanceKey(undefined);
     }
+  }, [detailsByInstance]);
+
+  useEffect(() => {
+    if (!instanceRequest) {
+      return;
+    }
+
+    void openInstance(instanceRequest.processInstanceKey);
+    window.requestAnimationFrame(() => {
+      document.getElementById(`process-instance-${instanceRequest.processInstanceKey}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  }, [instanceRequest, openInstance]);
+
+  function toggleInstance(processInstanceKey?: number) {
+    if (!processInstanceKey) {
+      return;
+    }
+
+    if (expandedInstanceKey === processInstanceKey) {
+      setExpandedInstanceKey(undefined);
+      return;
+    }
+
+    void openInstance(processInstanceKey);
   }
 
   return (
@@ -91,7 +112,7 @@ export function MonitoringRecords({ records, onFilter }: MonitoringRecordsProps)
               const expanded = group.processInstanceKey === expandedInstanceKey;
 
               return (
-                <article className="instance-card" key={group.key}>
+                <article className="instance-card" id={group.processInstanceKey ? `process-instance-${group.processInstanceKey}` : undefined} key={group.key}>
                   <button className="instance-summary" onClick={() => toggleInstance(group.processInstanceKey)} disabled={!group.processInstanceKey}>
                     <span>
                       <strong>{group.bpmnProcessId || 'Unknown process'}</strong>
@@ -106,7 +127,13 @@ export function MonitoringRecords({ records, onFilter }: MonitoringRecordsProps)
                     <div className="instance-details">
                       {loadingInstanceKey === group.processInstanceKey && <EmptyState>Loading process instance details...</EmptyState>}
                       {detailError && <p className="error">{detailError}</p>}
-                      {details && <ProcessInstanceDetailsPanel details={details} />}
+                      {details && (
+                        <ProcessInstanceDetailsPanel
+                          details={details}
+                          records={group.records}
+                          onSelectRecord={setSelectedRecord}
+                        />
+                      )}
                     </div>
                   )}
                 </article>
@@ -115,11 +142,20 @@ export function MonitoringRecords({ records, onFilter }: MonitoringRecordsProps)
           </div>
         )}
       </Panel>
+      <MonitoringRecordDialog record={selectedRecord} onClose={() => setSelectedRecord(undefined)} />
     </section>
   );
 }
 
-function ProcessInstanceDetailsPanel({ details }: { details: ProcessInstanceDetails }) {
+type ProcessInstanceDetailsPanelProps = {
+  details: ProcessInstanceDetails;
+  records: MonitoringRecord[];
+  onSelectRecord: (record: MonitoringRecord) => void;
+};
+
+function ProcessInstanceDetailsPanel({ details, records, onSelectRecord }: ProcessInstanceDetailsPanelProps) {
+  const violations = records.filter((record) => record.evaluationStatus === 'VIOLATED');
+
   return (
     <div className="instance-detail-grid">
       <div className="instance-metadata">
@@ -142,57 +178,68 @@ function ProcessInstanceDetailsPanel({ details }: { details: ProcessInstanceDeta
           </div>
           <div>
             <dt>Records</dt>
-            <dd>{details.records.length}</dd>
+            <dd>{records.length}</dd>
           </div>
         </dl>
       </div>
 
-      <ProcessDiagramViewer bpmnXml={details.bpmnXml} records={details.records} />
+      <ProcessDiagramViewer bpmnXml={details.bpmnXml} records={records} />
 
       <div>
         <h4>Instance Results</h4>
-        <MonitoringRecordTable records={details.records} />
+        <MonitoringRecordTable records={records} onSelectRecord={onSelectRecord} />
       </div>
 
       <div>
         <h4>Violations</h4>
-        {details.violations.length === 0 ? (
+        {violations.length === 0 ? (
           <EmptyState>No active violations for this instance.</EmptyState>
         ) : (
-          <ViolationRecordTable violations={details.violations} />
+          <ViolationRecordTable violations={violations} onSelectRecord={onSelectRecord} />
         )}
       </div>
     </div>
   );
 }
 
-function MonitoringRecordTable({ records }: { records: MonitoringRecord[] }) {
+type RecordTableProps = {
+  records: MonitoringRecord[];
+  onSelectRecord: (record: MonitoringRecord) => void;
+};
+
+function MonitoringRecordTable({ records, onSelectRecord }: RecordTableProps) {
   return (
     <div className="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Status</th>
-            <th>Activity ID</th>
+            <th>Task</th>
+            <th>Element Instance</th>
             <th>KEI</th>
             <th>Calculated</th>
             <th>Target</th>
-            <th>Difference</th>
+            <th>Variance</th>
             <th>Calculated At</th>
             <th>Evaluated At</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {records.map((record) => (
             <tr key={monitoringRecordKey(record)} className={record.evaluationStatus === 'VIOLATED' ? 'violation-row' : undefined}>
-              <td><StatusBadge value={record.evaluationStatus} /></td>
-              <td>{record.bpmnElementId || '-'}</td>
+              <td>
+                <button className="record-link" type="button" onClick={() => onSelectRecord(record)}>
+                  {record.elementName || record.bpmnElementId || '-'}
+                </button>
+              </td>
+              <td className="mono">{record.elementInstanceKey || '-'}</td>
               <td>{record.keiId || '-'}</td>
               <td>{formatMeasurement(record.calculatedValue, record.calculatedUnit)}</td>
               <td>{formatMeasurement(record.targetValue, record.calculatedUnit)}</td>
-              <td>{record.difference ?? '-'}</td>
+              <td>{formatVariance(record.difference, record.calculatedUnit)}</td>
               <td>{formatDateTime(record.calculatedAt)}</td>
               <td>{formatDateTime(record.evaluatedAt)}</td>
+              <td className="status-cell"><StatusBadge value={monitoringStatus(record)} /></td>
             </tr>
           ))}
         </tbody>
@@ -201,30 +248,39 @@ function MonitoringRecordTable({ records }: { records: MonitoringRecord[] }) {
   );
 }
 
-function ViolationRecordTable({ violations }: { violations: MonitoringRecord[] }) {
+type ViolationRecordTableProps = {
+  violations: MonitoringRecord[];
+  onSelectRecord: (record: MonitoringRecord) => void;
+};
+
+function ViolationRecordTable({ violations, onSelectRecord }: ViolationRecordTableProps) {
   return (
     <div className="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Status</th>
-            <th>Activity ID</th>
-            <th>Emission Type</th>
+            <th>Task</th>
+            <th>Element Instance</th>
+            <th>KEI</th>
             <th>Calculated</th>
             <th>Target</th>
-            <th>Difference</th>
+            <th>Variance</th>
             <th>Occurred At</th>
           </tr>
         </thead>
         <tbody>
           {violations.map((violation) => (
             <tr key={violation.evaluationEventId || `${violation.processInstanceKey}-${violation.bpmnElementId}`} className="violation-row">
-              <td><StatusBadge value={violation.evaluationStatus} /></td>
-              <td>{violation.bpmnElementId || '-'}</td>
+              <td>
+                <button className="record-link" type="button" onClick={() => onSelectRecord(violation)}>
+                  {violation.elementName || violation.bpmnElementId || '-'}
+                </button>
+              </td>
+              <td className="mono">{violation.elementInstanceKey || '-'}</td>
               <td>{violation.keiId || '-'}</td>
               <td>{formatMeasurement(violation.calculatedValue, violation.calculatedUnit)}</td>
               <td>{formatMeasurement(violation.targetValue, violation.calculatedUnit)}</td>
-              <td>{violation.difference ?? '-'}</td>
+              <td>{formatVariance(violation.difference, violation.calculatedUnit)}</td>
               <td>{formatDateTime(violation.evaluatedAt)}</td>
             </tr>
           ))}
@@ -252,7 +308,7 @@ function groupByProcessInstance(records: MonitoringRecord[]): ProcessInstanceGro
     if (current) {
       current.records.push(record);
       current.hasViolation = current.hasViolation || record.evaluationStatus === 'VIOLATED';
-      current.latestStatus = current.latestStatus || record.evaluationStatus;
+      current.latestStatus = current.latestStatus || monitoringStatus(record);
       return;
     }
 
@@ -260,7 +316,7 @@ function groupByProcessInstance(records: MonitoringRecord[]): ProcessInstanceGro
       key,
       processInstanceKey: record.processInstanceKey,
       bpmnProcessId: record.bpmnProcessId,
-      latestStatus: record.evaluationStatus,
+      latestStatus: monitoringStatus(record),
       hasViolation: record.evaluationStatus === 'VIOLATED',
       records: [record],
     });

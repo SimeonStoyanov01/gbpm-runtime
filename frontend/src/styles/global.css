@@ -143,32 +143,12 @@ main {
 
 section {
   margin-bottom: 32px;
+  scroll-margin-top: 18px;
 }
 
 .section-title {
   margin: 0 0 14px;
   font-size: 18px;
-}
-
-.chip {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  padding: 9px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  background: #fff;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.dot {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--success);
 }
 
 .grid-5 {
@@ -189,6 +169,18 @@ section {
   gap: 18px;
 }
 
+.grid-2 > *,
+.grid-3 > *,
+.dashboard-results > * {
+  min-width: 0;
+}
+
+.dashboard-results {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
 .card,
 .panel {
   border: 1px solid var(--line);
@@ -200,6 +192,18 @@ section {
 .card {
   min-height: 110px;
   padding: 18px;
+}
+
+.metric-card-action {
+  width: 100%;
+  color: #17202a;
+  background: #fff;
+  text-align: left;
+}
+
+.metric-card-action:hover {
+  border-color: #9bb9d4;
+  background: #f8fbff;
 }
 
 .label {
@@ -214,6 +218,7 @@ section {
   margin-top: 12px;
   font-size: 26px;
   font-weight: 850;
+  overflow-wrap: anywhere;
 }
 
 .sub,
@@ -244,6 +249,17 @@ section {
 
 #dashboard > .panel {
   margin-top: 18px;
+}
+
+.panel-link {
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.panel-link:hover {
+  text-decoration: underline;
 }
 
 .endpoint {
@@ -286,6 +302,29 @@ tbody td {
 
 tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.record-link {
+  max-width: 220px;
+  padding: 0;
+  border-radius: 0;
+  color: var(--primary);
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 800;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.table-secondary {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.record-link:hover {
+  text-decoration: underline;
 }
 
 .badge {
@@ -334,7 +373,43 @@ tbody tr:last-child td {
   gap: 14px;
 }
 
-.result-box,
+.operation-summary {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.operation-summary > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.operation-summary h4 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.operation-summary dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+  margin: 14px 0 0;
+}
+
+.operation-summary dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.operation-summary dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
 .empty-state {
   margin-top: 14px;
   padding: 14px;
@@ -342,8 +417,8 @@ tbody tr:last-child td {
   border-radius: 8px;
   color: #334155;
   background: #f8fafc;
-  font-family: var(--mono);
-  font-size: 12px;
+  font-family: inherit;
+  font-size: 13px;
   line-height: 1.55;
 }
 
@@ -451,6 +526,7 @@ tbody tr:last-child td {
   gap: 18px;
   padding: 18px;
   border-top: 1px solid var(--line);
+  font-family: inherit;
 }
 
 .instance-detail-grid {
@@ -512,6 +588,11 @@ tbody tr:last-child td {
   stroke-width: 5px !important;
 }
 
+.diagram-marker-calculated .djs-visual > :first-child {
+  stroke: #1476a8 !important;
+  stroke-width: 4px !important;
+}
+
 .diagram-result-overlay {
   max-width: 220px;
   padding: 5px 8px;
@@ -532,14 +613,24 @@ tbody tr:last-child td {
   background: #fff0ee;
 }
 
+.diagram-result-overlay.calculated {
+  border-color: #a8d1e5;
+  color: #075985;
+  background: #edf8fd;
+}
+
 .event-feed {
   display: grid;
   gap: 12px;
 }
 
+.event-grid {
+  align-items: start;
+}
+
 .event-card {
   display: grid;
-  grid-template-columns: 130px 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
   padding: 14px;
@@ -553,73 +644,137 @@ tbody tr:last-child td {
   background: #f3faff;
 }
 
-.live-results-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-  gap: 16px;
-}
-
-.live-result-lane {
-  display: grid;
-  align-content: start;
-  gap: 12px;
-}
-
-.live-result-lane header {
+.section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-bottom: 14px;
 }
 
-.live-result-lane h4 {
+.section-heading .section-title {
   margin: 0;
-  font-size: 14px;
 }
 
-.result-card {
+.event-value {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(360px, 1.2fr);
-  gap: 16px;
-  align-items: start;
-  padding: 14px;
+  gap: 7px;
+  justify-items: end;
+}
+
+.event-time {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.record-dialog {
+  width: min(820px, 100%);
+  max-height: calc(100vh - 48px);
+  margin: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f8fbff;
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.24);
+  overflow-y: auto;
+  font-family: inherit;
 }
 
-.result-card.compact {
-  grid-template-columns: 1fr;
-}
-
-.result-card p {
-  margin: 6px 0 0;
-  color: var(--muted);
-}
-
-.result-title {
+.record-dialog > header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
 }
 
-.result-metrics {
+.record-dialog h3 {
+  margin: 5px 0 0;
+  font-size: 18px;
+}
+
+.record-dialog-content {
   display: grid;
-  grid-template-columns: repeat(4, minmax(80px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.record-result-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0;
+  padding: 18px;
+  border-left: 4px solid var(--primary);
+  background: #f5f8fb;
+}
+
+.record-result-summary > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.record-result-summary > div:first-child > strong {
+  font-size: 22px;
+}
+
+.record-result-summary p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.record-result-state {
+  display: grid;
   gap: 10px;
+  justify-items: end;
+  text-align: right;
+}
+
+.record-section {
   margin: 0;
 }
 
-.result-metrics.two-col {
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
+.record-section h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
 }
 
-.result-metrics div {
+.record-detail-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.record-detail-list > div {
   min-width: 0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
 }
 
-.result-metrics dt {
+.record-detail-list > div:nth-child(odd) {
+  padding-right: 20px;
+}
+
+.record-detail-list dt {
   color: var(--muted);
   font-size: 11px;
   font-weight: 800;
@@ -627,10 +782,25 @@ tbody tr:last-child td {
   text-transform: uppercase;
 }
 
-.result-metrics dd {
-  margin: 4px 0 0;
-  color: #17202a;
+.record-detail-list dd {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.technical-details {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.technical-details summary {
+  color: var(--primary);
+  font-size: 13px;
   font-weight: 800;
+  cursor: pointer;
+}
+
+.technical-details .record-detail-list {
+  margin-top: 12px;
 }
 
 .error {
@@ -640,14 +810,11 @@ tbody tr:last-child td {
 @media (max-width: 1200px) {
   .grid-5,
   .grid-3,
-  .live-results-grid,
   .grid-2,
   .filter-bar {
     grid-template-columns: 1fr;
   }
 
-  .result-card,
-  .result-metrics,
   .instance-summary,
   .metadata-grid {
     grid-template-columns: 1fr;
@@ -676,11 +843,36 @@ tbody tr:last-child td {
     display: block;
   }
 
-  .chip {
-    margin-top: 14px;
-  }
-
   .user-task-heading {
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  main {
+    padding: 18px;
+  }
+
+  .event-card,
+  .record-detail-list,
+  .operation-summary dl {
+    grid-template-columns: 1fr;
+  }
+
+  .event-value {
+    justify-items: start;
+  }
+
+  .record-detail-list > div:nth-child(odd) {
+    padding-right: 0;
+  }
+
+  .record-result-summary {
+    display: grid;
+  }
+
+  .record-result-state {
+    justify-items: start;
+    text-align: left;
   }
 }

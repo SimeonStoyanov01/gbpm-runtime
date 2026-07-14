@@ -10,12 +10,9 @@ import type {
 } from '../../api/types';
 import { Endpoint } from '../../components/Endpoint';
 import { Panel } from '../../components/Panel';
+import { StatusBadge } from '../../components/StatusBadge';
 
-type ProcessesProps = {
-  onDeployment: (deployment: DeployProcessResponse) => void;
-};
-
-export function Processes({ onDeployment }: ProcessesProps) {
+export function Processes() {
   const [deployment, setDeployment] = useState<DeployProcessResponse>();
   const [processDefinitionKey, setProcessDefinitionKey] = useState('');
   const [variablesJson, setVariablesJson] = useState('{}');
@@ -65,7 +62,6 @@ export function Processes({ onDeployment }: ProcessesProps) {
       const response = await deployProcess(file);
       setDeployment(response);
       setProcessDefinitionKey(response.processDefinitionKey);
-      onDeployment(response);
     } catch (exception) {
       setError(exception instanceof Error ? exception.message : 'Deployment failed.');
     } finally {
@@ -126,14 +122,17 @@ export function Processes({ onDeployment }: ProcessesProps) {
         <Panel title="Deploy BPMN" action={<Endpoint>POST :8080 /api/process-definitions/deploy</Endpoint>}>
           <DeployForm disabled={busy} onDeploy={handleDeploy} />
           {deployment && (
-            <div className="result-box">
-              deploymentKey: "{deployment.deploymentKey}"<br />
-              processDefinitionKey: "{deployment.processDefinitionKey}"<br />
-              bpmnProcessId: "{deployment.bpmnProcessId}"<br />
-              version: {deployment.version}<br />
-              resourceName: "{deployment.resourceName}"<br />
-              status: "{deployment.status}"
-            </div>
+            <OperationSummary
+              title="Deployed process"
+              status={deployment.status}
+              fields={[
+                ['Process', deployment.bpmnProcessId],
+                ['Version', deployment.version],
+                ['Definition key', deployment.processDefinitionKey, true],
+                ['Deployment key', deployment.deploymentKey, true],
+                ['BPMN resource', deployment.resourceName],
+              ]}
+            />
           )}
           <div className="button-row">
             <button className="secondary" disabled={!deployment || busy} onClick={handleFindKeis}>View KEIs</button>
@@ -157,13 +156,16 @@ export function Processes({ onDeployment }: ProcessesProps) {
           </div>
           {startedInstance && (
             <>
-              <div className="result-box">
-                processDefinitionKey: "{startedInstance.processDefinitionKey}"<br />
-                bpmnProcessId: "{startedInstance.bpmnProcessId}"<br />
-                version: {startedInstance.version}<br />
-                processInstanceKey: "{startedInstance.processInstanceKey}"<br />
-                status: "{startedInstance.status}"
-              </div>
+              <OperationSummary
+                title="Started process instance"
+                status={startedInstance.status}
+                fields={[
+                  ['Process', startedInstance.bpmnProcessId],
+                  ['Version', startedInstance.version],
+                  ['Definition key', startedInstance.processDefinitionKey, true],
+                  ['Instance key', startedInstance.processInstanceKey, true],
+                ]}
+              />
 
               <div className="user-task-section">
                 <div className="user-task-heading">
@@ -213,7 +215,6 @@ export function Processes({ onDeployment }: ProcessesProps) {
           <button className="secondary" disabled={!processDefinitionKey || busy} onClick={handleFindKeis}>Refresh KEIs</button>
         </div>
         <KeiTable elements={keiResponse?.elementKeiAnnotations || []} />
-        <p className="hint">KEI metadata is read from the process-registry/root backend.</p>
       </Panel>
     </section>
   );
@@ -244,7 +245,8 @@ function KeiTable({ elements }: { elements: ElementKeiAnnotations[] }) {
       <table>
         <thead>
           <tr>
-            <th>BPMN Element ID</th>
+            <th>Task</th>
+            <th>Type</th>
             <th>KEI ID</th>
             <th>Unit</th>
             <th>Target Value</th>
@@ -255,10 +257,14 @@ function KeiTable({ elements }: { elements: ElementKeiAnnotations[] }) {
           {elements.flatMap((element) =>
             element.keiAnnotations.map((kei) => (
               <tr key={`${element.bpmnElementId}-${kei.id}`}>
-                <td>{element.bpmnElementId}</td>
+                <td>
+                  <strong>{element.elementName || 'Unnamed BPMN element'}</strong>
+                  <span className="table-secondary mono">{element.bpmnElementId}</span>
+                </td>
+                <td>{element.elementType || '-'}</td>
                 <td>{kei.id}</td>
                 <td>{kei.unit}</td>
-                <td>{kei.targetValue}</td>
+                <td>{kei.targetValue || <span className="badge neutral">No target</span>}</td>
                 <td>{kei.icon || '-'}</td>
               </tr>
             )),
@@ -266,5 +272,32 @@ function KeiTable({ elements }: { elements: ElementKeiAnnotations[] }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+type OperationSummaryField = [label: string, value: string | number, mono?: boolean];
+
+type OperationSummaryProps = {
+  title: string;
+  status: string;
+  fields: OperationSummaryField[];
+};
+
+function OperationSummary({ title, status, fields }: OperationSummaryProps) {
+  return (
+    <section className="operation-summary">
+      <header>
+        <h4>{title}</h4>
+        <StatusBadge value={status} />
+      </header>
+      <dl>
+        {fields.map(([label, value, mono]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd className={mono ? 'mono' : undefined}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

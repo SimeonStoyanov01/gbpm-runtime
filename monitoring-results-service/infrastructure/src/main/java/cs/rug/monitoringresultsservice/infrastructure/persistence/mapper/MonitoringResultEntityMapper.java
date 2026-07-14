@@ -30,6 +30,7 @@ public class MonitoringResultEntityMapper {
                 .processInstanceKey(processInstance.getProcessInstanceKey())
                 .elementInstanceKey(entity.getElementInstanceKey())
                 .bpmnElementId(bpmnElement.getBpmnElementId())
+                .elementName(bpmnElement.getElementName())
                 .keiId(keiAnnotation.getKeiId())
                 .calculatedValue(entity.getCalculatedValue())
                 .calculatedUnit(entity.getCalculatedUnit())
