@@ -1,6 +1,5 @@
 package cs.rug.processregistryservice.api.operations.deployprocess;
 
-import cs.rug.processregistryservice.api.base.ProcessorResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeployProcessDefinitionResponse implements ProcessorResponse {
+public class DeployProcessDefinitionResponse {
     private String deploymentKey;
     private String processDefinitionKey;
     private String bpmnProcessId;

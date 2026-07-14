@@ -1,6 +1,6 @@
 package cs.rug.processregistryservice.application.out.bpmn4es;
 
-import cs.rug.processregistryservice.application.model.bpmn4es.ElementKeiAnnotations;
+import cs.rug.processregistryservice.api.model.ElementKeiAnnotations;
 
 import java.util.List;
 

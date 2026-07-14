@@ -1,9 +1,9 @@
 package cs.rug.processregistryservice.infrastructure.client.camunda8;
 
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineRequestDto;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineResponseDto;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineRequestDto;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineResponseDto;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineRequest;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineResponse;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineRequest;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface Camunda8IntegrationFeignClient {
 
     @PostMapping(value = "/deploy", consumes = MediaType.APPLICATION_JSON_VALUE)
-    DeployProcessToEngineResponseDto deployProcessDefinition(
-            @RequestBody DeployProcessToEngineRequestDto request
+    DeployProcessToEngineResponse deployProcessDefinition(
+            @RequestBody DeployProcessToEngineRequest request
     );
 
     @PostMapping(value = "/instances", consumes = MediaType.APPLICATION_JSON_VALUE)
-    StartProcessInEngineResponseDto startProcessInstance(
-            @RequestBody StartProcessInEngineRequestDto request
+    StartProcessInEngineResponse startProcessInstance(
+            @RequestBody StartProcessInEngineRequest request
     );
 }

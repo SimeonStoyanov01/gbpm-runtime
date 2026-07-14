@@ -1,4 +1,4 @@
-package cs.rug.processregistryservice.infrastructure.client.monitoring.dto;
+package cs.rug.processregistryservice.api.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProcessModelKeiAnnotationDto {
+public class KeiAnnotation {
     private String id;
     private String unit;
     private String targetValue;

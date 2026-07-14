@@ -5,10 +5,10 @@ import cs.rug.processregistryservice.api.operations.deployprocess.DeployProcessD
 import cs.rug.processregistryservice.api.operations.startprocessinstance.StartProcessInstanceRequest;
 import cs.rug.processregistryservice.api.operations.startprocessinstance.StartProcessInstanceResponse;
 import cs.rug.processregistryservice.application.out.engine.WorkflowEngineCommandClient;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineRequestDto;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineResponseDto;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineRequestDto;
-import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineResponseDto;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineRequest;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.deployprocess.DeployProcessToEngineResponse;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineRequest;
+import cs.rug.processregistryservice.infrastructure.client.camunda8.dto.startprocess.StartProcessInEngineResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +20,8 @@ public class Camunda8WorkflowEngineCommandClientAdapter implements WorkflowEngin
 
     @Override
     public DeployProcessDefinitionResponse deployProcess(DeployProcessDefinitionRequest request) {
-        DeployProcessToEngineResponseDto response = camunda8IntegrationFeignClient.deployProcessDefinition(
-                DeployProcessToEngineRequestDto
+        DeployProcessToEngineResponse response = camunda8IntegrationFeignClient.deployProcessDefinition(
+                DeployProcessToEngineRequest
                         .builder()
                         .resourceName(request.getResourceName())
                         .resourceContent(request.getBpmnXml())
@@ -42,8 +42,8 @@ public class Camunda8WorkflowEngineCommandClientAdapter implements WorkflowEngin
 
     @Override
     public StartProcessInstanceResponse startProcessInstance(StartProcessInstanceRequest request) {
-        StartProcessInEngineResponseDto response = camunda8IntegrationFeignClient.startProcessInstance(
-                StartProcessInEngineRequestDto
+        StartProcessInEngineResponse response = camunda8IntegrationFeignClient.startProcessInstance(
+                StartProcessInEngineRequest
                         .builder()
                         .processDefinitionKey(request.getProcessDefinitionKey())
                         .variables(request.getVariables())

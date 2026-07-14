@@ -1,6 +1,5 @@
 package cs.rug.camunda8integration.api.operations.startprocess;
 
-import cs.rug.camunda8integration.api.base.ProcessorResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StartProcessInEngineResponse implements ProcessorResponse {
+public class StartProcessInEngineResponse {
     private String processDefinitionKey;
     private String bpmnProcessId;
     private Integer version;

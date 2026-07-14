@@ -1,7 +1,6 @@
 package cs.rug.processregistryservice.api.operations.findprocesskeiannotations;
 
-import cs.rug.processregistryservice.api.base.ProcessorResponse;
-import cs.rug.processregistryservice.api.model.ElementKeiAnnotationsModel;
+import cs.rug.processregistryservice.api.model.ElementKeiAnnotations;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +12,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FindProcessKeiAnnotationsResponse implements ProcessorResponse {
-    private List<ElementKeiAnnotationsModel> bpmn4esElementKeiAnnotations;
+public class FindProcessKeiAnnotationsResponse {
+    private List<ElementKeiAnnotations> elementKeiAnnotations;
 }

@@ -1,4 +1,4 @@
-package cs.rug.processregistryservice.application.model.bpmn4es;
+package cs.rug.processregistryservice.infrastructure.client.monitoring.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KeiMetadata {
+public class ProcessModelKeiAnnotation {
     private String id;
     private String unit;
     private String targetValue;

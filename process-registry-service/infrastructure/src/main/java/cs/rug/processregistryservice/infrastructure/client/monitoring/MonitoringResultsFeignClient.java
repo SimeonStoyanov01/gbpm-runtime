@@ -1,7 +1,6 @@
 package cs.rug.processregistryservice.infrastructure.client.monitoring;
 
-import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.RegisterProcessModelRequestDto;
-import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.RegisterProcessModelResponseDto;
+import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.RegisterProcessModelRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,5 +14,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface MonitoringResultsFeignClient {
 
     @PostMapping(value = "/process-models", consumes = MediaType.APPLICATION_JSON_VALUE)
-    RegisterProcessModelResponseDto registerProcessModel(@RequestBody RegisterProcessModelRequestDto request);
+    void registerProcessModel(@RequestBody RegisterProcessModelRequest request);
 }

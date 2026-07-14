@@ -1,12 +1,12 @@
 package cs.rug.processregistryservice.infrastructure.client.monitoring;
 
 import cs.rug.processregistryservice.api.operations.deployprocess.DeployProcessDefinitionResponse;
-import cs.rug.processregistryservice.application.model.bpmn4es.ElementKeiAnnotations;
-import cs.rug.processregistryservice.application.model.bpmn4es.KeiMetadata;
+import cs.rug.processregistryservice.api.model.ElementKeiAnnotations;
+import cs.rug.processregistryservice.api.model.KeiAnnotation;
 import cs.rug.processregistryservice.application.out.monitoring.MonitoringProcessModelClient;
-import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.ProcessModelElementDto;
-import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.ProcessModelKeiAnnotationDto;
-import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.RegisterProcessModelRequestDto;
+import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.ProcessModelElement;
+import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.ProcessModelKeiAnnotation;
+import cs.rug.processregistryservice.infrastructure.client.monitoring.dto.RegisterProcessModelRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
             byte[] bpmnXml,
             List<ElementKeiAnnotations> elementKeiAnnotations
     ) {
-        monitoringResultsFeignClient.registerProcessModel(RegisterProcessModelRequestDto
+        monitoringResultsFeignClient.registerProcessModel(RegisterProcessModelRequest
                 .builder()
                 .deploymentKey(Long.valueOf(deployedProcess.getDeploymentKey()))
                 .processDefinitionKey(Long.valueOf(deployedProcess.getProcessDefinitionKey()))
@@ -35,27 +35,27 @@ public class MonitoringProcessModelClientAdapter implements MonitoringProcessMod
                 .bpmnXml(new String(bpmnXml, StandardCharsets.UTF_8))
                 .elements(elementKeiAnnotations
                         .stream()
-                        .map(this::toElementDto)
+                        .map(this::toElement)
                         .toList())
                 .build());
     }
 
-    private ProcessModelElementDto toElementDto(ElementKeiAnnotations elementKeiAnnotations) {
-        return ProcessModelElementDto
+    private ProcessModelElement toElement(ElementKeiAnnotations elementKeiAnnotations) {
+        return ProcessModelElement
                 .builder()
                 .bpmnElementId(elementKeiAnnotations.getBpmnElementId())
                 .name(elementKeiAnnotations.getElementName())
                 .type(elementKeiAnnotations.getElementType())
                 .keiAnnotations(elementKeiAnnotations
-                        .getKeiMetadata()
+                        .getKeiAnnotations()
                         .stream()
-                        .map(this::toKeiDto)
+                        .map(this::toKeiAnnotation)
                         .toList())
                 .build();
     }
 
-    private ProcessModelKeiAnnotationDto toKeiDto(KeiMetadata keiMetadata) {
-        return ProcessModelKeiAnnotationDto
+    private ProcessModelKeiAnnotation toKeiAnnotation(KeiAnnotation keiMetadata) {
+        return ProcessModelKeiAnnotation
                 .builder()
                 .id(keiMetadata.getId())
                 .unit(keiMetadata.getUnit())

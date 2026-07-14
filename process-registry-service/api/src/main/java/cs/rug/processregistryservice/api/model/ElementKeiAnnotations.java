@@ -1,4 +1,4 @@
-package cs.rug.processregistryservice.infrastructure.client.monitoring.dto;
+package cs.rug.processregistryservice.api.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProcessModelElementDto {
+public class ElementKeiAnnotations {
     private String bpmnElementId;
-    private String name;
-    private String type;
-    private List<ProcessModelKeiAnnotationDto> keiAnnotations;
+    private String elementName;
+    private String elementType;
+    private List<KeiAnnotation> keiAnnotations;
 }

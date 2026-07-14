@@ -1,7 +1,7 @@
 package cs.rug.processregistryservice.application.out.monitoring;
 
 import cs.rug.processregistryservice.api.operations.deployprocess.DeployProcessDefinitionResponse;
-import cs.rug.processregistryservice.application.model.bpmn4es.ElementKeiAnnotations;
+import cs.rug.processregistryservice.api.model.ElementKeiAnnotations;
 
 import java.util.List;
 

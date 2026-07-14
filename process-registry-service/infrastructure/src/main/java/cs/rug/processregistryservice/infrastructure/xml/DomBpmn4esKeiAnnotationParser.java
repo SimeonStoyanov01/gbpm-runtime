@@ -1,9 +1,9 @@
 package cs.rug.processregistryservice.infrastructure.xml;
 
 import cs.rug.processregistryservice.api.exceptions.InvalidProcessDefinitionException;
+import cs.rug.processregistryservice.api.model.ElementKeiAnnotations;
+import cs.rug.processregistryservice.api.model.KeiAnnotation;
 import cs.rug.processregistryservice.application.out.bpmn4es.Bpmn4esKeiAnnotationParser;
-import cs.rug.processregistryservice.application.model.bpmn4es.ElementKeiAnnotations;
-import cs.rug.processregistryservice.application.model.bpmn4es.KeiMetadata;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -84,8 +84,8 @@ public class DomBpmn4esKeiAnnotationParser implements Bpmn4esKeiAnnotationParser
             return Optional.empty();
         }
 
-        List<KeiMetadata> keiMetadata = findKeiMetadata(environmentalIndicatorElement);
-        if (keiMetadata.isEmpty()) {
+        List<KeiAnnotation> keiAnnotations = findKeiAnnotations(environmentalIndicatorElement);
+        if (keiAnnotations.isEmpty()) {
             return Optional.empty();
         }
 
@@ -93,7 +93,7 @@ public class DomBpmn4esKeiAnnotationParser implements Bpmn4esKeiAnnotationParser
                 .bpmnElementId(bpmnParentElement.get().getAttribute("id"))
                 .elementName(findAttributeValue(bpmnParentElement.get(), "name").orElse(null))
                 .elementType(bpmnParentElement.get().getLocalName())
-                .keiMetadata(keiMetadata)
+                .keiAnnotations(keiAnnotations)
                 .build());
     }
 
@@ -113,10 +113,10 @@ public class DomBpmn4esKeiAnnotationParser implements Bpmn4esKeiAnnotationParser
         return Optional.empty();
     }
 
-    private List<KeiMetadata> findKeiMetadata(Element environmentalIndicatorsElement) {
+    private List<KeiAnnotation> findKeiAnnotations(Element environmentalIndicatorsElement) {
         NodeList childNodes = environmentalIndicatorsElement.getChildNodes();
 
-        List<KeiMetadata> keiMetadata = new ArrayList<>();
+        List<KeiAnnotation> keiAnnotations = new ArrayList<>();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
             if (!(childNode instanceof Element childElement)
@@ -124,15 +124,15 @@ public class DomBpmn4esKeiAnnotationParser implements Bpmn4esKeiAnnotationParser
                 continue;
             }
 
-            buildKeiMetadata(childElement).ifPresent(keiMetadata::add);
+            buildKeiAnnotation(childElement).ifPresent(keiAnnotations::add);
         }
 
-        return keiMetadata;
+        return keiAnnotations;
     }
 
-    private Optional<KeiMetadata> buildKeiMetadata(Element childElement) {
+    private Optional<KeiAnnotation> buildKeiAnnotation(Element childElement) {
         return findAttributeValue(childElement, "id")
-                .map(id -> KeiMetadata.builder()
+                .map(id -> KeiAnnotation.builder()
                         .id(id)
                         .unit(findAttributeValue(childElement, "unit").orElse(null))
                         .targetValue(findAttributeValue(childElement, "targetValue").orElse(null))

@@ -11,12 +11,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterProcessModelRequestDto {
+public class RegisterProcessModelRequest {
     private Long deploymentKey;
     private Long processDefinitionKey;
     private String bpmnProcessId;
     private Integer version;
     private String resourceName;
     private String bpmnXml;
-    private List<ProcessModelElementDto> elements;
+    private List<ProcessModelElement> elements;
 }

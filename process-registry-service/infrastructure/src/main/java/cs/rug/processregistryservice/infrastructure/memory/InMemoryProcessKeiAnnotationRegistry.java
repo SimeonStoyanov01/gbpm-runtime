@@ -1,13 +1,11 @@
 package cs.rug.processregistryservice.infrastructure.memory;
 
-import cs.rug.processregistryservice.application.model.bpmn4es.KeiMetadata;
-import cs.rug.processregistryservice.application.model.bpmn4es.ElementKeiAnnotations;
+import cs.rug.processregistryservice.api.model.ElementKeiAnnotations;
+import cs.rug.processregistryservice.api.model.KeiAnnotation;
 import cs.rug.processregistryservice.application.out.keiregistry.ProcessKeiAnnotationRegistry;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,36 +13,30 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class InMemoryProcessKeiAnnotationRegistry implements ProcessKeiAnnotationRegistry {
 
-    private final Map<Long, Map<String, List<KeiMetadata>>> mappingsByProcessDefinitionKey = new ConcurrentHashMap<>();
+    private final Map<Long, List<ElementKeiAnnotations>> mappingsByProcessDefinitionKey = new ConcurrentHashMap<>();
 
     @Override
     public void registerProcessAnnotations(Long processDefinitionKey, List<ElementKeiAnnotations> elementKeiAnnotations) {
-        Map<String, List<KeiMetadata>> keiMetadataByElementId = new LinkedHashMap<>();
-        for (ElementKeiAnnotations elementKeiAnnotation : elementKeiAnnotations) {
-            keiMetadataByElementId.put(elementKeiAnnotation.getBpmnElementId(), List.copyOf(elementKeiAnnotation.getKeiMetadata()));
-        }
-        mappingsByProcessDefinitionKey.put(processDefinitionKey, Collections.unmodifiableMap(keiMetadataByElementId));
+        mappingsByProcessDefinitionKey.put(processDefinitionKey, List.copyOf(elementKeiAnnotations));
     }
 
     @Override
     public List<ElementKeiAnnotations> findKeiAnnotationsByProcessDefinitionKey(Long processDefinitionKey) {
         return mappingsByProcessDefinitionKey
-                .getOrDefault(processDefinitionKey, Map.of())
-                .entrySet()
-                .stream()
-                .map(entry -> ElementKeiAnnotations
-                        .builder()
-                        .bpmnElementId(entry.getKey())
-                        .keiMetadata(entry.getValue())
-                        .build())
-                .toList();
+                .getOrDefault(processDefinitionKey, List.of());
     }
 
     @Override
-    public List<KeiMetadata> findKeiMetadataByProcessDefinitionKeyAndBpmnElementId(Long processDefinitionKey, String bpmnElementId) {
-
+    public List<KeiAnnotation> findKeiAnnotationsByProcessDefinitionKeyAndBpmnElementId(
+            Long processDefinitionKey,
+            String bpmnElementId
+    ) {
         return mappingsByProcessDefinitionKey
-                .getOrDefault(processDefinitionKey, Map.of())
-                .getOrDefault(bpmnElementId, List.of());
+                .getOrDefault(processDefinitionKey, List.of())
+                .stream()
+                .filter(element -> bpmnElementId.equals(element.getBpmnElementId()))
+                .findFirst()
+                .map(ElementKeiAnnotations::getKeiAnnotations)
+                .orElseGet(List::of);
     }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StartProcessInEngineResponseDto {
+public class StartProcessInEngineResponse {
     private String processDefinitionKey;
     private String bpmnProcessId;
     private Integer version;
