@@ -1,6 +1,7 @@
 package cs.rug.monitoringresultsservice.infrastructure.persistence.mapper;
 
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
+import cs.rug.monitoringresultsservice.api.model.ResourceBreakdown;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.BpmnElementEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiAnnotationEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiResultEntity;
@@ -39,6 +40,15 @@ public class MonitoringResultEntityMapper {
                 .evaluationStatus(entity.getEvaluationStatus())
                 .calculatedAt(entity.getCalculatedAt())
                 .evaluatedAt(entity.getEvaluatedAt())
+                .resourceBreakdown(entity.getResourceBreakdown()
+                        .stream()
+                        .map(resource -> ResourceBreakdown
+                                .builder()
+                                .resourceName(resource.getResourceName())
+                                .emissionValue(resource.getEmissionValue())
+                                .unit(resource.getUnit())
+                                .build())
+                        .toList())
                 .build();
     }
 }

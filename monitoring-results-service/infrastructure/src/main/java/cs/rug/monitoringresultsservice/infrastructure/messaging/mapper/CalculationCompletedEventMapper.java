@@ -24,6 +24,7 @@ public class CalculationCompletedEventMapper {
                 .calculatedValue(event.getResult().getValue())
                 .calculatedUnit(event.getResult().getUnit())
                 .calculatedAt(event.getOccurredAt())
+                .resourceBreakdown(event.getResourceBreakdown())
                 .build();
     }
 }

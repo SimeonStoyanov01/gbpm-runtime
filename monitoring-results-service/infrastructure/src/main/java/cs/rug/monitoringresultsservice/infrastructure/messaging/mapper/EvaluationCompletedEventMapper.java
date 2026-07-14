@@ -32,6 +32,7 @@ public class EvaluationCompletedEventMapper {
                 .difference(event.getEvaluation().getDifference())
                 .evaluationStatus(event.getEvaluation().getStatus())
                 .evaluatedAt(event.getOccurredAt())
+                .resourceBreakdown(calculationEvent.getResourceBreakdown())
                 .build();
     }
 }

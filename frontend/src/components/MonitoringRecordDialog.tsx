@@ -78,12 +78,40 @@ export function MonitoringRecordDialog({ record, onClose }: MonitoringRecordDial
             <Detail label="Reference set" value={record.referenceSetId} />
           </RecordSection>
 
+          {record.resourceBreakdown && record.resourceBreakdown.length > 0 && (
+            <section className="record-section">
+              <h4>Resource contributions</h4>
+              <div className="table-wrap">
+                <table className="resource-breakdown-table">
+                  <thead>
+                    <tr>
+                      <th>Resource</th>
+                      <th>Emission contribution</th>
+                      <th>Share</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {record.resourceBreakdown.map((resource, index) => (
+                      <tr key={`${resource.resourceName}-${index}`}>
+                        <td>{resource.resourceName}</td>
+                        <td>{formatMeasurement(resource.emissionValue, resource.unit)}</td>
+                        <td>{formatContributionShare(resource.emissionValue, record.calculatedValue)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
           <details className="technical-details">
             <summary>Technical details</summary>
             <dl className="record-detail-list">
               <Detail label="Process definition" value={record.processDefinitionKey} mono />
               <Detail label="Activity ID" value={record.bpmnElementId} mono />
               <Detail label="Engine" value={record.engineType} />
+              <Detail label="Calculation event" value={record.calculationEventId} mono />
+              <Detail label="Evaluation event" value={record.evaluationEventId} mono />
             </dl>
           </details>
         </div>
@@ -119,4 +147,12 @@ function RecordSection({ title, children }: RecordSectionProps) {
       <dl className="record-detail-list">{children}</dl>
     </section>
   );
+}
+
+function formatContributionShare(emissionValue: number, calculatedValue?: number): string {
+  if (!calculatedValue) {
+    return '-';
+  }
+
+  return `${((emissionValue / calculatedValue) * 100).toFixed(1)}%`;
 }

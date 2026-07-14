@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Builder
@@ -33,4 +34,5 @@ public class MonitoringRecord {
     private String evaluationStatus;
     private Instant calculatedAt;
     private Instant evaluatedAt;
+    private List<ResourceBreakdown> resourceBreakdown;
 }

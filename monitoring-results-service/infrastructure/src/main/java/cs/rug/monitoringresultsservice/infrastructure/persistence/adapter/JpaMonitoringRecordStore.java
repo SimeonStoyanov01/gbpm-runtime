@@ -2,6 +2,7 @@ package cs.rug.monitoringresultsservice.infrastructure.persistence.adapter;
 
 import cs.rug.monitoringresultsservice.api.exceptions.ProcessInstanceNotFoundException;
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
+import cs.rug.monitoringresultsservice.api.model.ResourceBreakdown;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findmonitoringrecords.FindMonitoringRecordsRequest;
 import cs.rug.monitoringresultsservice.api.operations.findprocessinstancedetails.FindProcessInstanceDetailsRequest;
@@ -10,6 +11,7 @@ import cs.rug.monitoringresultsservice.application.out.MonitoringRecordStore;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.BpmnElementEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiAnnotationEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiResultEntity;
+import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiResourceBreakdownEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.ProcessDefinitionEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.ProcessInstanceEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.mapper.MonitoringResultEntityMapper;
@@ -206,6 +208,7 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
         entity.setCalculatedValue(record.getCalculatedValue());
         entity.setCalculatedUnit(record.getCalculatedUnit());
         entity.setCalculatedAt(record.getCalculatedAt());
+        replaceResourceBreakdown(entity, record.getResourceBreakdown());
         entity.setUpdatedAt(Instant.now());
     }
 
@@ -233,7 +236,29 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
         entity.setDifference(record.getDifference());
         entity.setEvaluationStatus(record.getEvaluationStatus());
         entity.setEvaluatedAt(record.getEvaluatedAt());
+        replaceResourceBreakdown(entity, record.getResourceBreakdown());
         entity.setUpdatedAt(Instant.now());
+    }
+
+    private void replaceResourceBreakdown(
+            KeiResultEntity result,
+            List<ResourceBreakdown> resourceBreakdown
+    ) {
+        if (resourceBreakdown == null) {
+            return;
+        }
+
+        result.getResourceBreakdown().clear();
+        result.getResourceBreakdown().addAll(resourceBreakdown
+                .stream()
+                .map(resource -> KeiResourceBreakdownEntity
+                        .builder()
+                        .keiResult(result)
+                        .resourceName(resource.getResourceName())
+                        .emissionValue(resource.getEmissionValue())
+                        .unit(resource.getUnit())
+                        .build())
+                .toList());
     }
 
     private boolean matchesMonitoringFilter(KeiResultEntity result, FindMonitoringRecordsRequest request) {

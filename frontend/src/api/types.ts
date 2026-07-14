@@ -68,6 +68,13 @@ export type MonitoringRecord = {
   evaluationStatus?: string;
   calculatedAt?: string;
   evaluatedAt?: string;
+  resourceBreakdown?: ResourceBreakdown[];
+};
+
+export type ResourceBreakdown = {
+  resourceName: string;
+  emissionValue: number;
+  unit: string;
 };
 
 export type ProcessInstanceDetails = {

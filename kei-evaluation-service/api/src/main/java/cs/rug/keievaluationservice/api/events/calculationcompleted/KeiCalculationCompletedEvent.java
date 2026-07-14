@@ -4,6 +4,7 @@ import cs.rug.keievaluationservice.api.model.CalculationMetadata;
 import cs.rug.keievaluationservice.api.model.CalculationResult;
 import cs.rug.keievaluationservice.api.model.EngineExecutionContext;
 import cs.rug.keievaluationservice.api.model.KeiAnnotation;
+import cs.rug.keievaluationservice.api.model.ResourceBreakdown;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Builder
@@ -40,4 +42,8 @@ public class KeiCalculationCompletedEvent {
     @Valid
     @NotNull
     private CalculationResult result;
+
+    @Valid
+    @NotNull
+    private List<ResourceBreakdown> resourceBreakdown;
 }
