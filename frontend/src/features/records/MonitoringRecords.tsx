@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { findProcessInstanceDetails } from '../../api/monitoringApi';
-import type { MonitoringRecord, MonitoringRecordFilters, ProcessInstanceDetails, ThresholdViolation } from '../../api/types';
+import type { MonitoringRecord, MonitoringRecordFilters, ProcessInstanceDetails } from '../../api/types';
 import { Endpoint } from '../../components/Endpoint';
 import { EmptyState } from '../../components/EmptyState';
 import { Panel } from '../../components/Panel';
@@ -129,6 +129,10 @@ function ProcessInstanceDetailsPanel({ details }: { details: ProcessInstanceDeta
             <dd>{details.bpmnProcessId || '-'}</dd>
           </div>
           <div>
+            <dt>Resource</dt>
+            <dd>{details.resourceName || '-'}</dd>
+          </div>
+          <div>
             <dt>Definition Key</dt>
             <dd className="mono">{details.processDefinitionKey || '-'}</dd>
           </div>
@@ -155,7 +159,7 @@ function ProcessInstanceDetailsPanel({ details }: { details: ProcessInstanceDeta
         {details.violations.length === 0 ? (
           <EmptyState>No active violations for this instance.</EmptyState>
         ) : (
-          <ThresholdViolationTable violations={details.violations} />
+          <ViolationRecordTable violations={details.violations} />
         )}
       </div>
     </div>
@@ -197,7 +201,7 @@ function MonitoringRecordTable({ records }: { records: MonitoringRecord[] }) {
   );
 }
 
-function ThresholdViolationTable({ violations }: { violations: ThresholdViolation[] }) {
+function ViolationRecordTable({ violations }: { violations: MonitoringRecord[] }) {
   return (
     <div className="table-wrap">
       <table>
@@ -214,14 +218,14 @@ function ThresholdViolationTable({ violations }: { violations: ThresholdViolatio
         </thead>
         <tbody>
           {violations.map((violation) => (
-            <tr key={violation.eventId || `${violation.processInstanceKey}-${violation.serviceTaskId}`} className="violation-row">
-              <td><StatusBadge value={violation.status} /></td>
-              <td>{violation.serviceTaskId || '-'}</td>
-              <td>{violation.emissionType || '-'}</td>
-              <td>{formatMeasurement(violation.calculatedValue)}</td>
-              <td>{formatMeasurement(violation.targetValue)}</td>
+            <tr key={violation.evaluationEventId || `${violation.processInstanceKey}-${violation.bpmnElementId}`} className="violation-row">
+              <td><StatusBadge value={violation.evaluationStatus} /></td>
+              <td>{violation.bpmnElementId || '-'}</td>
+              <td>{violation.keiId || '-'}</td>
+              <td>{formatMeasurement(violation.calculatedValue, violation.calculatedUnit)}</td>
+              <td>{formatMeasurement(violation.targetValue, violation.calculatedUnit)}</td>
               <td>{violation.difference ?? '-'}</td>
-              <td>{formatDateTime(violation.occurredAt)}</td>
+              <td>{formatDateTime(violation.evaluatedAt)}</td>
             </tr>
           ))}
         </tbody>

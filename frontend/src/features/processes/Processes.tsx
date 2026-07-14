@@ -8,7 +8,6 @@ import type {
 } from '../../api/types';
 import { Endpoint } from '../../components/Endpoint';
 import { Panel } from '../../components/Panel';
-import { StatusBadge } from '../../components/StatusBadge';
 
 type ProcessesProps = {
   onDeployment: (deployment: DeployProcessResponse) => void;
@@ -126,9 +125,8 @@ export function Processes({ onDeployment }: ProcessesProps) {
       <Panel title="KEI Annotations" action={<Endpoint>GET :8080 /api/process-definitions/{'{key}'}/keis</Endpoint>}>
         <div className="button-row" style={{ marginTop: 0, marginBottom: 16 }}>
           <button className="secondary" disabled={!processDefinitionKey || busy} onClick={handleFindKeis}>Refresh KEIs</button>
-          {keiResponse && <StatusBadge value={`KEY ${keiResponse.processDefinitionKey}`} />}
         </div>
-        <KeiTable elements={keiResponse?.bpmn4esElementKeiAnnotations || []} />
+        <KeiTable elements={keiResponse?.elementKeiAnnotations || []} />
         <p className="hint">KEI metadata is read from the process-registry/root backend.</p>
       </Panel>
     </section>
@@ -169,7 +167,7 @@ function KeiTable({ elements }: { elements: ElementKeiAnnotations[] }) {
         </thead>
         <tbody>
           {elements.flatMap((element) =>
-            element.bpmn4esKeiAnnotations.map((kei) => (
+            element.keiAnnotations.map((kei) => (
               <tr key={`${element.bpmnElementId}-${kei.id}`}>
                 <td>{element.bpmnElementId}</td>
                 <td>{kei.id}</td>

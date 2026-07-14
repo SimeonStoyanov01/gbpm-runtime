@@ -1,10 +1,10 @@
 import { Client } from '@stomp/stompjs';
-import type { MonitoringRecord, ThresholdViolation } from '../api/types';
+import type { MonitoringRecord } from '../api/types';
 
 export type MonitoringSocketHandlers = {
   onCalculation: (record: MonitoringRecord) => void;
   onEvaluation: (record: MonitoringRecord) => void;
-  onViolation: (violation: ThresholdViolation) => void;
+  onViolation: (violation: MonitoringRecord) => void;
   onStatus?: (status: MonitoringSocketStatus) => void;
   onError?: (message: string) => void;
 };
@@ -35,7 +35,7 @@ export function connectMonitoringSocket(handlers: MonitoringSocketHandlers): Cli
         handlers.onEvaluation(JSON.parse(message.body) as MonitoringRecord);
       });
       client.subscribe('/topic/monitoring/violations', (message) => {
-        handlers.onViolation(JSON.parse(message.body) as ThresholdViolation);
+        handlers.onViolation(JSON.parse(message.body) as MonitoringRecord);
       });
     },
   });

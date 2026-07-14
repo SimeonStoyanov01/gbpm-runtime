@@ -1,13 +1,13 @@
 import { MetricCard } from '../../components/MetricCard';
 import { Panel } from '../../components/Panel';
 import { StatusBadge } from '../../components/StatusBadge';
-import type { MonitoringRecord, ThresholdViolation } from '../../api/types';
+import type { MonitoringRecord } from '../../api/types';
 import { formatDateTime, formatMeasurement, latestByTime } from '../../utils/format';
 import { LiveResults } from './LiveResults';
 
 type DashboardProps = {
   records: MonitoringRecord[];
-  violations: ThresholdViolation[];
+  violations: MonitoringRecord[];
   socketStatus: string;
 };
 
@@ -87,15 +87,15 @@ export function Dashboard({ records, violations, socketStatus }: DashboardProps)
               </thead>
               <tbody>
                 {violations.slice(0, 5).map((violation) => (
-                  <tr key={violation.eventId} className="violation-row">
+                  <tr key={violation.evaluationEventId} className="violation-row">
                     <td>{violation.bpmnProcessId || '-'}</td>
-                    <td>{violation.serviceTaskId || '-'}</td>
-                    <td>{violation.emissionType || '-'}</td>
+                    <td>{violation.bpmnElementId || '-'}</td>
+                    <td>{violation.keiId || '-'}</td>
                     <td>{violation.calculatedValue ?? '-'}</td>
                     <td>{violation.targetValue ?? '-'}</td>
                     <td>{violation.difference ?? '-'}</td>
-                    <td><StatusBadge value={violation.status} /></td>
-                    <td>{formatDateTime(violation.occurredAt)}</td>
+                    <td><StatusBadge value={violation.evaluationStatus} /></td>
+                    <td>{formatDateTime(violation.evaluatedAt)}</td>
                   </tr>
                 ))}
               </tbody>

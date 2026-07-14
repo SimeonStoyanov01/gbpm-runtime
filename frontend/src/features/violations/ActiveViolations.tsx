@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ActiveViolationFilters, ThresholdViolation } from '../../api/types';
+import type { ActiveViolationFilters, MonitoringRecord } from '../../api/types';
 import { Endpoint } from '../../components/Endpoint';
 import { EmptyState } from '../../components/EmptyState';
 import { Panel } from '../../components/Panel';
@@ -7,7 +7,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { formatDateTime } from '../../utils/format';
 
 type ActiveViolationsProps = {
-  violations: ThresholdViolation[];
+  violations: MonitoringRecord[];
   onFilter: (filters: ActiveViolationFilters) => void;
 };
 
@@ -54,16 +54,16 @@ export function ActiveViolations({ violations, onFilter }: ActiveViolationsProps
               </thead>
               <tbody>
                 {violations.map((violation) => (
-                  <tr key={violation.eventId} className="violation-row">
+                  <tr key={violation.evaluationEventId} className="violation-row">
                     <td>{violation.bpmnProcessId || '-'}</td>
                     <td className="mono">{violation.processInstanceKey || '-'}</td>
-                    <td>{violation.serviceTaskId || '-'}</td>
-                    <td>{violation.emissionType || '-'}</td>
+                    <td>{violation.bpmnElementId || '-'}</td>
+                    <td>{violation.keiId || '-'}</td>
                     <td>{violation.calculatedValue ?? '-'}</td>
                     <td>{violation.targetValue ?? '-'}</td>
                     <td>{violation.difference ?? '-'}</td>
-                    <td><StatusBadge value={violation.status} /></td>
-                    <td>{formatDateTime(violation.occurredAt)}</td>
+                    <td><StatusBadge value={violation.evaluationStatus} /></td>
+                    <td>{formatDateTime(violation.evaluatedAt)}</td>
                   </tr>
                 ))}
               </tbody>

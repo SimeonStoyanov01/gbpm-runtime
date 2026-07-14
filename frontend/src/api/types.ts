@@ -18,24 +18,29 @@ export type StartProcessInstanceResponse = {
 
 export type KeiAnnotation = {
   id: string;
-  unit: string;
-  targetValue: string;
+  unit?: string;
+  targetValue?: string;
   icon?: string;
 };
 
 export type ElementKeiAnnotations = {
   bpmnElementId: string;
-  bpmn4esKeiAnnotations: KeiAnnotation[];
+  elementName?: string;
+  elementType?: string;
+  keiAnnotations: KeiAnnotation[];
 };
 
 export type FindProcessKeisResponse = {
-  processDefinitionKey: number;
-  bpmn4esElementKeiAnnotations: ElementKeiAnnotations[];
+  elementKeiAnnotations: ElementKeiAnnotations[];
 };
 
 export type MonitoringRecord = {
   calculationEventId?: string;
   evaluationEventId?: string;
+  engineType?: string;
+  calculatorId?: string;
+  calculationMethod?: string;
+  referenceSetId?: string;
   processDefinitionKey?: number;
   bpmnProcessId?: string;
   processInstanceKey?: number;
@@ -54,24 +59,11 @@ export type MonitoringRecord = {
 export type ProcessInstanceDetails = {
   processDefinitionKey?: number;
   bpmnProcessId?: string;
+  resourceName?: string;
   processInstanceKey?: number;
   bpmnXml?: string;
   records: MonitoringRecord[];
-  violations: ThresholdViolation[];
-};
-
-export type ThresholdViolation = {
-  eventId?: string;
-  processDefinitionKey?: number;
-  bpmnProcessId?: string;
-  serviceTaskId?: string;
-  processInstanceKey?: number;
-  emissionType?: string;
-  calculatedValue?: number;
-  targetValue?: number;
-  difference?: number;
-  status?: string;
-  occurredAt?: string;
+  violations: MonitoringRecord[];
 };
 
 export type MonitoringRecordFilters = {

@@ -1,4 +1,4 @@
-import type { MonitoringRecord, ThresholdViolation } from '../../api/types';
+import type { MonitoringRecord } from '../../api/types';
 import { EmptyState } from '../../components/EmptyState';
 import { Panel } from '../../components/Panel';
 import { formatMeasurement } from '../../utils/format';
@@ -6,7 +6,7 @@ import { formatMeasurement } from '../../utils/format';
 type LiveEventsProps = {
   calculations: MonitoringRecord[];
   evaluations: MonitoringRecord[];
-  violations: ThresholdViolation[];
+  violations: MonitoringRecord[];
 };
 
 export function LiveEvents({ calculations, evaluations, violations }: LiveEventsProps) {
@@ -62,12 +62,12 @@ export function LiveEvents({ calculations, evaluations, violations }: LiveEvents
               <EmptyState>No violation messages received in this browser session.</EmptyState>
             ) : (
               violations.slice(0, 6).map((violation) => (
-                <div className="event-card highlight" key={violation.eventId}>
+                <div className="event-card highlight" key={violation.evaluationEventId}>
                   <span className="badge danger">Violation</span>
                   <div>
-                    <strong>{violation.serviceTaskId || '-'}</strong>
+                    <strong>{violation.bpmnElementId || '-'}</strong>
                     <br />
-                    <span className="mono">{violation.emissionType || '-'} · difference {violation.difference ?? '-'}</span>
+                    <span className="mono">{violation.keiId || '-'} · difference {violation.difference ?? '-'}</span>
                   </div>
                   <span className="badge danger">Active</span>
                 </div>

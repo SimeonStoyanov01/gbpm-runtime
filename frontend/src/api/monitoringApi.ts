@@ -4,7 +4,6 @@ import type {
   MonitoringRecord,
   MonitoringRecordFilters,
   ProcessInstanceDetails,
-  ThresholdViolation,
 } from './types';
 
 export async function findMonitoringRecords(
@@ -15,8 +14,8 @@ export async function findMonitoringRecords(
 
 export async function findActiveViolations(
   filters: ActiveViolationFilters = {},
-): Promise<ThresholdViolation[]> {
-  return requestJson<ThresholdViolation[]>(`/api/monitoring/violations/active${queryString(filters)}`);
+): Promise<MonitoringRecord[]> {
+  return requestJson<MonitoringRecord[]>(`/api/monitoring/violations/active${queryString(filters)}`);
 }
 
 export async function findProcessInstanceDetails(

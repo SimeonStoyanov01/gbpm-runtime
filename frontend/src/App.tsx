@@ -5,7 +5,6 @@ import type {
   DeployProcessResponse,
   MonitoringRecord,
   MonitoringRecordFilters,
-  ThresholdViolation,
 } from './api/types';
 import { Layout } from './components/Layout';
 import { Dashboard } from './features/dashboard/Dashboard';
@@ -18,10 +17,10 @@ import type { MonitoringSocketStatus } from './websocket/monitoringSocket';
 
 export function App() {
   const [records, setRecords] = useState<MonitoringRecord[]>([]);
-  const [violations, setViolations] = useState<ThresholdViolation[]>([]);
+  const [violations, setViolations] = useState<MonitoringRecord[]>([]);
   const [calculationEvents, setCalculationEvents] = useState<MonitoringRecord[]>([]);
   const [evaluationEvents, setEvaluationEvents] = useState<MonitoringRecord[]>([]);
-  const [violationEvents, setViolationEvents] = useState<ThresholdViolation[]>([]);
+  const [violationEvents, setViolationEvents] = useState<MonitoringRecord[]>([]);
   const [latestDeployment, setLatestDeployment] = useState<DeployProcessResponse>();
   const [socketStatus, setSocketStatus] = useState<MonitoringSocketStatus>('disconnected');
   const [error, setError] = useState<string>();
@@ -109,8 +108,8 @@ function upsertRecord(records: MonitoringRecord[], record: MonitoringRecord): Mo
   return sortRecords(records.map((existing, currentIndex) => currentIndex === index ? { ...existing, ...record } : existing));
 }
 
-function upsertViolation(violations: ThresholdViolation[], violation: ThresholdViolation): ThresholdViolation[] {
-  const index = violations.findIndex((existing) => existing.eventId === violation.eventId);
+function upsertViolation(violations: MonitoringRecord[], violation: MonitoringRecord): MonitoringRecord[] {
+  const index = violations.findIndex((existing) => existing.evaluationEventId === violation.evaluationEventId);
   if (index === -1) {
     return sortViolations([violation, ...violations]);
   }
@@ -122,9 +121,9 @@ function sortRecords(records: MonitoringRecord[]): MonitoringRecord[] {
   return [...records].sort((left, right) => monitoringTime(right) - monitoringTime(left));
 }
 
-function sortViolations(violations: ThresholdViolation[]): ThresholdViolation[] {
+function sortViolations(violations: MonitoringRecord[]): MonitoringRecord[] {
   return [...violations].sort((left, right) =>
-    parseTime(right.occurredAt) - parseTime(left.occurredAt),
+    parseTime(right.evaluatedAt) - parseTime(left.evaluatedAt),
   );
 }
 
