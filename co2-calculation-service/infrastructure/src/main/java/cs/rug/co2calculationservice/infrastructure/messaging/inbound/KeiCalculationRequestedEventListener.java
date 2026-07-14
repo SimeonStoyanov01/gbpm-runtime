@@ -14,7 +14,6 @@ import tools.jackson.databind.ObjectMapper;
 public class KeiCalculationRequestedEventListener {
 
     private final ObjectMapper objectMapper;
-    private final CalculationRequestEventMapper calculationRequestEventMapper;
     private final CalculateCo2Operation calculateCo2Operation;
 
     @RabbitListener(queues = "${runtime.messaging.calculation-request.queue-name}")
@@ -28,11 +27,13 @@ public class KeiCalculationRequestedEventListener {
         }
 
         log.info(
-                "Received KEI calculation request: eventId={}",
-                event.getEventId()
+                "Received KEI calculation request: keiId={}, processInstanceKey={}, bpmnElementId={}",
+                event.getKei().getId(),
+                event.getExecution().getProcessInstanceKey(),
+                event.getExecution().getBpmnElementId()
         );
 
-        calculateCo2Operation.process(calculationRequestEventMapper.toRequest(event));
+        calculateCo2Operation.process(event);
     }
 
     private KeiCalculationRequestedEvent readEvent(byte[] payload) {

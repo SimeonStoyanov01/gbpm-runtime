@@ -10,9 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalculationDescriptor {
+public class CalculationMetadata {
     @NotBlank
-    private String strategy;
+    private String calculatorId;
+
+    @NotBlank
+    private String calculationMethod;
 
     @NotBlank
     private String referenceSetId;

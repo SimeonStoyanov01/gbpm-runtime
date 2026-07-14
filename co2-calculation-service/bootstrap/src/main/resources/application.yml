@@ -31,10 +31,14 @@ spring:
       mode: ${CO2_CALCULATION_SQL_INIT_MODE:always}
 
 runtime:
+  calculation:
+    calculator-id: ${CO2_CALCULATION_CALCULATOR_ID:example_co2_calculator}
+    calculation-method: ${CO2_CALCULATION_METHOD:popescu_resource_co2}
+    reference-set-id: ${CO2_CALCULATION_REFERENCE_SET_ID:popescu-demo-v1}
   messaging:
     calculation-request:
       exchange-name: ${RUNTIME_CALCULATION_REQUEST_EXCHANGE:runtime.observation.events}
-      routing-key: ${RUNTIME_CALCULATION_REQUEST_ROUTING_KEY:kei.calculation.requested}
+      routing-key: ${RUNTIME_CALCULATION_REQUEST_ROUTING_KEY:kei.calculation.requested.carbon-emissions}
       queue-name: ${RUNTIME_CALCULATION_REQUEST_QUEUE:runtime.co2-calculation.kei-calculation-requested}
     calculation-result:
       exchange-name: ${RUNTIME_CALCULATION_RESULT_EXCHANGE:runtime.calculation.events}

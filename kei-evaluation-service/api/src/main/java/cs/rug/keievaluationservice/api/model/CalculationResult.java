@@ -14,9 +14,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CalculationResult {
-    @NotBlank
-    private String status;
-
     @NotNull
     private BigDecimal value;
 

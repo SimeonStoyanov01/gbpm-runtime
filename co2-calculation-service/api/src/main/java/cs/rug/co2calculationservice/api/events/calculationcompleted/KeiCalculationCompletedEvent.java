@@ -1,6 +1,6 @@
 package cs.rug.co2calculationservice.api.events.calculationcompleted;
 
-import cs.rug.co2calculationservice.api.model.CalculationDescriptor;
+import cs.rug.co2calculationservice.api.model.CalculationMetadata;
 import cs.rug.co2calculationservice.api.model.CalculationResult;
 import cs.rug.co2calculationservice.api.model.EngineExecutionContext;
 import cs.rug.co2calculationservice.api.model.KeiAnnotation;
@@ -19,9 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class KeiCalculationCompletedEvent {
     private String eventId;
-    private String eventType;
     private Instant occurredAt;
-    private CalculationDescriptor calculation;
+    private CalculationMetadata calculation;
     private KeiAnnotation kei;
     private EngineExecutionContext execution;
     private CalculationResult result;

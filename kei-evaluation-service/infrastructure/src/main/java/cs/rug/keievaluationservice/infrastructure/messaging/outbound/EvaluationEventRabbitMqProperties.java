@@ -16,7 +16,4 @@ public class EvaluationEventRabbitMqProperties {
 
     @NotBlank
     private String evaluationRoutingKey;
-
-    @NotBlank
-    private String violationRoutingKey;
 }

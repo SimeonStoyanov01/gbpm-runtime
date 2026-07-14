@@ -1,17 +1,19 @@
-package cs.rug.co2calculationservice.application;
+package cs.rug.co2calculationservice.application.processors;
 
 import cs.rug.co2calculationservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
 import cs.rug.co2calculationservice.api.events.calculationfailed.KeiCalculationFailedEvent;
+import cs.rug.co2calculationservice.api.events.calculationrequested.KeiCalculationRequestedEvent;
+import cs.rug.co2calculationservice.api.model.CalculationMetadata;
 import cs.rug.co2calculationservice.api.model.ResourceBreakdown;
 import cs.rug.co2calculationservice.api.model.ResourceUsage;
 import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Operation;
-import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Request;
-import cs.rug.co2calculationservice.api.operations.calculateco2.CalculateCo2Response;
+import cs.rug.co2calculationservice.application.CalculationFailureException;
 import cs.rug.co2calculationservice.application.factory.CalculationCompletedEventFactory;
 import cs.rug.co2calculationservice.application.factory.CalculationFailedEventFactory;
 import cs.rug.co2calculationservice.application.model.CalculationOutcome;
 import cs.rug.co2calculationservice.application.model.EmissionFactor;
 import cs.rug.co2calculationservice.application.model.ResourceProfile;
+import cs.rug.co2calculationservice.application.out.CalculationMetadataProvider;
 import cs.rug.co2calculationservice.application.out.CalculationResultPublisher;
 import cs.rug.co2calculationservice.application.out.EmissionFactorLookup;
 import cs.rug.co2calculationservice.application.out.ResourceProfileLookup;
@@ -32,49 +34,37 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CalculateCo2Processor implements CalculateCo2Operation {
 
-    private static final String POPESCU_RESOURCE_CO2_STRATEGY = "POPESCU_RESOURCE_CO2";
     private static final String CARBON_EMISSIONS_KEI_ID = "carbon-emissions";
     private static final String RESULT_UNIT = "kg";
     private static final int RESULT_SCALE = 4;
 
     private final ResourceProfileLookup resourceProfileLookup;
     private final EmissionFactorLookup emissionFactorLookup;
+    private final CalculationMetadataProvider calculationMetadataProvider;
     private final CalculationResultPublisher calculationResultPublisher;
     private final Validator validator;
     private final CalculationCompletedEventFactory calculationCompletedEventFactory;
     private final CalculationFailedEventFactory calculationFailedEventFactory;
 
     @Override
-    public CalculateCo2Response process(CalculateCo2Request request) {
-        Objects.requireNonNull(request, "request must not be null");
+    public void process(KeiCalculationRequestedEvent request) {
+        Objects.requireNonNull(request, "calculation request must not be null");
+        CalculationMetadata calculation = calculationMetadataProvider.calculationMetadata();
 
         try {
             validate(request);
-            CalculationOutcome outcome = calculate(request);
-            KeiCalculationCompletedEvent event = calculationCompletedEventFactory.create(request, outcome);
+            CalculationOutcome outcome = calculate(request, calculation);
+            KeiCalculationCompletedEvent event = calculationCompletedEventFactory.create(request, outcome, calculation);
             calculationResultPublisher.publishCompleted(event);
 
-            return CalculateCo2Response
-                    .builder()
-                    .eventId(event.getEventId())
-                    .status(outcome.getStatus())
-                    .event(event)
-                    .build();
         } catch (CalculationFailureException exception) {
-            CalculationOutcome outcome = CalculationOutcome.failed(exception.getCode(), exception.getMessage());
-            KeiCalculationFailedEvent event = calculationFailedEventFactory.create(request, exception);
+            KeiCalculationFailedEvent event = calculationFailedEventFactory.create(request, exception, calculation);
             calculationResultPublisher.publishFailed(event);
-
-            return CalculateCo2Response
-                    .builder()
-                    .eventId(event.getEventId())
-                    .status(outcome.getStatus())
-                    .build();
         }
     }
 
-    private void validate(CalculateCo2Request request) {
-        Set<ConstraintViolation<CalculateCo2Request>> violations = validator.validate(request);
+    private void validate(KeiCalculationRequestedEvent request) {
+        Set<ConstraintViolation<KeiCalculationRequestedEvent>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             String message = violations
                     .stream()
@@ -84,15 +74,14 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
         }
     }
 
-    private CalculationOutcome calculate(CalculateCo2Request request) {
-        requireSupportedStrategy(request);
+    private CalculationOutcome calculate(KeiCalculationRequestedEvent request, CalculationMetadata calculation) {
         requireSupportedKei(request);
 
         BigDecimal total = BigDecimal.ZERO;
         List<ResourceBreakdown> breakdown = new ArrayList<>();
 
         for (ResourceUsage resourceUsage : request.getInputs().getResourceUsages()) {
-            ResourceBreakdown resourceBreakdown = calculateResource(request, resourceUsage);
+            ResourceBreakdown resourceBreakdown = calculateResource(resourceUsage, calculation.getReferenceSetId());
             total = total.add(resourceBreakdown.getEmissionValue());
             breakdown.add(resourceBreakdown);
         }
@@ -103,8 +92,7 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
         );
     }
 
-    private ResourceBreakdown calculateResource(CalculateCo2Request request, ResourceUsage resourceUsage) {
-        String referenceSetId = request.getCalculation().getReferenceSetId();
+    private ResourceBreakdown calculateResource(ResourceUsage resourceUsage, String referenceSetId) {
         ResourceProfile resourceProfile = resourceProfileLookup
                 .findResourceProfile(referenceSetId, resourceUsage.getResourceName())
                 .orElseThrow(() -> CalculationFailureException.resourceProfileNotFound(
@@ -137,13 +125,7 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
                 .build();
     }
 
-    private void requireSupportedStrategy(CalculateCo2Request request) {
-        if (!POPESCU_RESOURCE_CO2_STRATEGY.equals(request.getCalculation().getStrategy())) {
-            throw CalculationFailureException.unsupportedStrategy(request.getCalculation().getStrategy());
-        }
-    }
-
-    private void requireSupportedKei(CalculateCo2Request request) {
+    private void requireSupportedKei(KeiCalculationRequestedEvent request) {
         if (!CARBON_EMISSIONS_KEI_ID.equals(request.getKei().getId())) {
             throw CalculationFailureException.unsupportedKei(request.getKei().getId());
         }

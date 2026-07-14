@@ -14,7 +14,6 @@ import tools.jackson.databind.ObjectMapper;
 public class KeiCalculationCompletedEventListener {
 
     private final ObjectMapper objectMapper;
-    private final CalculationResultEventMapper calculationResultEventMapper;
     private final EvaluateKeiOperation evaluateKeiOperation;
 
     @RabbitListener(queues = "${runtime.messaging.calculation-result.queue-name}")
@@ -32,7 +31,7 @@ public class KeiCalculationCompletedEventListener {
                 event.getEventId()
         );
 
-        evaluateKeiOperation.process(calculationResultEventMapper.toRequest(event));
+        evaluateKeiOperation.process(event);
     }
 
     private KeiCalculationCompletedEvent readEvent(byte[] payload) {

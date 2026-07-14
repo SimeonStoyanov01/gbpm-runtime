@@ -1,7 +1,6 @@
 package cs.rug.keievaluationservice.infrastructure.messaging.outbound;
 
 import cs.rug.keievaluationservice.api.events.evaluationcompleted.KeiEvaluationCompletedEvent;
-import cs.rug.keievaluationservice.api.events.thresholdviolationdetected.ThresholdViolationDetectedEvent;
 import cs.rug.keievaluationservice.application.out.EvaluationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Message;
@@ -25,15 +24,6 @@ public class RabbitEvaluationEventPublisher implements EvaluationEventPublisher 
         rabbitTemplate.send(
                 properties.getExchangeName(),
                 properties.getEvaluationRoutingKey(),
-                buildJsonMessage(event)
-        );
-    }
-
-    @Override
-    public void publishViolation(ThresholdViolationDetectedEvent event) {
-        rabbitTemplate.send(
-                properties.getExchangeName(),
-                properties.getViolationRoutingKey(),
                 buildJsonMessage(event)
         );
     }

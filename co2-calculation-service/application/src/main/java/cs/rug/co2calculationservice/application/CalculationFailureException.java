@@ -22,13 +22,6 @@ public class CalculationFailureException extends RuntimeException {
         );
     }
 
-    public static CalculationFailureException unsupportedStrategy(String strategy) {
-        return new CalculationFailureException(
-                "UNSUPPORTED_CALCULATION_STRATEGY",
-                "Unsupported calculation strategy: " + strategy
-        );
-    }
-
     public static CalculationFailureException unsupportedKei(String keiId) {
         return new CalculationFailureException(
                 "UNSUPPORTED_KEI",

@@ -20,4 +20,3 @@ runtime:
       events:
         exchange-name: ${RUNTIME_EVALUATION_RESULT_EXCHANGE:runtime.evaluation.events}
         evaluation-routing-key: ${RUNTIME_EVALUATION_RESULT_ROUTING_KEY:kei.evaluation.completed}
-        violation-routing-key: ${RUNTIME_THRESHOLD_VIOLATION_ROUTING_KEY:kei.threshold.violation.detected}

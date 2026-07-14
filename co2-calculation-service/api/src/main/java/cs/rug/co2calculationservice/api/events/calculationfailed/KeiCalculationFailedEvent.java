@@ -1,6 +1,6 @@
 package cs.rug.co2calculationservice.api.events.calculationfailed;
 
-import cs.rug.co2calculationservice.api.model.CalculationDescriptor;
+import cs.rug.co2calculationservice.api.model.CalculationMetadata;
 import cs.rug.co2calculationservice.api.model.CalculationError;
 import cs.rug.co2calculationservice.api.model.EngineExecutionContext;
 import cs.rug.co2calculationservice.api.model.KeiAnnotation;
@@ -17,9 +17,8 @@ import java.time.Instant;
 @AllArgsConstructor
 public class KeiCalculationFailedEvent {
     private String eventId;
-    private String eventType;
     private Instant occurredAt;
-    private CalculationDescriptor calculation;
+    private CalculationMetadata calculation;
     private KeiAnnotation kei;
     private EngineExecutionContext execution;
     private CalculationError error;

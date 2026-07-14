@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CalculationResult {
-    private String status;
     private BigDecimal value;
     private String unit;
 }

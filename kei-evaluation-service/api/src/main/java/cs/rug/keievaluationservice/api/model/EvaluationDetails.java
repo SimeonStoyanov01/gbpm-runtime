@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class EvaluationDetails {
     private String status;
-    private String operator;
     private BigDecimal targetValue;
     private BigDecimal difference;
-    private String unit;
 }
