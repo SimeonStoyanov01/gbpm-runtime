@@ -5,8 +5,5 @@
     "objectId": "OBJ-001",
     "type": "car",
     "material": "steel"
-  },
-  "designApproved": true,
-  "qualityCheckPassed": true,
-  "finalInspectionPassed": true
+  }
 }

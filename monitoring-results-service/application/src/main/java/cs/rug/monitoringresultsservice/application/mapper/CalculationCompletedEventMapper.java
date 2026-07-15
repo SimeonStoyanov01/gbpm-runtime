@@ -1,4 +1,4 @@
-package cs.rug.monitoringresultsservice.infrastructure.messaging.mapper;
+package cs.rug.monitoringresultsservice.application.mapper;
 
 import cs.rug.monitoringresultsservice.api.events.calculationcompleted.KeiCalculationCompletedEvent;
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;

@@ -29,9 +29,7 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
 
     @Override
     public void process(KeiCalculationCompletedEvent event) {
-        Optional<String> validationError = validate(event);
-        if (validationError.isPresent()) {
-            log.warn("Skipping invalid KEI calculation completed event: {}", validationError.get());
+        if (!isValid(event)) {
             return;
         }
 
@@ -90,15 +88,20 @@ public class EvaluateKeiProcessor implements EvaluateKeiOperation {
         }
     }
 
-    private Optional<String> validate(KeiCalculationCompletedEvent event) {
+    private boolean isValid(KeiCalculationCompletedEvent event) {
         Set<ConstraintViolation<KeiCalculationCompletedEvent>> violations = validator.validate(event);
-        if (!violations.isEmpty()) {
-            String message = violations
-                    .stream()
-                    .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
-                    .collect(Collectors.joining("; "));
-            return Optional.of(message);
+        if (violations.isEmpty()) {
+            return true;
         }
-        return Optional.empty();
+
+        log.warn(
+                "Skipping invalid KEI calculation completed event: {}",
+                violations
+                        .stream()
+                        .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                        .sorted()
+                        .collect(Collectors.joining("; "))
+        );
+        return false;
     }
 }

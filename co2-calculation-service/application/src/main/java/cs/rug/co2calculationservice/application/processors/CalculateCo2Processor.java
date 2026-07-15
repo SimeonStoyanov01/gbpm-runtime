@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,6 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
 
     @Override
     public void process(KeiCalculationRequestedEvent request) {
-        Objects.requireNonNull(request, "calculation request must not be null");
         CalculationMetadata calculation = calculationMetadataProvider.calculationMetadata();
 
         try {
@@ -82,6 +80,7 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
             String message = violations
                     .stream()
                     .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                    .sorted()
                     .collect(Collectors.joining("; "));
             throw CalculationFailureException.invalidRequest(message);
         }
