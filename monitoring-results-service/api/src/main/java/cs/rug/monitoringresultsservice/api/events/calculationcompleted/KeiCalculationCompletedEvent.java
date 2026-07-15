@@ -39,6 +39,9 @@ public class KeiCalculationCompletedEvent {
     @NotNull
     private EngineExecutionContext execution;
 
+    @NotBlank
+    private String workObjectType;
+
     @Valid
     @NotNull
     private CalculationResult result;

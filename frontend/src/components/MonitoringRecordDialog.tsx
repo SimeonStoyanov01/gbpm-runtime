@@ -65,6 +65,7 @@ export function MonitoringRecordDialog({ record, onClose }: MonitoringRecordDial
 
           <RecordSection title="Process context">
             <Detail label="Task" value={record.elementName || '-'} />
+            <Detail label="Work object" value={record.workObjectType} />
             <Detail label="Element instance" value={record.elementInstanceKey} mono />
             <Detail label="BPMN process" value={record.bpmnProcessId} />
             <Detail label="Process instance" value={record.processInstanceKey} mono />
@@ -80,22 +81,22 @@ export function MonitoringRecordDialog({ record, onClose }: MonitoringRecordDial
 
           {record.resourceBreakdown && record.resourceBreakdown.length > 0 && (
             <section className="record-section">
-              <h4>Resource contributions</h4>
+              <h4>Resource usage</h4>
               <div className="table-wrap">
                 <table className="resource-breakdown-table">
                   <thead>
                     <tr>
                       <th>Resource</th>
+                      <th>Usage</th>
                       <th>Emission contribution</th>
-                      <th>Share</th>
                     </tr>
                   </thead>
                   <tbody>
                     {record.resourceBreakdown.map((resource, index) => (
                       <tr key={`${resource.resourceName}-${index}`}>
                         <td>{resource.resourceName}</td>
+                        <td>{formatMeasurement(resource.usageValue, resource.usageUnit)}</td>
                         <td>{formatMeasurement(resource.emissionValue, resource.unit)}</td>
-                        <td>{formatContributionShare(resource.emissionValue, record.calculatedValue)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -147,12 +148,4 @@ function RecordSection({ title, children }: RecordSectionProps) {
       <dl className="record-detail-list">{children}</dl>
     </section>
   );
-}
-
-function formatContributionShare(emissionValue: number, calculatedValue?: number): string {
-  if (!calculatedValue) {
-    return '-';
-  }
-
-  return `${((emissionValue / calculatedValue) * 100).toFixed(1)}%`;
 }

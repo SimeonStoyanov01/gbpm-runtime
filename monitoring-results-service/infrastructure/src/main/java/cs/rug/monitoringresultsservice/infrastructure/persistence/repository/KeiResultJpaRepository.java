@@ -5,6 +5,8 @@ import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiAnno
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.KeiResultEntity;
 import cs.rug.monitoringresultsservice.infrastructure.persistence.entity.ProcessInstanceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,11 +25,20 @@ public interface KeiResultJpaRepository extends JpaRepository<KeiResultEntity, U
             Long elementInstanceKey
     );
 
-    List<KeiResultEntity> findByProcessInstanceProcessInstanceKey(Long processInstanceKey);
-
-    List<KeiResultEntity> findByProcessInstanceProcessDefinitionProcessDefinitionKey(Long processDefinitionKey);
-
-    List<KeiResultEntity> findByProcessInstanceProcessDefinitionBpmnProcessId(String bpmnProcessId);
-
-    List<KeiResultEntity> findByEvaluationStatus(String evaluationStatus);
+    @Query("""
+            SELECT result
+            FROM KeiResultEntity result
+            JOIN result.processInstance processInstance
+            JOIN processInstance.processDefinition processDefinition
+            WHERE (:processInstanceKey IS NULL OR processInstance.processInstanceKey = :processInstanceKey)
+              AND (:processDefinitionKey IS NULL OR processDefinition.processDefinitionKey = :processDefinitionKey)
+              AND (:bpmnProcessId IS NULL OR processDefinition.bpmnProcessId = :bpmnProcessId)
+              AND (:evaluationStatus IS NULL OR result.evaluationStatus = :evaluationStatus)
+            """)
+    List<KeiResultEntity> findAllByFilters(
+            @Param("processInstanceKey") Long processInstanceKey,
+            @Param("processDefinitionKey") Long processDefinitionKey,
+            @Param("bpmnProcessId") String bpmnProcessId,
+            @Param("evaluationStatus") String evaluationStatus
+    );
 }

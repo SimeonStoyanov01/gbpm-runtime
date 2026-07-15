@@ -24,6 +24,7 @@ public class EvaluationCompletedEventMapper {
                 .processInstanceKey(calculationEvent.getExecution().getProcessInstanceKey())
                 .elementInstanceKey(calculationEvent.getExecution().getElementInstanceKey())
                 .bpmnElementId(calculationEvent.getExecution().getBpmnElementId())
+                .workObjectType(calculationEvent.getWorkObjectType())
                 .keiId(calculationEvent.getKei().getId())
                 .calculatedValue(calculationEvent.getResult().getValue())
                 .calculatedUnit(calculationEvent.getResult().getUnit())

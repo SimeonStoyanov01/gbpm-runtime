@@ -40,6 +40,12 @@ public class KeiResourceBreakdownEntity {
     @Column(name = "resource_name", nullable = false)
     private String resourceName;
 
+    @Column(name = "usage_value", precision = 19, scale = 6)
+    private BigDecimal usageValue;
+
+    @Column(name = "usage_unit")
+    private String usageUnit;
+
     @Column(name = "emission_value", nullable = false, precision = 19, scale = 6)
     private BigDecimal emissionValue;
 

@@ -1,6 +1,7 @@
 package cs.rug.monitoringresultsservice.infrastructure.persistence.adapter;
 
 import cs.rug.monitoringresultsservice.api.exceptions.ProcessInstanceNotFoundException;
+import cs.rug.monitoringresultsservice.api.model.EvaluationStatus;
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.model.ResourceBreakdown;
 import cs.rug.monitoringresultsservice.api.operations.findactiveviolations.FindActiveViolationsRequest;
@@ -32,8 +33,6 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class JpaMonitoringRecordStore implements MonitoringRecordStore {
-
-    private static final String EVALUATION_STATUS_VIOLATED = "VIOLATED";
 
     private final ProcessDefinitionJpaRepository processDefinitionRepository;
     private final ProcessInstanceJpaRepository processInstanceRepository;
@@ -84,9 +83,13 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
     @Transactional(readOnly = true)
     public List<MonitoringRecord> findMonitoringRecords(FindMonitoringRecordsRequest request) {
         return keiResultRepository
-                .findAll()
+                .findAllByFilters(
+                        request.getProcessInstanceKey(),
+                        request.getProcessDefinitionKey(),
+                        request.getBpmnProcessId(),
+                        request.getEvaluationStatus()
+                )
                 .stream()
-                .filter(result -> matchesMonitoringFilter(result, request))
                 .map(monitoringResultMapper::toMonitoringRecord)
                 .toList();
     }
@@ -95,9 +98,13 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
     @Transactional(readOnly = true)
     public List<MonitoringRecord> findActiveViolations(FindActiveViolationsRequest request) {
         return keiResultRepository
-                .findByEvaluationStatus(EVALUATION_STATUS_VIOLATED)
+                .findAllByFilters(
+                        null,
+                        request.getProcessDefinitionKey(),
+                        request.getBpmnProcessId(),
+                        EvaluationStatus.VIOLATED.name()
+                )
                 .stream()
-                .filter(result -> matchesViolationFilter(result, request))
                 .map(monitoringResultMapper::toMonitoringRecord)
                 .toList();
     }
@@ -110,7 +117,12 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
                 .orElseThrow(() -> new ProcessInstanceNotFoundException(request.getProcessInstanceKey()));
         ProcessDefinitionEntity processDefinition = processInstance.getProcessDefinition();
         List<MonitoringRecord> records = keiResultRepository
-                .findByProcessInstanceProcessInstanceKey(processInstance.getProcessInstanceKey())
+                .findAllByFilters(
+                        processInstance.getProcessInstanceKey(),
+                        null,
+                        null,
+                        null
+                )
                 .stream()
                 .map(monitoringResultMapper::toMonitoringRecord)
                 .toList();
@@ -125,7 +137,7 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
                 .records(records)
                 .violations(records
                         .stream()
-                        .filter(record -> EVALUATION_STATUS_VIOLATED.equals(record.getEvaluationStatus()))
+                        .filter(record -> EvaluationStatus.VIOLATED.name().equals(record.getEvaluationStatus()))
                         .toList())
                 .build();
     }
@@ -204,6 +216,7 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
         entity.setCalculatorId(record.getCalculatorId());
         entity.setCalculationMethod(record.getCalculationMethod());
         entity.setReferenceSetId(record.getReferenceSetId());
+        entity.setWorkObjectType(record.getWorkObjectType());
         entity.setCalculationEventId(record.getCalculationEventId());
         entity.setCalculatedValue(record.getCalculatedValue());
         entity.setCalculatedUnit(record.getCalculatedUnit());
@@ -227,6 +240,7 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
         entity.setCalculatorId(record.getCalculatorId());
         entity.setCalculationMethod(record.getCalculationMethod());
         entity.setReferenceSetId(record.getReferenceSetId());
+        entity.setWorkObjectType(record.getWorkObjectType());
         entity.setCalculationEventId(record.getCalculationEventId());
         entity.setEvaluationEventId(record.getEvaluationEventId());
         entity.setCalculatedValue(record.getCalculatedValue());
@@ -255,36 +269,12 @@ public class JpaMonitoringRecordStore implements MonitoringRecordStore {
                         .builder()
                         .keiResult(result)
                         .resourceName(resource.getResourceName())
+                        .usageValue(resource.getUsageValue())
+                        .usageUnit(resource.getUsageUnit())
                         .emissionValue(resource.getEmissionValue())
                         .unit(resource.getUnit())
                         .build())
                 .toList());
     }
 
-    private boolean matchesMonitoringFilter(KeiResultEntity result, FindMonitoringRecordsRequest request) {
-        return matches(request.getProcessInstanceKey(), result.getProcessInstance().getProcessInstanceKey())
-                && matches(
-                        request.getProcessDefinitionKey(),
-                        result.getProcessInstance().getProcessDefinition().getProcessDefinitionKey()
-                )
-                && matches(
-                        request.getBpmnProcessId(),
-                        result.getProcessInstance().getProcessDefinition().getBpmnProcessId()
-                )
-                && matches(request.getEvaluationStatus(), result.getEvaluationStatus());
-    }
-
-    private boolean matchesViolationFilter(KeiResultEntity result, FindActiveViolationsRequest request) {
-        return matches(
-                request.getProcessDefinitionKey(),
-                result.getProcessInstance().getProcessDefinition().getProcessDefinitionKey()
-        ) && matches(
-                request.getBpmnProcessId(),
-                result.getProcessInstance().getProcessDefinition().getBpmnProcessId()
-        );
-    }
-
-    private boolean matches(Object filterValue, Object recordValue) {
-        return filterValue == null || filterValue.equals(recordValue);
-    }
 }

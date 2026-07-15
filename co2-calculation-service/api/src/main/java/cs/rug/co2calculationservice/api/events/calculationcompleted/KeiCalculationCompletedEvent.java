@@ -23,6 +23,7 @@ public class KeiCalculationCompletedEvent {
     private CalculationMetadata calculation;
     private KeiAnnotation kei;
     private EngineExecutionContext execution;
+    private String workObjectType;
     private CalculationResult result;
     private List<ResourceBreakdown> resourceBreakdown;
 }

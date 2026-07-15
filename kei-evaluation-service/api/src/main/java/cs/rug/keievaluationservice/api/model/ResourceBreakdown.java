@@ -19,6 +19,12 @@ public class ResourceBreakdown {
     private String resourceName;
 
     @NotNull
+    private BigDecimal usageValue;
+
+    @NotBlank
+    private String usageUnit;
+
+    @NotNull
     private BigDecimal emissionValue;
 
     @NotBlank

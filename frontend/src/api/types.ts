@@ -60,6 +60,7 @@ export type MonitoringRecord = {
   elementInstanceKey?: number;
   bpmnElementId?: string;
   elementName?: string;
+  workObjectType?: string;
   keiId?: string;
   calculatedValue?: number;
   calculatedUnit?: string;
@@ -73,6 +74,8 @@ export type MonitoringRecord = {
 
 export type ResourceBreakdown = {
   resourceName: string;
+  usageValue?: number;
+  usageUnit?: string;
   emissionValue: number;
   unit: string;
 };

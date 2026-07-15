@@ -32,6 +32,7 @@ public class MonitoringResultEntityMapper {
                 .elementInstanceKey(entity.getElementInstanceKey())
                 .bpmnElementId(bpmnElement.getBpmnElementId())
                 .elementName(bpmnElement.getElementName())
+                .workObjectType(entity.getWorkObjectType())
                 .keiId(keiAnnotation.getKeiId())
                 .calculatedValue(entity.getCalculatedValue())
                 .calculatedUnit(entity.getCalculatedUnit())
@@ -45,6 +46,8 @@ public class MonitoringResultEntityMapper {
                         .map(resource -> ResourceBreakdown
                                 .builder()
                                 .resourceName(resource.getResourceName())
+                                .usageValue(resource.getUsageValue())
+                                .usageUnit(resource.getUsageUnit())
                                 .emissionValue(resource.getEmissionValue())
                                 .unit(resource.getUnit())
                                 .build())

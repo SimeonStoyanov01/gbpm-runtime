@@ -15,5 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class EngineTaskCompletedEvent {
     private EngineExecutionContext execution;
+    private String workObjectType;
     private List<ResourceUsage> resourceUsages;
 }

@@ -84,6 +84,7 @@ public class CreateKeiObservationProcessor implements CreateKeiObservationOperat
             KeiCalculationRequestedEvent calculationEvent = keiCalculationRequestedEventFactory.create(
                     event.getExecution(),
                     keiAnnotation,
+                    event.getWorkObjectType(),
                     resourceUsages
             );
 

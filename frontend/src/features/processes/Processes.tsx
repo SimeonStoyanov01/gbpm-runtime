@@ -12,10 +12,20 @@ import { Endpoint } from '../../components/Endpoint';
 import { Panel } from '../../components/Panel';
 import { StatusBadge } from '../../components/StatusBadge';
 
+const EXAMPLE_PROCESS_VARIABLES = JSON.stringify({
+  caseId: 'CASE-001',
+  orderId: 'ORD-2041',
+  workObject: {
+    objectId: 'OBJ-001',
+    type: 'car',
+    material: 'steel',
+  },
+}, null, 2);
+
 export function Processes() {
   const [deployment, setDeployment] = useState<DeployProcessResponse>();
   const [processDefinitionKey, setProcessDefinitionKey] = useState('');
-  const [variablesJson, setVariablesJson] = useState('{}');
+  const [variablesJson, setVariablesJson] = useState(EXAMPLE_PROCESS_VARIABLES);
   const [startedInstance, setStartedInstance] = useState<StartProcessInstanceResponse>();
   const [keiResponse, setKeiResponse] = useState<FindProcessKeisResponse>();
   const [activeUserTasks, setActiveUserTasks] = useState<ActiveUserTask[]>([]);
@@ -61,7 +71,6 @@ export function Processes() {
     try {
       const response = await deployProcess(file);
       setDeployment(response);
-      setProcessDefinitionKey(response.processDefinitionKey);
     } catch (exception) {
       setError(exception instanceof Error ? exception.message : 'Deployment failed.');
     } finally {
@@ -82,7 +91,7 @@ export function Processes() {
     }
   }
 
-  async function handleFindKeis() {
+  async function findKeis(processDefinitionKey: string) {
     if (!processDefinitionKey) {
       setError('Process definition key is required.');
       return;
@@ -135,7 +144,13 @@ export function Processes() {
             />
           )}
           <div className="button-row">
-            <button className="secondary" disabled={!deployment || busy} onClick={handleFindKeis}>View KEIs</button>
+            <button
+              className="secondary"
+              disabled={!deployment || busy}
+              onClick={() => findKeis(deployment?.processDefinitionKey || '')}
+            >
+              View KEIs
+            </button>
             <button className="secondary" disabled={!deployment || busy} onClick={() => setProcessDefinitionKey(deployment?.processDefinitionKey || '')}>
               Use key for start form
             </button>
@@ -151,6 +166,9 @@ export function Processes() {
             <div>
               <label>Variables JSON</label>
               <textarea value={variablesJson} onChange={(event) => setVariablesJson(event.target.value)} />
+              {variablesJson === EXAMPLE_PROCESS_VARIABLES && (
+                <p className="hint">Example payload for testing. Edit it to match the deployed process.</p>
+              )}
             </div>
             <button disabled={!processDefinitionKey || busy} onClick={handleStart}>Start process instance</button>
           </div>
@@ -212,7 +230,13 @@ export function Processes() {
 
       <Panel title="KEI Annotations" action={<Endpoint>GET :8080 /api/process-definitions/{'{key}'}/keis</Endpoint>}>
         <div className="button-row" style={{ marginTop: 0, marginBottom: 16 }}>
-          <button className="secondary" disabled={!processDefinitionKey || busy} onClick={handleFindKeis}>Refresh KEIs</button>
+          <button
+            className="secondary"
+            disabled={!processDefinitionKey || busy}
+            onClick={() => findKeis(processDefinitionKey)}
+          >
+            Refresh KEIs
+          </button>
         </div>
         <KeiTable elements={keiResponse?.elementKeiAnnotations || []} />
       </Panel>

@@ -25,6 +25,7 @@ public class CalculationCompletedEventFactory {
                 .calculation(calculation)
                 .kei(request.getKei())
                 .execution(request.getExecution())
+                .workObjectType(request.getWorkObjectType())
                 .result(CalculationResult
                         .builder()
                         .value(outcome.getValue())

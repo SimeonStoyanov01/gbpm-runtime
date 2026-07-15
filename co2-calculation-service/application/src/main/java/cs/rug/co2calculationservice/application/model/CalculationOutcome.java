@@ -9,8 +9,6 @@ import java.util.List;
 @Getter
 public class CalculationOutcome {
 
-    private static final String RESULT_UNIT = "kg";
-
     private final BigDecimal value;
     private final String unit;
     private final List<ResourceBreakdown> resourceBreakdown;
@@ -27,11 +25,12 @@ public class CalculationOutcome {
 
     public static CalculationOutcome succeeded(
             BigDecimal value,
+            String unit,
             List<ResourceBreakdown> resourceBreakdown
     ) {
         return new CalculationOutcome(
                 value,
-                RESULT_UNIT,
+                unit,
                 resourceBreakdown
         );
     }

@@ -100,6 +100,7 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
 
         return CalculationOutcome.succeeded(
                 total.setScale(RESULT_SCALE, RoundingMode.HALF_UP),
+                RESULT_UNIT,
                 breakdown
         );
     }
@@ -132,6 +133,8 @@ public class CalculateCo2Processor implements CalculateCo2Operation {
         return ResourceBreakdown
                 .builder()
                 .resourceName(resourceUsage.getResourceName())
+                .usageValue(timeUsed)
+                .usageUnit(resourceUsage.getUnit())
                 .emissionValue(emissionValue)
                 .unit(RESULT_UNIT)
                 .build();

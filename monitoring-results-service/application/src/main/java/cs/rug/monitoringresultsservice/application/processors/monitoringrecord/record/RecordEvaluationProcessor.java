@@ -1,6 +1,7 @@
 package cs.rug.monitoringresultsservice.application.processors.monitoringrecord.record;
 
 import cs.rug.monitoringresultsservice.api.events.evaluationcompleted.KeiEvaluationCompletedEvent;
+import cs.rug.monitoringresultsservice.api.model.EvaluationStatus;
 import cs.rug.monitoringresultsservice.api.model.MonitoringRecord;
 import cs.rug.monitoringresultsservice.api.operations.recordevaluation.RecordEvaluationOperation;
 import cs.rug.monitoringresultsservice.application.mapper.EvaluationCompletedEventMapper;
@@ -17,8 +18,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RecordEvaluationProcessor implements RecordEvaluationOperation {
-
-    private static final String EVALUATION_STATUS_VIOLATED = "VIOLATED";
 
     private final MonitoringRecordStore monitoringRecordStore;
     private final MonitoringUpdatePublisher monitoringUpdatePublisher;
@@ -42,7 +41,7 @@ public class RecordEvaluationProcessor implements RecordEvaluationOperation {
         );
 
         monitoringUpdatePublisher.publishEvaluationUpdate(savedRecord);
-        if (EVALUATION_STATUS_VIOLATED.equals(savedRecord.getEvaluationStatus())) {
+        if (EvaluationStatus.VIOLATED.name().equals(savedRecord.getEvaluationStatus())) {
             monitoringUpdatePublisher.publishViolationUpdate(savedRecord);
         }
     }

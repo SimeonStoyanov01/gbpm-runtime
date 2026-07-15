@@ -82,6 +82,9 @@ public class KeiResultEntity {
     @Column(name = "reference_set_id")
     private String referenceSetId;
 
+    @Column(name = "work_object_type")
+    private String workObjectType;
+
     @Column(name = "calculation_event_id", unique = true)
     private String calculationEventId;
 

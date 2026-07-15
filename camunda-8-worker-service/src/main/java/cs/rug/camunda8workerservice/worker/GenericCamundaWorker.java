@@ -34,14 +34,20 @@ public class GenericCamundaWorker {
             autoComplete = false
     )
     public void handleJob(JobClient jobClient, ActivatedJob job) {
-        CreateExecutionRunResponse executionRun = createExecutionRun(job);
+        Map<String, Object> variables = job.getVariablesAsMap();
+        WorkObject workObject = readRequiredValue(
+                variables,
+                camundaWorkerProperties.getWorkObjectVariable(),
+                WorkObject.class
+        );
+        CreateExecutionRunResponse executionRun = createExecutionRun(job, variables, workObject);
 
         if (!isSuccessful(executionRun)) {
             throw new IllegalStateException("Operational execution did not complete successfully: "
                     + executionRun.getStatus());
         }
 
-        EngineTaskCompletedEvent event = buildEngineTaskCompletedEvent(job, executionRun);
+        EngineTaskCompletedEvent event = buildEngineTaskCompletedEvent(job, executionRun, workObject.getType());
         engineTaskCompletedEventPublisher.publish(event);
 
         jobClient
@@ -57,9 +63,11 @@ public class GenericCamundaWorker {
         );
     }
 
-    private CreateExecutionRunResponse createExecutionRun(ActivatedJob job) {
-        Map<String, Object> variables = job.getVariablesAsMap();
-
+    private CreateExecutionRunResponse createExecutionRun(
+            ActivatedJob job,
+            Map<String, Object> variables,
+            WorkObject workObject
+    ) {
         return mockOperationalServiceClient.createExecutionRun(CreateExecutionRunRequest
                 .builder()
                 .orderId(readOptionalString(
@@ -68,11 +76,7 @@ public class GenericCamundaWorker {
                         String.valueOf(job.getProcessInstanceKey())
                 ))
                 .bpmnElementId(job.getElementId())
-                .workObject(readRequiredValue(
-                        variables,
-                        camundaWorkerProperties.getWorkObjectVariable(),
-                        WorkObject.class
-                ))
+                .workObject(workObject)
                 .build());
     }
 
@@ -82,7 +86,8 @@ public class GenericCamundaWorker {
 
     private EngineTaskCompletedEvent buildEngineTaskCompletedEvent(
             ActivatedJob job,
-            CreateExecutionRunResponse executionRun
+            CreateExecutionRunResponse executionRun,
+            String workObjectType
     ) {
         return EngineTaskCompletedEvent
                 .builder()
@@ -95,6 +100,7 @@ public class GenericCamundaWorker {
                         .elementInstanceKey(job.getElementInstanceKey())
                         .bpmnElementId(job.getElementId())
                         .build())
+                .workObjectType(workObjectType)
                 .resourceUsages(executionRun.getResourceUsages() == null
                         ? List.of()
                         : executionRun.getResourceUsages())

@@ -26,6 +26,7 @@ public class MonitoringRecord {
     private Long elementInstanceKey;
     private String bpmnElementId;
     private String elementName;
+    private String workObjectType;
     private String keiId;
     private BigDecimal calculatedValue;
     private String calculatedUnit;

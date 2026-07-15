@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ResourceBreakdown {
     private String resourceName;
+    private BigDecimal usageValue;
+    private String usageUnit;
     private BigDecimal emissionValue;
     private String unit;
 }

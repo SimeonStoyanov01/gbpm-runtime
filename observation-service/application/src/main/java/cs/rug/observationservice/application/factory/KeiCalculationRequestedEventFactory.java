@@ -15,12 +15,14 @@ public class KeiCalculationRequestedEventFactory {
     public KeiCalculationRequestedEvent create(
             EngineExecutionContext execution,
             KeiAnnotation keiAnnotation,
+            String workObjectType,
             List<ResourceUsage> resourceUsages
     ) {
         return KeiCalculationRequestedEvent
                 .builder()
                 .kei(keiAnnotation)
                 .execution(execution)
+                .workObjectType(workObjectType)
                 .inputs(CalculationInputs
                         .builder()
                         .resourceUsages(resourceUsages)

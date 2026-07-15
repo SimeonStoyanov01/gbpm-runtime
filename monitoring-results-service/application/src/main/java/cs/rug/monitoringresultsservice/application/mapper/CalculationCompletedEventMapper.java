@@ -20,6 +20,7 @@ public class CalculationCompletedEventMapper {
                 .processInstanceKey(event.getExecution().getProcessInstanceKey())
                 .elementInstanceKey(event.getExecution().getElementInstanceKey())
                 .bpmnElementId(event.getExecution().getBpmnElementId())
+                .workObjectType(event.getWorkObjectType())
                 .keiId(event.getKei().getId())
                 .calculatedValue(event.getResult().getValue())
                 .calculatedUnit(event.getResult().getUnit())
