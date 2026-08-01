@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: kei-evaluation-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
+
+server:
+  port: ${SERVER_PORT:8093}
+
+runtime:
+  messaging:
+    calculation-result:
+      exchange-name: ${RUNTIME_CALCULATION_RESULT_EXCHANGE:runtime.calculation.events}
+      routing-key: ${RUNTIME_CALCULATION_RESULT_ROUTING_KEY:kei.calculation.completed}
+      queue-name: ${RUNTIME_EVALUATION_CALCULATION_RESULT_QUEUE:runtime.evaluation.kei-calculation-completed}
+    evaluation:
+      events:
+        exchange-name: ${RUNTIME_EVALUATION_RESULT_EXCHANGE:runtime.evaluation.events}
+        evaluation-routing-key: ${RUNTIME_EVALUATION_RESULT_ROUTING_KEY:kei.evaluation.completed}

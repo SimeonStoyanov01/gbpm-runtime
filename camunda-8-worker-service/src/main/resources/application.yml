@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: camunda-8-worker-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  main:
+    web-application-type: none
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
+
+camunda:
+  client:
+    mode: self-managed
+    auth:
+      method: none
+    rest-address: ${CAMUNDA_REST_ADDRESS:http://localhost:8088}
+    grpc-address: ${CAMUNDA_GRPC_ADDRESS:http://localhost:26500}
+
+camunda8worker:
+  worker:
+    engine-type: ${CAMUNDA8_WORKER_ENGINE_TYPE:CAMUNDA_8}
+    successful-status: ${CAMUNDA8_WORKER_SUCCESSFUL_STATUS:COMPLETED}
+    order-id-variable: ${CAMUNDA8_WORKER_ORDER_ID_VARIABLE:orderId}
+    work-object-variable: ${CAMUNDA8_WORKER_WORK_OBJECT_VARIABLE:workObject}
+  clients:
+    mock-operational-service:
+      url: ${MOCK_OPERATIONAL_SERVICE_URL:http://localhost:8091}
+  messaging:
+    engine-task-completed:
+      exchange-name: ${CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE:runtime.camunda8.events}
+      routing-key: ${CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY:engine.task.completed}

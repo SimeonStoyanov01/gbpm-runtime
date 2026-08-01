@@ -1,0 +1,127 @@
+# Local Camunda 8 runtime and Runtime Camunda adapter services.
+name: runtime-camunda8-local
+
+services:
+  orchestration:
+    image: camunda/camunda:${CAMUNDA_VERSION}
+    container_name: orchestration
+    ports:
+      - "8088:8080"
+      - "26500:26500"
+      - "9600:9600"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/9600 && echo -e \"GET /actuator/health/status HTTP/1.1\r\nHost: localhost\r\n\r\n\" >&3 && head -n 1 <&3'"]
+      interval: 1s
+      retries: 30
+      start_period: 30s
+    volumes:
+      - zeebe:/usr/local/zeebe/data
+    configs:
+      - source: orchestration-config
+        target: /usr/local/camunda/config/application.yaml
+    networks:
+      - runtime-local
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - logger.org.elasticsearch.deprecation="OFF"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cat/health | grep -q green"]
+      interval: 1s
+      retries: 30
+      start_period: 30s
+      timeout: 1s
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+    networks:
+      - runtime-local
+
+  camunda-8-integration:
+    build:
+      context: ../../../camunda-8-integration
+      dockerfile: Dockerfile
+    container_name: camunda-8-integration
+    ports:
+      - "8090:8090"
+    environment:
+      SERVER_PORT: 8090
+      CAMUNDA_REST_ADDRESS: http://orchestration:8080
+      CAMUNDA_GRPC_ADDRESS: http://orchestration:26500
+    depends_on:
+      orchestration:
+        condition: service_healthy
+    networks:
+      - runtime-local
+
+  camunda-8-worker-service:
+    build:
+      context: ../../../camunda-8-worker-service
+      dockerfile: Dockerfile
+    container_name: camunda-8-worker-service
+    environment:
+      CAMUNDA_REST_ADDRESS: http://orchestration:8080
+      CAMUNDA_GRPC_ADDRESS: http://orchestration:26500
+      MOCK_OPERATIONAL_SERVICE_URL: http://mock-operational-service:8091
+      RABBITMQ_HOST: runtime-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: runtime
+      RABBITMQ_PASSWORD: runtime
+      CAMUNDA8_ENGINE_TASK_COMPLETED_EXCHANGE: runtime.camunda8.events
+      CAMUNDA8_ENGINE_TASK_COMPLETED_ROUTING_KEY: engine.task.completed
+    depends_on:
+      orchestration:
+        condition: service_healthy
+    networks:
+      - runtime-local
+
+volumes:
+  zeebe:
+  elastic:
+
+networks:
+  runtime-local:
+    external: true
+
+configs:
+  orchestration-config:
+    content: |
+      management.endpoints.configprops.show-values: always
+      camunda:
+        system:
+          cpu-thread-count: "3"
+          io-thread-count: "3"
+        security:
+          authentication:
+            method: "basic"
+            unprotectedApi: true
+          authorizations:
+            enabled: false
+          initialization:
+            users:
+              - username: "demo"
+                password: "demo"
+                name: "Demo User"
+                email: "demo@demo.com"
+            defaultRoles.admin.users:
+              - "demo"
+        database.index.numberOfReplicas: 0
+        data:
+          secondary-storage:
+            type: elasticsearch
+            elasticsearch:
+              cluster-name: elasticsearch
+              url: "http://elasticsearch:9200"

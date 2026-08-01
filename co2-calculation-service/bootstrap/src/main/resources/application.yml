@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: co2-calculation-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: ${SERVER_PORT:8092}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
+  datasource:
+    url: ${CO2_CALCULATION_DATASOURCE_URL:jdbc:postgresql://localhost:5432/co2_calculation}
+    username: ${CO2_CALCULATION_DATASOURCE_USERNAME:co2_calculation}
+    password: ${CO2_CALCULATION_DATASOURCE_PASSWORD:co2_calculation}
+  jpa:
+    hibernate:
+      ddl-auto: ${CO2_CALCULATION_JPA_DDL_AUTO:none}
+    open-in-view: false
+  sql:
+    init:
+      mode: ${CO2_CALCULATION_SQL_INIT_MODE:always}
+
+runtime:
+  calculation:
+    calculator-id: ${CO2_CALCULATION_CALCULATOR_ID:example_co2_calculator}
+    calculation-method: ${CO2_CALCULATION_METHOD:popescu_resource_co2}
+    reference-set-id: ${CO2_CALCULATION_REFERENCE_SET_ID:popescu-demo-v1}
+  messaging:
+    calculation-request:
+      exchange-name: ${RUNTIME_CALCULATION_REQUEST_EXCHANGE:runtime.observation.events}
+      routing-key: ${RUNTIME_CALCULATION_REQUEST_ROUTING_KEY:kei.calculation.requested.carbon-emissions}
+      queue-name: ${RUNTIME_CALCULATION_REQUEST_QUEUE:runtime.co2-calculation.kei-calculation-requested}
+    calculation-result:
+      exchange-name: ${RUNTIME_CALCULATION_RESULT_EXCHANGE:runtime.calculation.events}
+      completed-routing-key: ${RUNTIME_CALCULATION_RESULT_COMPLETED_ROUTING_KEY:kei.calculation.completed}
+      failed-routing-key: ${RUNTIME_CALCULATION_RESULT_FAILED_ROUTING_KEY:kei.calculation.failed}

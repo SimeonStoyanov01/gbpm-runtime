@@ -1,0 +1,69 @@
+name: runtime-infra-local
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: runtime-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: runtime
+      RABBITMQ_DEFAULT_PASS: runtime
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - runtime-local
+
+  co2-calculation-postgres:
+    image: postgres:16
+    container_name: co2-calculation-postgres
+    environment:
+      POSTGRES_DB: co2_calculation
+      POSTGRES_USER: co2_calculation
+      POSTGRES_PASSWORD: co2_calculation
+    ports:
+      - "5432:5432"
+    volumes:
+      - co2-calculation-postgres-data:/var/lib/postgresql/data
+      - ../../../co2-calculation-service/bootstrap/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U co2_calculation -d co2_calculation"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - runtime-local
+
+  monitoring-results-postgres:
+    image: postgres:16
+    container_name: monitoring-results-postgres
+    environment:
+      POSTGRES_DB: monitoring_results
+      POSTGRES_USER: monitoring_results
+      POSTGRES_PASSWORD: monitoring_results
+    ports:
+      - "5434:5432"
+    volumes:
+      - monitoring-results-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U monitoring_results -d monitoring_results"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - runtime-local
+
+volumes:
+  rabbitmq-data:
+  co2-calculation-postgres-data:
+  monitoring-results-postgres-data:
+
+networks:
+  runtime-local:
+    external: true

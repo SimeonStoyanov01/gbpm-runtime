@@ -32,6 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
+**/target/
 
 .env
 *.env
@@ -40,6 +41,11 @@ build/
 *.log
 logs/
 
+/deploy/local/evaluation/
+docs/
+
 ### OS ###
 .DS_Store
 Thumbs.db
+*.mp4
+!figures/Env_monitoring_system_video_guide.mp4

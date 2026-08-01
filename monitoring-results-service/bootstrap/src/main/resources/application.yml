@@ -1,0 +1,34 @@
+server:
+  port: ${MONITORING_RESULTS_SERVICE_PORT:8094}
+
+spring:
+  application:
+    name: monitoring-results-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:runtime}
+    password: ${RABBITMQ_PASSWORD:runtime}
+  datasource:
+    url: ${MONITORING_RESULTS_DATASOURCE_URL:jdbc:postgresql://localhost:5434/monitoring_results}
+    username: ${MONITORING_RESULTS_DATASOURCE_USERNAME:monitoring_results}
+    password: ${MONITORING_RESULTS_DATASOURCE_PASSWORD:monitoring_results}
+  jpa:
+    hibernate:
+      ddl-auto: ${MONITORING_RESULTS_JPA_DDL_AUTO:update}
+    open-in-view: false
+    properties:
+      hibernate:
+        schema_update:
+          unique_constraint_strategy: RECREATE_QUIETLY
+
+runtime:
+  messaging:
+    calculation-result:
+      exchange-name: ${RUNTIME_CALCULATION_RESULT_EXCHANGE:runtime.calculation.events}
+      routing-key: ${RUNTIME_CALCULATION_RESULT_ROUTING_KEY:kei.calculation.completed}
+      queue-name: ${RUNTIME_MONITORING_CALCULATION_RESULT_QUEUE:runtime.monitoring.kei-calculation-completed}
+    evaluation-result:
+      exchange-name: ${RUNTIME_EVALUATION_RESULT_EXCHANGE:runtime.evaluation.events}
+      routing-key: ${RUNTIME_EVALUATION_RESULT_ROUTING_KEY:kei.evaluation.completed}
+      queue-name: ${RUNTIME_MONITORING_EVALUATION_RESULT_QUEUE:runtime.monitoring.kei-evaluation-completed}

@@ -1,0 +1,9 @@
+{
+  "caseId": "CASE-001",
+  "orderId": "ORD-2041",
+  "workObject": {
+    "objectId": "OBJ-001",
+    "type": "car",
+    "material": "steel"
+  }
+}

@@ -1,0 +1,146 @@
+[
+  {
+    "bpmnElementId": "Activity_04tru70",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_04tru70",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.08,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_15oxmp3",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_15oxmp3",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_0vfi00b",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.5,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_0vfi00b",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.25,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_08xdevs",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 4.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_08xdevs",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1d0ugzo",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 3.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1d0ugzo",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.5,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1g2fx8l",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1g2fx8l",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.5,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_06mjrx1",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 2.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_06mjrx1",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.0,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1u7lv5m",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.75,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_1u7lv5m",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.375,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_09k6v2k",
+    "objectType": "car",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 1.5,
+    "unit": "hour"
+  },
+  {
+    "bpmnElementId": "Activity_09k6v2k",
+    "objectType": "motorbike",
+    "material": "steel",
+    "resourceName": "Welder",
+    "timeUsed": 0.75,
+    "unit": "hour"
+  }
+]
