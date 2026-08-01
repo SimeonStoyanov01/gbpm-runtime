@@ -32,7 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-codex-instructions/
 **/target/
 
 .env
@@ -49,3 +48,4 @@ docs/
 .DS_Store
 Thumbs.db
 *.mp4
+!figures/Env_monitoring_system_video_guide.mp4

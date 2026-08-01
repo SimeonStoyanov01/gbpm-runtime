@@ -1,6 +1,6 @@
 # Environmental Monitoring Prototype
 
-Runtime is a prototype for connecting BPMN-level Key Environmental Indicator (KEI) metadata to process execution. It deploys BPMN4ES-annotated process models to a Workflow Enigne(Camunda 8), observes selected service-task executions, calculates environmental values from runtime resource usage, evaluates optional targets, and exposes the resulting monitoring state through REST and WebSocket interfaces.
+This repository contains a prototype for connecting BPMN-level Key Environmental Indicator (KEI) metadata to process execution. It deploys BPMN4ES-annotated process models to a workflow engine (Camunda 8), observes selected service-task executions, calculates environmental values from runtime resource usage, evaluates optional targets, and exposes the resulting monitoring state through REST and WebSocket interfaces.
 
 The workflow engine remains responsible for process orchestration. KEI interpretation, environmental calculation, threshold evaluation, persistence, and visualization are performed by services outside the engine.
 
@@ -25,7 +25,7 @@ The workflow engine remains responsible for process orchestration. KEI interpret
 
 The prototype separates workflow-engine integration from environmental monitoring. The main boundaries and their relationships are shown in the high-level system-context view:
 
-System Context View
+![System context of the Environmental Monitoring System](figures/GBPMRuntime-System-Context.png)
 
 ### Runtime Flow
 
@@ -60,7 +60,7 @@ The resulting runtime metadata is stored by Monitoring Results. Process Registry
 
 ### Mock Execution Data
 
-The Camunda worker does not invent environmental inputs. It sends the BPMN element ID and the process `workObject` to Mock Operational Service. That service matches the request against `[mock-execution-runs.json](mock-operational-service/infrastructure/src/main/resources/mock-execution-runs.json)` and returns the resources used, usage values, and units.
+The Camunda worker sends the BPMN element ID and the process `workObject` to Mock Operational Service. That service matches the request against [`mock-execution-runs.json`](mock-operational-service/infrastructure/src/main/resources/mock-execution-runs.json) and returns the resources used, usage values, and units.
 
 This represents the prototype's mocked data-collection boundary. Production sensors and an environmental knowledge base are outside this repository.
 
@@ -137,7 +137,7 @@ All backend event routes use durable RabbitMQ topic exchanges and JSON payloads.
 | Observation      | `runtime.observation.events` | `kei.calculation.requested.<keiId>` | KEI-specific calculator queue                               | Route each observed KEI to a calculator. The CO2 route uses `kei.calculation.requested.carbon-emissions`. |
 | CO2 Calculation  | `runtime.calculation.events` | `kei.calculation.completed`         | `runtime.evaluation.kei-calculation-completed` / Evaluation | Evaluate successful calculations that have targets.                                                       |
 | CO2 Calculation  | `runtime.calculation.events` | `kei.calculation.completed`         | `runtime.monitoring.kei-calculation-completed` / Monitoring | Persist successful targetless calculations.                                                               |
-| CO2 Calculation  | `runtime.calculation.events` | `kei.calculation.failed`            | No queue in the current local stack                         | Publish calculation failure details for an interested consumer.                                           |
+| CO2 Calculation  | `runtime.calculation.events` | `kei.calculation.failed`            | No queue in the current local stack                         | Emit calculation failure details; the local deployment has no consumer for this route.                     |
 | KEI Evaluation   | `runtime.evaluation.events`  | `kei.evaluation.completed`          | `runtime.monitoring.kei-evaluation-completed` / Monitoring  | Persist threshold evaluation results and expose violations.                                               |
 
 
@@ -158,7 +158,7 @@ The `co2_calculation` PostgreSQL database stores calculator inputs, not monitori
 | `emission_factors`  | Emission factor and fuel unit for a reference set and fuel type.           |
 
 
-`[schema.sql](co2-calculation-service/bootstrap/src/main/resources/schema.sql)` creates and seeds these tables. Spring runs it on local service startup; PostgreSQL also runs it when the Docker volume is first initialized.
+[`schema.sql`](co2-calculation-service/bootstrap/src/main/resources/schema.sql) creates and seeds these tables. Spring runs it on local service startup; PostgreSQL also runs it when the Docker volume is first initialized.
 
 ### Monitoring Database
 
@@ -314,7 +314,7 @@ Each service README also contains commands for running that service directly and
 
 ## Containers and Ports
 
-The backend is split into three Compose projects under `[deploy/local](deploy/local)`.
+The backend is split into three Compose projects under [`deploy/local`](deploy/local).
 
 
 | Compose project | Container                     | Host port(s)            | Purpose                                              |
@@ -345,9 +345,9 @@ Useful local interfaces:
 ## Prototype Walkthrough
 
 1. Start the backend and frontend as described above.
-2. Open the frontend and deploy `[automobile_design_kei_notarget.bpmn](deploy/examples/automobile_design_kei_notarget.bpmn)`.
+2. Open the frontend and deploy [`automobile_design_kei_notarget.bpmn`](deploy/examples/automobile_design_kei_notarget.bpmn).
 3. Use the returned process-definition key in the start form.
-4. Start an instance with `[transport-demo-start-variables.json](deploy/examples/transport-demo-start-variables.json)`, or the equivalent body:
+4. Start an instance with [`transport-demo-start-variables.json`](deploy/examples/transport-demo-start-variables.json), or the equivalent body:
   ```json
    {
      "caseId": "CASE-001",
@@ -366,9 +366,8 @@ Useful local interfaces:
 
 
 
-## Video Guides
+## Video Guide
 
-A complete video guide going over the main capabilities of the frontend can ve observed below:
+The following recording demonstrates model deployment, process execution, monitoring records, and live frontend updates:
 
-[Watch the Runtime UI video guide](figures/Env_monitoring_system_video_guide .mp4)
-
+[Watch the Runtime UI video guide](figures/Env_monitoring_system_video_guide.mp4)
