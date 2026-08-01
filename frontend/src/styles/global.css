@@ -151,9 +151,9 @@ section {
   font-size: 18px;
 }
 
-.grid-5 {
+.grid-4 {
   display: grid;
-  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
   gap: 14px;
 }
 
@@ -808,7 +808,7 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 1200px) {
-  .grid-5,
+  .grid-4,
   .grid-3,
   .grid-2,
   .filter-bar {

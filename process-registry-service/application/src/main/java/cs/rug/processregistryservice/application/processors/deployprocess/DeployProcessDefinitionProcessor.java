@@ -23,11 +23,11 @@ public class DeployProcessDefinitionProcessor implements DeployProcessDefinition
 
     @Override
     public DeployProcessDefinitionResponse process(DeployProcessDefinitionRequest request) {
-        DeployProcessDefinitionResponse deployProcessDefinitionResponse = workflowEngineCommandClient
-                .deployProcess(request);
-
         List<ElementKeiAnnotations> elementKeiAnnotations = bpmn4esKeiAnnotationParser
                 .parse(request.getBpmnXml());
+
+        DeployProcessDefinitionResponse deployProcessDefinitionResponse = workflowEngineCommandClient
+                .deployProcess(request);
 
         monitoringProcessModelClient.registerProcessModel(
                 deployProcessDefinitionResponse,

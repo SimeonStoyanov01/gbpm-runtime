@@ -20,10 +20,9 @@ export function Dashboard({ records, violations, onOpenInstance }: DashboardProp
   return (
     <section id="dashboard">
       <h2 className="section-title">Dashboard</h2>
-      <div className="grid-5">
+      <div className="grid-4">
         <MetricCard label="Monitoring Records" value={records.length} sub="Persisted KEI results" />
-        <MetricCard label="Violated Evaluations" value={violatedRecords.length} sub="Results outside their targets" />
-        <MetricCard label="Active Violations" value={violations.length} sub="Queryable violation projection" />
+        <MetricCard label="Detected Violations" value={violatedRecords.length} sub="Results outside their targets" />
         <MetricCard
           label="Latest Process Instance"
           value={latestRecord?.bpmnProcessId || '-'}
